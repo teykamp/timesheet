@@ -1,4 +1,4 @@
-### Timesheet
+# Timesheet
 Timesheet tracking for employees and managers
 
 
@@ -39,7 +39,7 @@ Manager
 ```
 
 ## Description:
-# User:
+### User:
 Properties: 
   userId (use the unique identifier from Google OAuth, often called sub), 
   username (optional, as it may not be provided by Google),
@@ -47,7 +47,8 @@ Properties:
   timesheets (list of user's timesheets)
 Relationships:
   One user can have multiple timesheets.
-# Timesheet:
+
+### Timesheet:
 Properties: 
   timesheetId, 
   userId (foreign key), 
@@ -59,7 +60,7 @@ Relationships:
   One timesheet has multiple entries (representing hours worked on different projects on different days).
   One timesheet is associated with one manager (managerId).
 
-# TimesheetEntry:
+### TimesheetEntry:
 Properties: 
   entryId, 
   timesheetId (foreign key), 
@@ -72,7 +73,7 @@ Relationships:
   One entry is associated with one project.
 This might be compressed into timesheet, as it is probably not needed.
 
-# Project:
+### Project:
 Properties: 
   projectId, 
   projectName, 
@@ -80,7 +81,7 @@ Properties:
 Relationships:
   One project can be associated with multiple entries in different timesheets.
 
-# Manager:
+### Manager:
 Properties: 
   managerId, 
   name, 
