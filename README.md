@@ -63,6 +63,7 @@ Manager
     - One timesheet is associated with one manager (managerId).
 
 ### TimesheetEntry:
+This might be compressed into timesheet, as it is probably not needed.
 - **Properties:**
     - entryId
     - timesheetId (foreign key)
@@ -74,7 +75,6 @@ Manager
 - **Relationships:**
     - One entry belongs to one timesheet.
     - One entry is associated with one project.  
-This might be compressed into timesheet, as it is probably not needed.
 
 ### Project:
 - **Properties:**
