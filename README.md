@@ -73,8 +73,8 @@ Manager
 
 - **Relationships:**
     - One entry belongs to one timesheet.
-    - One entry is associated with one project.
-    - This might be compressed into timesheet, as it is probably not needed.
+    - One entry is associated with one project.  
+This might be compressed into timesheet, as it is probably not needed.
 
 ### Project:
 - **Properties:**
