@@ -9,7 +9,6 @@ User
 |-- userId (Google's unique identifier, often 'sub' from the OAuth response)
 |-- username (optional, might not be provided by Google)
 |-- email (user's email address from Google OAuth)
-|-- isManager
 |-- timesheets []
 
 Timesheet
@@ -30,6 +29,12 @@ TimesheetEntry
 Project
 |-- projectId
 |-- projectName
+
+Manager
+|-- managerId
+|-- name
+|-- email
+|-- timesheets []
 ```
 
 ## Description:
@@ -39,7 +44,6 @@ Project
     - userId (use the unique identifier from Google OAuth, often called sub)
     - username (optional, as it may not be provided by Google)
     - email (the user's email address from Google OAuth)
-    - isManager
     - timesheets (list of user's timesheets)
 
 - **Relationships:**
