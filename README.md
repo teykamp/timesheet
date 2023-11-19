@@ -6,7 +6,6 @@ Timesheet tracking for employees and managers
 
 ```text
 User
-
 |-- userId (Google's unique identifier, often 'sub' from the OAuth response)
 |-- username (optional, might not be provided by Google)
 |-- email (user's email address from Google OAuth)
@@ -94,5 +93,37 @@ Aliases
 CREATE TABLE Project (
     projectId INT PRIMARY KEY,
     projectName VARCHAR(255) NOT NULL
+);
+```
+- Setting up timesheetEntries table
+```SQL
+CREATE TABLE TimesheetEntry (
+    entryId INT PRIMARY KEY,
+    timesheetId INT,
+    projectId INT,
+    hoursWorked INT,
+    date DATE,
+    FOREIGN KEY (timesheetId) REFERENCES Timesheet(timesheetId),
+    FOREIGN KEY (projectId) REFERENCES Project(projectId)
+);
+```
+- Setting up the timesheets table
+```SQL
+CREATE TABLE Timesheet (
+    timesheetId INT PRIMARY KEY,
+    userId INT,
+    endDate DATE,
+    FOREIGN KEY (userId) REFERENCES User(userId)
+);
+```
+- Setting up the users table
+```SQL
+CREATE TABLE User (
+    userId VARCHAR(255) PRIMARY KEY,
+    username VARCHAR(255),
+    email VARCHAR(255) NOT NULL,
+    managerId VARCHAR(255),
+    isManager BOOLEAN,
+    FOREIGN KEY (managerId) REFERENCES User(userId)
 );
 ```
