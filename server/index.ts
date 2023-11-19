@@ -6,8 +6,17 @@ const app = express();
 app.use(express.json());
 dotenv.config();
 
-var conString = process.env.DB_CONNECTION_URL
-var client = new pg.Client(conString);
+const conString = process.env.DB_CONNECTION_URL;
+const client = new pg.Client(conString);
+
+const queriesRoute = require('./queries');
+app.use('/api', queriesRoute);
+
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Hello World!'
+  });
+});
 
 client.connect((err) => {
   if (err) {
@@ -17,12 +26,12 @@ client.connect((err) => {
     if (err) {
       return console.error('error running query', err);
     }
-    console.log(result);
+    console.log(result.rows);
     client.end();
   });
 });
 
-
-app.listen(3000, () => {
-  console.log('Server is listening on port 2000. Ready to accept requests!');
+const PORT = process.env.PORT || 3000; // Use the provided PORT or default to 3000
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}. Ready to accept requests!`);
 });
