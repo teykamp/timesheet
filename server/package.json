@@ -2,13 +2,12 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec ts-node ./index.ts",
-    "build": "tsc -p .",
-    "watch": "tsc -w"
+    "dev": "nodemon --exec ts-node index.ts",
+    "start": "node index.js",
+    "build": "tsc -p ."
   },
   "keywords": [],
   "author": "",
