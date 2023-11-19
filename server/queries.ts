@@ -1,40 +1,42 @@
 import express from 'express';
-import { Pool } from 'pg';
+import { Pool, QueryResult } from 'pg';
 
 const router = express.Router();
-const conString = process.env.DB_CONNECTION_URL;
 const pool = new Pool({
-  connectionString: conString,
+  connectionString: process.env.DB_CONNECTION_URL,
 });
 
-/*
-  PROJECTS
-*/
+async function handleQuery(
+  res: express.Response,
+  queryText: string,
+  queryParams?: any[]
+): Promise<QueryResult | undefined> {
+  try {
+    const client = await pool.connect();
+    const result = await client.query(queryText, queryParams);
+    return result;
+  } catch (error) {
+    res.status(500).json({ error: 'Database error' });
+  }
+}
 
 // GET all projects
 router.get('/projects', async (req, res) => {
-  try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT * FROM project');
+  const result = await handleQuery(res, 'SELECT * FROM project');
+  if (result) {
     res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: 'Error running the query' });
   }
 });
 
 // GET specific project
 router.get('/projects/:projectId', async (req, res) => {
   const { projectId } = req.params;
-  try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT * FROM project WHERE projectId = $1', [projectId]);
+  const result = await handleQuery(res, 'SELECT * FROM project WHERE projectId = $1', [projectId]);
+  if (result) {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Project not found' });
     }
-
     res.json(result.rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: 'Error retrieving project from the database' });
   }
 });
 
@@ -46,12 +48,33 @@ router.post('/projects', async (req, res) => {
     return res.status(400).json({ error: 'Project name is required' });
   }
 
-  try {
-    const client = await pool.connect();
-    const result = await client.query('INSERT INTO project (projectName) VALUES ($1) RETURNING *', [projectName]);
+  const result = await handleQuery(res, 'INSERT INTO project (projectName) VALUES ($1) RETURNING *', [projectName]);
+  if (result) {
     res.status(201).json(result.rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: 'Error inserting project into the database' });
+  }
+});
+
+// DELETE a project by projectId
+router.delete('/projects/:projectId', async (req, res) => {
+  const { projectId } = req.params;
+
+  const result = await handleQuery(res, 'DELETE FROM project WHERE projectId = $1 RETURNING *', [projectId]);
+  if (result) {
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+    res.json(result.rows[0]);
+  }
+});
+
+// DELETE all projects
+router.delete('/projects', async (req, res) => {
+  const result = await handleQuery(res, 'DELETE FROM project RETURNING *');
+  if (result) {
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No projects found' });
+    }
+    res.json(result.rows);
   }
 });
 
@@ -60,113 +83,6 @@ export = router;
 
 
 
-
-// import express from 'express';
-// import pg from 'pg';
-
-// const router = express.Router();
-// const conString = process.env.DB_CONNECTION_URL;
-// const client = new pg.Client(conString);
-
-// /*
-//   PROJECTS
-// */
-
-// // get all projects
-// router.get('/projects', (req, res) => {
-//   client.connect((err) => {
-//     if (err) {
-//       return res.status(500).json({ error: 'Could not connect to the database' });
-//     }
-
-//     client.query('SELECT * FROM project', (err, result) => {
-//       if (err) {
-//         client.end();
-//         return res.status(500).json({ error: 'Error running the query' });
-//       }
-
-//       res.json(result.rows);
-//       client.end();
-//     });
-//   });
-// });
-
-// // POST a project
-// router.post('/projects', async (req, res) => {
-//   const { projectName } = req.body;
-
-//   if (!projectName) {
-//     return res.status(400).json({ error: 'Project name is required' });
-//   }
-
-//   try {
-//     await client.connect();
-//     const result = await client.query('INSERT INTO project (projectName) VALUES ($1) RETURNING *', [projectName]);
-//     res.status(201).json(result.rows[0]);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error inserting project into the database' });
-//   } finally {
-//     await client.end();
-//   }
-// });
-
-// // GET a project by projectId
-// router.get('/projects/:projectId', async (req, res) => {
-//   const { projectId } = req.params;
-
-//   try {
-//     await client.connect();
-//     const result = await client.query('SELECT * FROM project WHERE projectId = $1', [projectId]);
-
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ error: 'Project not found' });
-//     }
-
-//     res.json(result.rows[0]);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error retrieving project from the database' });
-//   } finally {
-//     await client.end();
-//   }
-// });
-
-// // DELETE a project by projectId
-// router.delete('/projects/:projectId', async (req, res) => {
-//   const { projectId } = req.params;
-
-//   try {
-//     await client.connect();
-//     const result = await client.query('DELETE FROM project WHERE projectId = $1 RETURNING *', [projectId]);
-
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ error: 'Project not found' });
-//     }
-
-//     res.json(result.rows[0]);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error deleting project from the database' });
-//   } finally {
-//     await client.end();
-//   }
-// });
-
-// // DELETE all projects
-// router.delete('/projects', async (req, res) => {
-//   try {
-//     await client.connect();
-//     const result = await client.query('DELETE FROM project RETURNING *');
-
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ error: 'No projects found' });
-//     }
-
-//     res.json(result.rows);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Error deleting projects from the database' });
-//   } finally {
-//     await client.end();
-//   }
-// });
 
 // /*
 //   TIMESHEETS
