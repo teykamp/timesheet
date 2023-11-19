@@ -200,12 +200,122 @@ router.delete('/timesheets', async (req, res) => {
   }
 });
 
-// post a timesheetEntry
-// get a timesheetEntry
-// get all timesheetEntries
-// delete a timesheetEntry
-// delete all timesheetEntries
-// update a timesheetEntry
+/*
+  TIMESHEETENTRIES
+*/
+
+// POST a timesheetEntry
+router.post('/timesheetEntries', async (req, res) => {
+  const { timesheetID, entryID, projectID, hoursWorked, Date } = req.body;
+
+  try {
+    await client.connect();
+    const result = await client.query(
+      'INSERT INTO timesheetEntry (timesheetID, entryID, projectID, hoursWorked, Date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [timesheetID, entryID, projectID, hoursWorked, Date]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Error inserting timesheetEntry into the database' });
+  } finally {
+    await client.end();
+  }
+});
+
+// GET a timesheetEntry by entryID
+router.get('/timesheetEntries/:entryID', async (req, res) => {
+  const { entryID } = req.params;
+
+  try {
+    await client.connect();
+    const result = await client.query('SELECT * FROM timesheetEntry WHERE entryID = $1', [entryID]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'TimesheetEntry not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving timesheetEntry from the database' });
+  } finally {
+    await client.end();
+  }
+});
+
+// GET all timesheetEntries
+router.get('/timesheetEntries', async (req, res) => {
+  try {
+    await client.connect();
+    const result = await client.query('SELECT * FROM timesheetEntry');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving timesheetEntries from the database' });
+  } finally {
+    await client.end();
+  }
+});
+
+// DELETE a timesheetEntry by entryID
+router.delete('/timesheetEntries/:entryID', async (req, res) => {
+  const { entryID } = req.params;
+
+  try {
+    await client.connect();
+    const result = await client.query('DELETE FROM timesheetEntry WHERE entryID = $1 RETURNING *', [entryID]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'TimesheetEntry not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting timesheetEntry from the database' });
+  } finally {
+    await client.end();
+  }
+});
+
+// DELETE all timesheetEntries
+router.delete('/timesheetEntries', async (req, res) => {
+  try {
+    await client.connect();
+    const result = await client.query('DELETE FROM timesheetEntry RETURNING *');
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No timesheetEntries found' });
+    }
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting timesheetEntries from the database' });
+  } finally {
+    await client.end();
+  }
+});
+
+// UPDATE a timesheetEntry by entryID
+router.put('/timesheetEntries/:entryID', async (req, res) => {
+  const { entryID } = req.params;
+  const { timesheetID, projectID, hoursWorked, Date } = req.body;
+
+  try {
+    await client.connect();
+    const result = await client.query(
+      'UPDATE timesheetEntry SET timesheetID = $1, projectID = $2, hoursWorked = $3, Date = $4 WHERE entryID = $5 RETURNING *',
+      [timesheetID, projectID, hoursWorked, Date, entryID]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'TimesheetEntry not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating timesheetEntry in the database' });
+  } finally {
+    await client.end();
+  }
+});
 
 // post a user
 // get a user
