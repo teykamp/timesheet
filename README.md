@@ -87,3 +87,12 @@ Aliases
     - alias (string) 
 - **Relationships**
     - one alias is associated with one project for one user
+
+ ## Database Setup Queries
+- Setting up projects table
+```SQL
+CREATE TABLE Project (
+    projectId INT PRIMARY KEY,
+    projectName VARCHAR(255) NOT NULL
+);
+```
