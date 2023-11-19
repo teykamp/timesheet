@@ -5,6 +5,7 @@ const router = express.Router();
 const conString = process.env.DB_CONNECTION_URL;
 const client = new pg.Client(conString);
 
+// get all projects
 router.get('/projects', (req, res) => {
   client.connect((err) => {
     if (err) {
@@ -22,5 +23,33 @@ router.get('/projects', (req, res) => {
     });
   });
 });
+
+// post a project
+// get a project
+// delete a project
+// delete all projects
+
+// post a timesheet
+// get a timesheet
+// get all timesheets
+// delete a timesheet
+// delete all timesheets
+
+// post a timesheetEntry
+// get a timesheetEntry
+// get all timesheetEntries
+// delete a timesheetEntry
+// delete all timesheetEntries
+// update a timesheetEntry
+
+// post a user
+// get a user
+// get all users
+// delete a user
+// delete all users
+// get all managers
+// get all users of a manager
+// update user's manager
+// update user's manager status
 
 export = router;
