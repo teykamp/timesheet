@@ -1,0 +1,25 @@
+LIGHT MODE
+
+Universal:
+Background: FFFFFF
+Hovered/Active Text: 000000
+Inactive Items: DEDEDE
+Dividing Lines: DEDEDE
+Text Field Frames: DEDEDE
+Links: 3B97FC
+
+Regular Users:
+Button Primary: 3B97FC
+Button Secondary: 0F63CA
+Button Text: FFFFFF
+
+Administrators:
+Button Primary: 24C834
+Button Secondary: 1D9E2B
+Button Text: FFFFFF
+Approve: 24C834
+Reject: FF2E2E
+Approved Primary: 1D9E2B
+Approved Secondary: 9DF2A7
+Rejected Primary: BB0000
+Rejected Secondary: FF8888
