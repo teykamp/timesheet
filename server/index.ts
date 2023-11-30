@@ -12,7 +12,8 @@ dotenv.config();
 
 const { OAuth2 } = google.auth;
 const { GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET } = process.env;
-const redirectUri = process.env.NODE_ENV ? 'prodURL' : 'http://localhost:5177/auth';
+// const redirectUri = process.env.NODE_ENV ? 'produrl' : 'http://localhost:5174';
+const redirectUri = 'http://localhost:5174'
 module.exports.redirectUri = redirectUri;
 
 const scope = [
