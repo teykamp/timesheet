@@ -17,7 +17,7 @@ const scope = [
   'https://www.googleapis.com/auth/userinfo.email',
 ]
 
-const getGoogleProfileData = async (accessToken) => {
+const getGoogleProfileData = async (accessToken: any) => {
   try {
     const auth = new OAuth2(
       GOOGLE_OAUTH_CLIENT_ID,
@@ -53,6 +53,7 @@ const queriesRoute = require('./queries');
 app.use('/api', queriesRoute);
 
 app.get('/api/auth/url', (req, res) => {
+  console.log('test')
   res.json({ url: getAuthUrl() });
 }); // redirect to ths url to login
 
@@ -66,10 +67,11 @@ app.get('/api/auth/:authCode', async (req, res) => {
     );
     const { tokens } = await auth.getToken(authCode);
     const { access_token: accessToken } = tokens;
-
-    // respond with some shit, probabily the access token
+    
+    res.json({
+      access_token: accessToken
+    })
   } catch (e) {
-    // this tells the caller that their code is a load of bullshit and to fuck their mo with it
     res.json({
       error: 'INVALID AUTH CODE'
     });
@@ -78,7 +80,7 @@ app.get('/api/auth/:authCode', async (req, res) => {
 
 app.get('/api/user', async (req, res) => {
   const { authorization } = req.headers;
-  const accessToken = authorization.split(' ')[1];
+  const accessToken = authorization?.split(' ')[1];
 
   try {
     const userProfile = await getGoogleProfileData(accessToken);
