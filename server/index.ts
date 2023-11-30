@@ -1,10 +1,13 @@
 import dotenv from 'dotenv';
 import express from 'express';
 
+const cors = require('cors');
+
 const { google } = require('googleapis');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 dotenv.config();
 
 const { OAuth2 } = google.auth;
@@ -53,7 +56,6 @@ const queriesRoute = require('./queries');
 app.use('/api', queriesRoute);
 
 app.get('/api/auth/url', (req, res) => {
-  console.log('test')
   res.json({ url: getAuthUrl() });
 }); // redirect to ths url to login
 
