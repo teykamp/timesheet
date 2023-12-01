@@ -9,34 +9,39 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import axios from 'axios'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-const userProfile = ref(null);
+const userProfile = ref(null)
 
 const redirectToGoogleAuth = async () => {
   try {
-    const response = await axios.get('api/auth/url');
-    const authUrl = response.data.url;
-    window.location.href = authUrl;
+    const response = await axios.get('api/auth/url')
+    const authUrl = response.data.url
+    window.open(authUrl, '_blank')
   } catch (error) {
-    console.error('Error fetching authentication URL', error.response.data);
+    console.error('Error fetching authentication URL', error.response.data)
   }
-};
+}
 
 onMounted(async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const authCode = urlParams.get('code')
+  const route = useRoute();
+  const authCode = route.query.code;
 
-  if (authCode) {
+  if (typeof(authCode) === 'string') {
     try {
-      const response = await axios.get(`api/auth/${authCode}`);
+      const url = `/api/auth/${encodeURIComponent(authCode)}`;
+      const response = await axios.get(url);
+
       const accessToken = response.data.access_token;
 
       try {
-        const profileResponse = await axios.get('api/user', {
+        // Use the access token to fetch user profile data
+        const profileResponse = await axios.get('/api/user', {
           headers: { Authorization: `Bearer ${accessToken}` }
         });
+
         userProfile.value = profileResponse.data.profileData;
       } catch (error) {
         console.error('Error fetching user profile data', error.response.data);
