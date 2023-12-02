@@ -19,7 +19,7 @@ const redirectToGoogleAuth = async () => {
   try {
     const response = await axios.get('api/auth/url')
     const authUrl = response.data.url
-    window.open(authUrl, '_blank')
+    window.location.href = authUrl
   } catch (error) {
     console.error('Error fetching authentication URL', error.response.data)
   }
