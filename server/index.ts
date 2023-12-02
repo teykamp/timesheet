@@ -87,11 +87,9 @@ app.get('/api/user', async (req, res) => {
 
   try {
     const userProfile = await getGoogleProfileData(accessToken);
-    const userEmail = await 1 + 1 // actual call here
     res.json({
       profileData: {
         ...userProfile,
-        userEmail
       }
     });
   } catch (e) {
