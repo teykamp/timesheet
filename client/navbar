@@ -1,0 +1,86 @@
+<script setup>
+import { ref } from 'vue'
+</script>
+
+<style>
+.navbar {
+  list-style-type: none;
+  font-family: Arial;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.navbar li {
+  float: left;
+}
+
+li a, .dropbtn {
+  display: inline-block;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover, .dropdown:hover .dropbtn {
+  background-color: #dedede;
+}
+
+li.dropdown {
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {background-color: #dedede;}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+#divfont {
+  font-family: Arial;
+  font-size: 15px;
+  color: black;
+}
+</style>
+
+<template>
+<ul class=navbar>
+  <li><a href="home.html">Home</a></li>
+  
+  <li><a href="expenses.html">Expenses</a></li>
+
+  <li><a href="timesheets.html">Timesheets</a></li>
+
+  <li><a href="timesheets.html">Approvals</a></li>
+  
+  <li class="dropdown">
+    <a href="profile" class="dropbtn">O</a>
+    <div class="dropdown-content">
+      <a href="#">Link 1</a>
+      <a href="#">Link 2</a>
+      <a href="#">Link 3</a>
+      </div>
+  </li>
+  
+</ul>
+</template>
