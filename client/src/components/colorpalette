@@ -6,13 +6,14 @@ export const useColorPalette = defineStore('colors',{
 		black: '#000000',
 		gray: '#dedede',
 		blue: '#3b97fc',
-		darkblue: '#0f63ca',
+		blueshadow: '#0f63ca',
 		green: '#24c834',
-		darkgreen: '#1d9e2b',
-		lightgreen: '#9df2a7'
+		greenshadow: '#1d9e2b',
+		greeninner: '#9df2a7'
+		greenouter: '#1d9e2b',
 		red: '#ff2e2e',
-		darkred: '#bb0000',
-		lightred: '#ff8888'
+		redinner: '#ff8888',
+		redouter: '#bb0000'
 	})
 	actions: {
 	}		
