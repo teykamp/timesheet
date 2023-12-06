@@ -1,9 +1,28 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-</script>
-
 <template>
   <v-app>
     <RouterView />
+    <v-snackbar 
+      v-model="snackbar.show" 
+      :timeout="3000" 
+      :color="snackbar.color"
+      style="font-family: Roboto Slab;"
+    >{{ snackbar.text }}</v-snackbar>
+    <v-dialog
+      v-model="dialog.show"
+      width="auto"
+    >
+      <Dialog />
+    </v-dialog>
   </v-app>
 </template>
+
+<script setup lang="ts">
+import { RouterView } from 'vue-router'
+
+import Dialog from './components/Dialog.vue';
+
+import { useSnackbar, useDialog } from './stores/useUserInterface'
+
+const snackbar = useSnackbar()
+const dialog = useDialog()
+</script>
