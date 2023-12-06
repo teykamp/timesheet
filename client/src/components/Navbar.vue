@@ -6,11 +6,12 @@
     >
       <div v-if="smAndUp">
         <v-btn 
-          v-for="route in router.getRoutes()"
-          :key="route.path"
-          @click="navLinkClick(route)"
+          v-for="localRoute in router.getRoutes()"
+          :key="localRoute.path"
+          @click="navLinkClick(localRoute)"
+          :style="{ background: localRoute.path === currentRoute ? blueShadow : '' }"
         >
-          {{ route.name }}
+          {{ localRoute.name }}
         </v-btn>
       </div>
     </v-card>
@@ -46,7 +47,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 import { useDisplay } from 'vuetify'
@@ -56,6 +58,10 @@ const { smAndDown, smAndUp } = useDisplay()
 const { blueShadow } = useColorPalette()
 
 const router = useRouter()
+const route = useRoute()
+const currentRoute = computed(() => {
+  return route.path
+})
 
 const navLinkClick = (route: RouteRecordRaw) => {
   router.push(route.path)
