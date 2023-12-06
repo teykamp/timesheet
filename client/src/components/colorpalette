@@ -1,0 +1,20 @@
+import { defineStore }
+
+export const useColorPalette = defineStore('colors',{
+	state: () => ({
+		white: '#ffffff',
+		black: '#000000',
+		gray: '#dedede',
+		blue: '#3b97fc',
+		blueshadow: '#0f63ca',
+		green: '#24c834',
+		greenshadow: '#1d9e2b',
+		greeninner: '#9df2a7'
+		greenouter: '#1d9e2b',
+		red: '#ff2e2e',
+		redinner: '#ff8888',
+		redouter: '#bb0000'
+	})
+	actions: {
+	}		
+})
