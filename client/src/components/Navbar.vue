@@ -2,14 +2,18 @@
   <div>
     <v-card
       elevation="1"
-      class="h-20 rounded-0"
+      class="h-16 rounded-0"
     >
-      <div v-if="smAndUp">
+      <div 
+        v-if="smAndUp"
+      >
         <v-btn 
           v-for="localRoute in router.getRoutes()"
           :key="localRoute.path"
           @click="navLinkClick(localRoute)"
-          :style="{ background: localRoute.path === currentRoute ? blueShadow : '' }"
+          flat
+          class="ma-2"
+          :style="{ background: localRoute.path === currentRoute ? gray : '' }"
         >
           {{ localRoute.name }}
         </v-btn>
@@ -55,7 +59,7 @@ import { useDisplay } from 'vuetify'
 import { useColorPalette } from '../stores/useUserInterface'
 
 const { smAndDown, smAndUp } = useDisplay()
-const { blueShadow } = useColorPalette()
+const { gray } = useColorPalette()
 
 const router = useRouter()
 const route = useRoute()
