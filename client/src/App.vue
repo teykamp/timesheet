@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <NavBar />
     <RouterView />
     <v-snackbar 
       v-model="snackbar.show" 
@@ -19,7 +20,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 
-import Dialog from './components/Dialog.vue';
+import Dialog from './components/Dialog.vue'
+import NavBar from './components/Navbar.vue'
 
 import { useSnackbar, useDialog } from './stores/useUserInterface'
 
