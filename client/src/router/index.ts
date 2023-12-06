@@ -19,13 +19,13 @@ const router = createRouter({
     },
     {
       path: '/expense',
-      name: 'timesheet',
-      component: HomeView
+      name: 'expense',
+      component: ExpenseView
     },
     {
       path: '/admin',
       name: 'admin',
-      component: HomeView
+      component: AdminView
     },
   ]
 })
