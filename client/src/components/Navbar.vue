@@ -4,8 +4,37 @@
       elevation="1"
       class="h-16 rounded-0 d-flex align-center"
     >
+      <v-avatar v-if="smAndUp"
+        class="mx-10"
+        size="x-large"
+        color="info"
+        icon="mdi-clock-outline"
+      >
+      </v-avatar>
+      <v-btn
+        v-if="xs"
+        @click="showDrawer = !showDrawer"
+        class="ml-4"
+        flat
+        icon="mdi-menu">
+      </v-btn>
+      
+      <Teleport to="body">
+        <v-navigation-drawer
+          v-model="showDrawer"
+          location="bottom"
+          temporary
+        >
+          <v-list-item title="My Application" subtitle="Vuetify"></v-list-item>
+          <v-divider></v-divider>
+          <v-list-item link title="List Item 1"></v-list-item>
+          <v-list-item link title="List Item 2"></v-list-item>
+          <v-list-item link title="List Item 3"></v-list-item>
+        </v-navigation-drawer>
+      </Teleport>
+
       <div 
-        v-if="smAndUp"
+        v-if="mdAndUp"
       >
         <v-btn 
           v-for="localRoute in router.getRoutes()"
@@ -39,53 +68,99 @@
           color: textPrimary,
         }"
       ></v-btn>
-      <v-avatar class="mx-4 mr-8">
-        <v-img
-          src="https://cdn.vuetifyjs.com/images/john.jpg"
-          alt=""
-        ></v-img>
-      </v-avatar>
+
+      <v-menu
+        v-model="showProfileMenu"
+        :close-on-content-click="false"
+        location="end"
+      >
+      <!-- this should create a dialog from the bottom on mobile -->
+        <template v-slot:activator="{ props }">
+          <v-btn
+            icon
+            flat 
+            v-bind="props"
+            class="mx-4 mr-8"
+          >
+            <v-avatar>
+              <v-img
+                src="https://cdn.vuetifyjs.com/images/john.jpg"
+                alt=""
+              ></v-img>
+            </v-avatar>
+          </v-btn>
+        </template>
+
+        <!-- menuBox -->
+        <v-card min-width="300">
+          <v-list>
+            <v-list-item
+              prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
+              title="John Leider"
+              subtitle="Founder of Vuetify"
+            >
+              <template v-slot:append>
+                <v-btn
+                  variant="text"
+                  icon="mdi-heart"
+                ></v-btn>
+              </template>
+            </v-list-item>
+          </v-list>
+
+          <v-divider></v-divider>
+
+          <v-list>
+            <v-list-item>
+              <v-switch
+                color="purple"
+                label="Enable messages"
+                hide-details
+              ></v-switch>
+            </v-list-item>
+
+            <v-list-item>
+              <v-switch
+                color="purple"
+                label="Enable hints"
+                hide-details
+              ></v-switch>
+            </v-list-item>
+          </v-list>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn
+              variant="text"
+              @click="showProfileMenu = false"
+            >
+              Cancel
+            </v-btn>
+            <v-btn
+              color="primary"
+              variant="text"
+              @click="showProfileMenu = false"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-menu>
+      <!-- end menuBox -->
     </v-card>
-      <!-- <ul class=navbar>
-        <li><a href="home.html">Home</a></li>
-      
-        <li><a href="expenses.html">Expenses</a></li>
-      
-        <li><a href="timesheets.html">Timesheets</a></li>
-      
-        <li><a href="timesheets.html">Approvals</a></li>
-      
-        <li class="dropdown">
-          <a href="profile" class="dropbtn">O</a>
-          <div class="dropdown-content">
-            <a href="#">Profile</a>
-            <a href="#">Settings</a>
-            <a href="#">Log Out</a>
-          </div>
-        </li>
-      </ul>
-      <hr> -->
-    <div v-if="smAndDown">
-      <v-navigation-drawer>
-        <v-list-item title="My Application" subtitle="Vuetify"></v-list-item>
-        <v-divider></v-divider>
-        <v-list-item link title="List Item 1"></v-list-item>
-        <v-list-item link title="List Item 2"></v-list-item>
-        <v-list-item link title="List Item 3"></v-list-item>
-      </v-navigation-drawer>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 import { useDisplay } from 'vuetify'
 import { useColorPalette } from '../stores/useUserInterfaceStore'
 
-const { smAndDown, smAndUp } = useDisplay()
+const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
 
 const router = useRouter()
@@ -97,79 +172,7 @@ const currentRoute = computed(() => {
 const navLinkClick = (route: RouteRecordRaw) => {
   router.push(route.path)
 }
+
+const showProfileMenu = ref(false)
+const showDrawer = ref(false)
 </script>
-
-<style scoped>
-.navbar {
-  list-style-type: none;
-  font-family: Arial;
-  font-weight: bold;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #ffffff;
-}
-
-.navbar li {
-  float: left;
-}
-
-li a,
-.dropbtn {
-  display: inline-block;
-  color: black;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-
-li a:hover,
-.dropdown:hover .dropbtn {
-  background-color: #dedede;
-}
-
-li.dropdown {
-  display: inline-block;
-  float: right;
-  direction: rtl;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #ffffff;
-  min-width: 100px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  text-align: right;
-}
-
-.dropdown-content a:hover {
-  background-color: #dedede;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-#divfont {
-  font-family: Arial;
-  font-size: 15px;
-  color: black;
-}
-
-hr {
-  height: 2px;
-  border: none;
-  background-color: #dedede;
-  margin-top: 0px
-}
-</style>
-../stores/useUserInterfaceStore

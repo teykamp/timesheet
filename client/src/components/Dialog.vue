@@ -1,4 +1,5 @@
 <template>
+  <!-- needs to become full width and bottom on mobile -->
   <v-sheet class="pa-5">
     <h1>
       {{ dialog.body.title }}
