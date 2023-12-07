@@ -2,7 +2,7 @@
   <div>
     <v-card
       elevation="1"
-      class="h-16 rounded-0"
+      class="h-16 rounded-0 d-flex align-center"
     >
       <div 
         v-if="smAndUp"
@@ -13,11 +13,38 @@
           @click="navLinkClick(localRoute)"
           flat
           class="ma-2"
-          :style="{ background: localRoute.path === currentRoute ? gray : '' }"
+          :style="{
+            background: localRoute.path === currentRoute ? gray : '',
+            color: localRoute.path === currentRoute ? textSelected : textPrimary, 
+          }"
         >
           {{ localRoute.name }}
         </v-btn>
       </div>
+      <v-spacer>
+      </v-spacer>
+      <v-btn
+        class="mx-4"
+        :style="{ 
+          background: blue, 
+          color: white 
+        }"
+        prepend-icon="mdi-plus"
+      >New</v-btn>
+      <v-btn 
+        size="small" 
+        flat 
+        icon="mdi-bell-outline"
+        :style="{
+          color: textPrimary,
+        }"
+      ></v-btn>
+      <v-avatar class="mx-4 mr-8">
+        <v-img
+          src="https://cdn.vuetifyjs.com/images/john.jpg"
+          alt=""
+        ></v-img>
+      </v-avatar>
     </v-card>
       <!-- <ul class=navbar>
         <li><a href="home.html">Home</a></li>
@@ -59,7 +86,7 @@ import { useDisplay } from 'vuetify'
 import { useColorPalette } from '../stores/useUserInterface'
 
 const { smAndDown, smAndUp } = useDisplay()
-const { gray } = useColorPalette()
+const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
 
 const router = useRouter()
 const route = useRoute()

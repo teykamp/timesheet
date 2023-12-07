@@ -4,6 +4,8 @@ export const useColorPalette = defineStore('colors',{
 	state: () => ({
 		white: '#ffffff',
 		black: '#000000',
+    textPrimary: '#6b7280',
+    textSelected: '#374151',
 		gray: '#dedede',
 		blue: '#3b97fc',
 		blueShadow: '#0f63ca',
