@@ -23,8 +23,8 @@ import { RouterView } from 'vue-router'
 import Dialog from './components/Dialog.vue'
 import NavBar from './components/Navbar.vue'
 
-import { useSnackbar, useDialog } from './stores/useUserInterface'
+import { useSnackbar, useDialog } from './stores/useUserInterfaceStore'
 
 const snackbar = useSnackbar()
 const dialog = useDialog()
-</script>
+</script>./stores/useUserInterfaceStore

@@ -83,7 +83,7 @@ import { useRouter, useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 import { useDisplay } from 'vuetify'
-import { useColorPalette } from '../stores/useUserInterface'
+import { useColorPalette } from '../stores/useUserInterfaceStore'
 
 const { smAndDown, smAndUp } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
@@ -172,3 +172,4 @@ hr {
   margin-top: 0px
 }
 </style>
+../stores/useUserInterfaceStore

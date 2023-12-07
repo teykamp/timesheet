@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDialog } from '../stores/useUserInterface'
+import { useDialog } from '../stores/useUserInterfaceStore'
 
 const dialog = useDialog()
-</script>
+</script>../stores/useUserInterfaceStore
