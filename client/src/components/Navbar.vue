@@ -25,7 +25,7 @@
         <Teleport to="body">
           <v-navigation-drawer
             v-model="showDrawer"
-            location="bottom"
+            location="left"
             temporary
             class="h-75"
           >
