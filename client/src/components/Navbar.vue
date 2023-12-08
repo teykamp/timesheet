@@ -29,30 +29,69 @@
             temporary
             class="h-75"
           >
-          <!-- bell icon only xs -->
-            <v-list-item class="d-flex justify-center mt-6">
-              <v-avatar
-                size="x-large"
-                color="info"
-                icon="mdi-clock-outline"
-              ></v-avatar>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item 
-              v-for="localRoute in router.getRoutes()"
-              :key="localRoute.path"
-              @click="navLinkClick(localRoute)"
-              flat
-              class="my-2 mx-6 rounded-lg"
-              :style="{
-                background: localRoute.path === currentRoute ? gray : '',
-                color: localRoute.path === currentRoute ? textSelected : textPrimary,
-              }"
-            >
-              {{ String(localRoute.name).replace(/^\w/, (c) => c.toUpperCase()) }}
-            </v-list-item>
-            <v-divider></v-divider>
-      
+            <v-list class="mx-6">
+              <v-list-item class="d-flex justify-center my-4">
+                <v-avatar
+                  size="x-large"
+                  color="info"
+                  icon="mdi-clock-outline"
+                ></v-avatar>
+              </v-list-item>
+              <p
+                class="text-overline"
+                :style="{
+                  color: textPrimary,
+                }"
+              >Navigation</p>
+              <v-divider></v-divider>
+              <v-list-item 
+                v-for="localRoute in router.getRoutes()"
+                :key="localRoute.path"
+                @click="navLinkClick(localRoute)"
+                flat
+                class="my-2 rounded-lg"
+                prepend-icon="_"
+                :style="{
+                  background: localRoute.path === currentRoute ? gray : '',
+                  color: localRoute.path === currentRoute ? textSelected : textPrimary,
+                }"
+              >
+                {{ String(localRoute.name).replace(/^\w/, (c) => c.toUpperCase()) }}
+              </v-list-item>
+              <v-divider></v-divider>
+              <p
+                class="text-overline"
+                :style="{
+                  color: textPrimary,
+                }"
+              >Profile</p>
+               <v-list-item 
+                  v-if="xs"
+                  class="my-2"
+                  prepend-icon="mdi-account"
+                  :style="{
+                    color: textPrimary,
+                  }"
+                >Account</v-list-item>
+              <v-list-item 
+                v-if="xs"
+                class="my-2"
+                prepend-icon="mdi-bell"
+                :style="{
+                  color: textPrimary,
+                }"
+              >Notifications</v-list-item>
+             
+              <v-list-item 
+                v-if="xs"
+                class="my-2"
+                prepend-icon="mdi-cog"
+                :style="{
+                  color: textPrimary,
+                }"
+              >Settings</v-list-item>
+            </v-list>
+
           </v-navigation-drawer>
         </Teleport>
       
@@ -76,13 +115,23 @@
         <v-spacer v-if="smAndUp">
         </v-spacer>
         <v-btn
-          class="mx-5"
+          v-if="smAndUp"
+          class="mx-5 w-32"
           :style="{ 
             background: blue, 
             color: white,
           }"
           prepend-icon="mdi-plus"
         >New</v-btn>
+        <v-btn
+          v-else
+          class="mx-5"
+          :style="{ 
+            background: blue, 
+            color: white,
+          }"
+          icon="mdi-plus"
+        ></v-btn>
         <v-btn
           v-if="smAndUp"
           size="small" 
