@@ -106,7 +106,8 @@
             class="ma-2"
             :style="{
               background: localRoute.path === currentRoute ? gray : '',
-              color: localRoute.path === currentRoute ? textSelected : textPrimary, 
+              color: localRoute.path === currentRoute ? textSelected : textPrimary,
+              fontWeight: localRoute.path === currentRoute ? 550 : '',
             }"
           >
             {{ localRoute.name }}
@@ -186,8 +187,8 @@
             <v-list>
               <v-list-item>
                 <v-switch
-                  color="purple"
-                  label="Enable messages"
+                  color="blue"
+                  label="Dark mode"
                   hide-details
                 ></v-switch>
               </v-list-item>
