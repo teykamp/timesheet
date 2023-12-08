@@ -133,7 +133,7 @@
           icon="mdi-plus"
         ></v-btn>
         <v-btn
-          v-if="smAndUp"
+          v-if="smAndUp && googleProfileData.id"
           size="small" 
           flat 
           icon="mdi-bell-outline"
@@ -141,8 +141,15 @@
             color: textPrimary,
           }"
         ></v-btn>
-      
+        <v-btn
+          v-if="googleProfileData.id === ''"
+          flat
+          class="mr-4"
+          prepend-icon="mdi-login"
+        >Log In</v-btn>
+
         <v-menu
+          v-if="googleProfileData.id !== ''"
           v-model="showProfileMenu"
           :close-on-content-click="false"
           location="end"
@@ -157,7 +164,7 @@
             >
               <v-avatar>
                 <v-img
-                  src="https://cdn.vuetifyjs.com/images/john.jpg"
+                  :src="googleProfileData.picture"
                   alt=""
                 ></v-img>
               </v-avatar>
@@ -168,7 +175,7 @@
           <v-card min-width="300">
             <v-list>
               <v-list-item
-                prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
+                :prepend-avatar="googleProfileData.picture"
                 title="John Leider"
                 subtitle="Founder of Vuetify"
               >
@@ -233,9 +240,15 @@ import type { RouteRecordRaw } from 'vue-router'
 
 import { useDisplay } from 'vuetify'
 import { useColorPalette } from '../stores/useUserInterfaceStore'
+import { useGoogleUserData } from '../stores/useDataStore'
 
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
+const { getGoogleUserData } = useGoogleUserData()
+
+const googleProfileData = computed(() => {
+  return getGoogleUserData()
+})
 
 const router = useRouter()
 const route = useRoute()

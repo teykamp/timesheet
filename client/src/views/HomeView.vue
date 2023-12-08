@@ -13,6 +13,10 @@ import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useGoogleUserData } from '../stores/useDataStore'
+
+const googleUserLoginData = useGoogleUserData()
+
 const userProfile = ref(null)
 
 const redirectToGoogleAuth = async () => {
@@ -43,6 +47,9 @@ onMounted(async () => {
         });
 
         userProfile.value = profileResponse.data.profileData;
+        googleUserLoginData.logUserIn({
+          ...profileResponse.data.profileData
+        })
       } catch (error) {
         console.error('Error fetching user profile data', error.response.data);
       }

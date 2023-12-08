@@ -98,15 +98,6 @@ app.get('/api/user', async (req, res) => {
   }
 });
 
-// export type GoogleProfile = {
-//   id: string,
-//   name: string,
-//   given_name: string,
-//   family_name: string,
-//   picture: string,
-//   locale: string
-// }
-
 // DB API
 
 app.get('/api', (req, res) => {
