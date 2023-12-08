@@ -157,7 +157,7 @@
             >
               <v-avatar>
                 <v-img
-                  src="https://cdn.vuetifyjs.com/images/john.jpg"
+                  src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
                   alt=""
                 ></v-img>
               </v-avatar>
@@ -168,14 +168,14 @@
           <v-card min-width="300">
             <v-list>
               <v-list-item
-                prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
-                title="John Leider"
-                subtitle="Founder of Vuetify"
+                prepend-avatar="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+                title="Username"
+                subtitle="Admin"
               >
                 <template v-slot:append>
                   <v-btn
                     variant="text"
-                    icon="mdi-heart"
+                    icon="mdi-cog-outline"
                   ></v-btn>
                 </template>
               </v-list-item>
