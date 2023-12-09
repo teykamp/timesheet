@@ -18,8 +18,6 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
-
 import Dialog from './components/Dialog.vue'
 import NavBar from './components/Navbar.vue'
 
@@ -27,4 +25,4 @@ import { useSnackbar, useDialog } from './stores/useUserInterfaceStore'
 
 const snackbar = useSnackbar()
 const dialog = useDialog()
-</script>./stores/useUserInterfaceStore
+</script>
