@@ -69,7 +69,7 @@ export const useGoogleUserData = defineStore('googleUserData',{
       }
     },
 
-    async getGoogleProfileData() {
+    async getGoogleProfileDataFromGoogle() {
       const route = useRoute()
       const authCode = route.query.code
 

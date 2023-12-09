@@ -7,9 +7,9 @@
 import { ref, onMounted } from 'vue'
 import { useGoogleUserData } from '../stores/useDataStore'
 
-const { redirectToGoogleAuth, getGoogleProfileData } = useGoogleUserData()
+const { redirectToGoogleAuth, getGoogleProfileDataFromGoogle } = useGoogleUserData()
 
 onMounted(() => {
-  getGoogleProfileData()
+  getGoogleProfileDataFromGoogle()
 })
 </script>
