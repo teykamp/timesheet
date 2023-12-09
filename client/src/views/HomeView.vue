@@ -4,10 +4,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useGoogleUserData } from '../stores/useDataStore'
 
-const { redirectToGoogleAuth, getGoogleProfileDataFromGoogle } = useGoogleUserData()
+const { getGoogleProfileDataFromGoogle } = useGoogleUserData()
 
 onMounted(() => {
   getGoogleProfileDataFromGoogle()

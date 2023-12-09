@@ -90,6 +90,13 @@
                   color: textPrimary,
                 }"
               >Settings</v-list-item>
+              <v-list-item
+                @click="handleNavDrawerLogInOutClick()"
+                :style="{
+                  color: textPrimary
+                }"
+                :prepend-icon="googleProfileData.id ==='' ? 'mdi-login' : 'mdi-logout'"
+              >{{ `Log ${googleProfileData.id === '' ? 'In' : 'Out'}` }}</v-list-item>
             </v-list>
 
           </v-navigation-drawer>
@@ -173,58 +180,44 @@
           </template>
       
           <!-- menuBox -->
-          <v-card min-width="300">
+          <v-card
+            class="pa-4" 
+            :style="{
+              width: '300px'
+            }"
+          >
             <v-list>
               <v-list-item
                 :prepend-avatar="googleProfileData.picture"
-                title="John Leider"
-                subtitle="Founder of Vuetify"
+                :title="googleProfileData.name"
               >
                 <template v-slot:append>
-                  <v-btn
-                    variant="text"
-                    icon="mdi-heart"
-                  ></v-btn>
-                </template>
+                    <v-btn
+                      flat
+                      icon="mdi-cog"
+                    ></v-btn>
+                  </template>
               </v-list-item>
+              <v-list-item>
+                <v-switch
+                  color="purple"
+                  label="Stay Logged In"
+                  ></v-switch>
+              </v-list-item>
+
             </v-list>
-      
             <v-divider></v-divider>
-      
-            <v-list>
-              <v-list-item>
-                <v-switch
-                  color="purple"
-                  label="Enable messages"
-                  hide-details
-                ></v-switch>
-              </v-list-item>
-      
-              <v-list-item>
-                <v-switch
-                  color="purple"
-                  label="Enable hints"
-                  hide-details
-                ></v-switch>
-              </v-list-item>
-            </v-list>
-      
             <v-card-actions>
+              <v-btn
+                @click="showProfileMenu = false, logUserOut()"
+                variant="text"
+                prepend-icon="mdi-logout"
+              >Log Out</v-btn>
               <v-spacer></v-spacer>
-      
               <v-btn
                 variant="text"
                 @click="showProfileMenu = false"
-              >
-                Cancel
-              </v-btn>
-              <v-btn
-                color="primary"
-                variant="text"
-                @click="showProfileMenu = false"
-              >
-                Save
-              </v-btn>
+              >Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-menu>
@@ -245,7 +238,7 @@ import { useGoogleUserData } from '../stores/useDataStore'
 
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
-const { getGoogleUserData, redirectToGoogleAuth } = useGoogleUserData()
+const { getGoogleUserData, redirectToGoogleAuth, logUserOut } = useGoogleUserData()
 
 const googleProfileData = computed(() => {
   return getGoogleUserData()
@@ -263,4 +256,8 @@ const navLinkClick = (route: RouteRecordRaw) => {
 
 const showProfileMenu = ref(false)
 const showDrawer = ref(false)
+
+const handleNavDrawerLogInOutClick = () => {
+  googleProfileData.value.id === '' ? redirectToGoogleAuth() : logUserOut()
+}
 </script>
