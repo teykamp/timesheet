@@ -1,4 +1,7 @@
 import { defineStore } from 'pinia'
+import { useRoute } from 'vue-router'
+import axios from 'axios'
+
 
 export type GoogleProfile = {
   id: string,
@@ -54,6 +57,44 @@ export const useGoogleUserData = defineStore('googleUserData',{
         family_name: this.family_name,
         picture: this.picture,
         locale: this.locale
+      }
+    },
+    async redirectToGoogleAuth() {
+      try {
+        const response = await axios.get('api/auth/url')
+        const authUrl = response.data.url
+        window.location.href = authUrl
+      } catch (error) {
+        console.error('Error fetching authentication URL', error.response.data)
+      }
+    },
+
+    async getGoogleProfileData() {
+      const route = useRoute()
+      const authCode = route.query.code
+
+      if (typeof(authCode) === 'string') {
+        try {
+          const url = `/api/auth/${encodeURIComponent(authCode)}`
+          const response = await axios.get(url)
+
+          const accessToken = response.data.access_token;
+
+          try {
+            // Use the access token to fetch user profile data
+            const profileResponse = await axios.get('/api/user', {
+              headers: { Authorization: `Bearer ${accessToken}` }
+            })
+
+            this.logUserIn({
+              ...profileResponse.data.profileData
+            })
+          } catch (error) {
+            console.error('Error fetching user profile data', error.response.data)
+          }
+        } catch (error) {
+          console.error('Error exchanging authorization code for access token', error.response.data)
+        }
       }
     }
   }		

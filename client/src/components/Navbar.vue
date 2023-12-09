@@ -143,6 +143,7 @@
         ></v-btn>
         <v-btn
           v-if="googleProfileData.id === ''"
+          @click="redirectToGoogleAuth()"
           flat
           class="mr-4"
           prepend-icon="mdi-login"
@@ -244,7 +245,7 @@ import { useGoogleUserData } from '../stores/useDataStore'
 
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
-const { getGoogleUserData } = useGoogleUserData()
+const { getGoogleUserData, redirectToGoogleAuth } = useGoogleUserData()
 
 const googleProfileData = computed(() => {
   return getGoogleUserData()
