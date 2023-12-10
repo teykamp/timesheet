@@ -120,7 +120,6 @@ CREATE TABLE Timesheet (
 ```SQL
 CREATE TABLE User (
     userId VARCHAR(255) PRIMARY KEY,
-    username VARCHAR(255),
     email VARCHAR(255) NOT NULL,
     managerId VARCHAR(255),
     isManager BOOLEAN,
