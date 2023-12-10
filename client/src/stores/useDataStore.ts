@@ -26,6 +26,9 @@ export const useGoogleUserData = defineStore('googleUserData',{
     locale: ''
   }), 
   actions: {
+    isUserLoggedIn() {
+      return this.id !== ''
+    },
     logUserIn(googleProfile: GoogleProfile) {
       this.id = googleProfile.id
       this.email = googleProfile.email
