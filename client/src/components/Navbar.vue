@@ -211,7 +211,7 @@
             <v-divider></v-divider>
             <v-card-actions>
               <v-btn
-                @click="showProfileMenu = false, deleteLocalLoginData(), logUserOut(), googleProfileData = getGoogleUserData()"
+                @click="showProfileMenu = false, deleteLocalLoginData(), logUserOut() /*, googleProfileData = getGoogleUserData() */"
                 variant="text"
                 prepend-icon="mdi-logout"
               >Log Out</v-btn>
@@ -282,6 +282,9 @@ const handleNavDrawerLogInOutClick = () => {
     deleteLocalLoginData()
     logUserOut()
   }
+
+  showDrawer.value = false
+  
 }
 
 const updateLocalLoginData = () => {
