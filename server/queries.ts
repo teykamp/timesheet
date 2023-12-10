@@ -86,7 +86,7 @@ router.delete('/projects', async (req, res) => {
 router.post('/timesheets', async (req, res) => {
   const { userId, endDate } = req.body;
 
-  if (!userId || !endDate) return res.status(400).json({ error: 'User ID and end date are required' });
+  if (!userId || !endDate) return res.status(400).json({ error: 'User Id and end date are required' });
   try {
     const result = await handleQuery(res, 'INSERT INTO timesheet (userId, endDate) VALUES ($1, $2) RETURNING *', [userId, endDate]);
     if (result) res.status(201).json(result.rows[0]);
@@ -153,19 +153,19 @@ router.delete('/timesheets', async (req, res) => {
 
 // POST a timesheetEntry
 router.post('/timesheetEntries', async (req, res) => {
-  const { timesheetID, entryID, projectID, hoursWorked, Date } = req.body;
+  const { timesheetId, entryId, projectId, hoursWorked, Date } = req.body;
   const result = await handleQuery(
     res,
-    'INSERT INTO timesheetEntry (timesheetID, entryID, projectID, hoursWorked, Date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [timesheetID, entryID, projectID, hoursWorked, Date]
+    'INSERT INTO timesheetEntry (timesheetId, entryId, projectId, hoursWorked, Date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    [timesheetId, entryId, projectId, hoursWorked, Date]
   );
   if (result) res.status(201).json(result.rows[0]);
 });
 
-// GET a timesheetEntry by entryID
-router.get('/timesheetEntries/:entryID', async (req, res) => {
-  const { entryID } = req.params;
-  const result = await handleQuery(res, 'SELECT * FROM timesheetEntry WHERE entryID = $1', [entryID]);
+// GET a timesheetEntry by entryId
+router.get('/timesheetEntries/:entryId', async (req, res) => {
+  const { entryId } = req.params;
+  const result = await handleQuery(res, 'SELECT * FROM timesheetEntry WHERE entryId = $1', [entryId]);
   if (result) {
     if (result.rows.length === 0) return res.status(404).json({ error: 'TimesheetEntry not found' });
     res.json(result.rows[0]);
@@ -178,10 +178,10 @@ router.get('/timesheetEntries', async (req, res) => {
   if (result) res.json(result.rows);
 });
 
-// DELETE a timesheetEntry by entryID
-router.delete('/timesheetEntries/:entryID', async (req, res) => {
-  const { entryID } = req.params;
-  const result = await handleQuery(res, 'DELETE FROM timesheetEntry WHERE entryID = $1 RETURNING *', [entryID]);
+// DELETE a timesheetEntry by entryId
+router.delete('/timesheetEntries/:entryId', async (req, res) => {
+  const { entryId } = req.params;
+  const result = await handleQuery(res, 'DELETE FROM timesheetEntry WHERE entryId = $1 RETURNING *', [entryId]);
   if (result) {
     if (result.rows.length === 0) return res.status(404).json({ error: 'TimesheetEntry not found' });
     res.json(result.rows[0]);
@@ -198,15 +198,15 @@ router.delete('/timesheetEntries', async (req, res) => {
   }
 });
 
-// UPDATE a timesheetEntry by entryID
-router.put('/timesheetEntries/:entryID', async (req, res) => {
-  const { entryID } = req.params;
-  const { timesheetID, projectID, hoursWorked, Date } = req.body;
+// UPDATE a timesheetEntry by entryId
+router.put('/timesheetEntries/:entryId', async (req, res) => {
+  const { entryId } = req.params;
+  const { timesheetId, projectId, hoursWorked, Date } = req.body;
 
   const result = await handleQuery(
     res,
-    'UPDATE timesheetEntry SET timesheetID = $1, projectID = $2, hoursWorked = $3, Date = $4 WHERE entryID = $5 RETURNING *',
-    [timesheetID, projectID, hoursWorked, Date, entryID]
+    'UPDATE timesheetEntry SET timesheetId = $1, projectId = $2, hoursWorked = $3, Date = $4 WHERE entryId = $5 RETURNING *',
+    [timesheetId, projectId, hoursWorked, Date, entryId]
   );
 
   if (result) {
@@ -221,22 +221,22 @@ router.put('/timesheetEntries/:entryID', async (req, res) => {
 
 // POST a user
 router.post('/users', async (req, res) => {
-  const { username, email, managerID, isManager } = req.body;
+  const { username, email, managerId, isManager } = req.body;
 
   const result = await handleQuery(
     res,
-    'INSERT INTO "user" (username, email, managerID, isManager) VALUES ($1, $2, $3, $4) RETURNING *',
-    [username, email, managerID, isManager]
+    'INSERT INTO "timesheetuser" (userId, email, managerId, isManager) VALUES ($1, $2, $3, $4) RETURNING *',
+    [username, email, managerId, isManager]
   );
 
   if (result) res.status(201).json(result.rows[0]);
 });
 
-// GET a user by userID
-router.get('/users/:userID', async (req, res) => {
-  const { userID } = req.params;
+// GET a user by userId
+router.get('/users/:userId', async (req, res) => {
+  const { userId } = req.params;
 
-  const result = await handleQuery(res, 'SELECT * FROM "user" WHERE userID = $1', [userID]);
+  const result = await handleQuery(res, 'SELECT * FROM "timesheetuser" WHERE userId = $1', [userId]);
 
   if (result) {
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
@@ -246,16 +246,16 @@ router.get('/users/:userID', async (req, res) => {
 
 // GET all users
 router.get('/users', async (req, res) => {
-  const result = await handleQuery(res, 'SELECT * FROM "user"');
+  const result = await handleQuery(res, 'SELECT * FROM "timesheetuser"');
 
   if (result) res.json(result.rows);
 });
 
-// DELETE a user by userID
-router.delete('/users/:userID', async (req, res) => {
-  const { userID } = req.params;
+// DELETE a user by userId
+router.delete('/users/:userId', async (req, res) => {
+  const { userId } = req.params;
 
-  const result = await handleQuery(res, 'DELETE FROM "user" WHERE userID = $1 RETURNING *', [userID]);
+  const result = await handleQuery(res, 'DELETE FROM "user" WHERE userId = $1 RETURNING *', [userId]);
 
   if (result) {
     if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
@@ -284,10 +284,10 @@ router.get('/managers', async (req, res) => {
 });
 
 // GET all users of a manager
-router.get('/users/manager/:managerID', async (req, res) => {
-  const { managerID } = req.params;
+router.get('/users/manager/:managerId', async (req, res) => {
+  const { managerId } = req.params;
 
-  const result = await handleQuery(res, 'SELECT * FROM "user" WHERE managerID = $1', [managerID]);
+  const result = await handleQuery(res, 'SELECT * FROM "user" WHERE managerId = $1', [managerId]);
 
   if (result) {
     res.json(result.rows);
@@ -295,14 +295,14 @@ router.get('/users/manager/:managerID', async (req, res) => {
 });
 
 // UPDATE user's manager
-router.put('/users/:userID/manager', async (req, res) => {
-  const { userID } = req.params;
-  const { managerID } = req.body;
+router.put('/users/:userId/manager', async (req, res) => {
+  const { userId } = req.params;
+  const { managerId } = req.body;
 
   const result = await handleQuery(
     res,
-    'UPDATE "user" SET managerID = $1 WHERE userID = $2 RETURNING *',
-    [managerID, userID]
+    'UPDATE "user" SET managerId = $1 WHERE userId = $2 RETURNING *',
+    [managerId, userId]
   );
 
   if (result) {
@@ -314,14 +314,14 @@ router.put('/users/:userID/manager', async (req, res) => {
 });
 
 // UPDATE user's manager status
-router.put('/users/:userID/manager/status', async (req, res) => {
-  const { userID } = req.params;
+router.put('/users/:userId/manager/status', async (req, res) => {
+  const { userId } = req.params;
   const { isManager } = req.body;
 
   const result = await handleQuery(
     res,
-    'UPDATE "user" SET isManager = $1 WHERE userID = $2 RETURNING *',
-    [isManager, userID]
+    'UPDATE "user" SET isManager = $1 WHERE userId = $2 RETURNING *',
+    [isManager, userId]
   );
 
   if (result) {
