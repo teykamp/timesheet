@@ -5,7 +5,7 @@ Timesheet tracking for employees and managers
 ## Object Model:
 
 ```text
-User
+TimesheetUser 
 |-- userId (Google's unique identifier, often 'sub' from the OAuth response)
 |-- username (optional, might not be provided by Google)
 |-- email (user's email address from Google OAuth)
@@ -113,16 +113,16 @@ CREATE TABLE Timesheet (
     timesheetId INT PRIMARY KEY,
     userId INT,
     endDate DATE,
-    FOREIGN KEY (userId) REFERENCES User(userId)
+    FOREIGN KEY (userId) REFERENCES TimesheetUser(userId)
 );
 ```
 - Setting up the users table
 ```SQL
-CREATE TABLE User (
+CREATE TABLE TimesheetUser (
     userId VARCHAR(255) PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     managerId VARCHAR(255),
     isManager BOOLEAN,
-    FOREIGN KEY (managerId) REFERENCES User(userId)
+    FOREIGN KEY (managerId) REFERENCES TimesheetUser(userId)
 );
 ```
