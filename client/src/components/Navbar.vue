@@ -200,6 +200,8 @@
               </v-list-item>
               <v-list-item>
                 <v-switch
+                  @change="updateLocalLoginData()"
+                  v-model="keepUserLoggedIn"
                   color="purple"
                   label="Stay Logged In"
                   ></v-switch>
@@ -209,7 +211,7 @@
             <v-divider></v-divider>
             <v-card-actions>
               <v-btn
-                @click="showProfileMenu = false, logUserOut()"
+                @click="showProfileMenu = false, deleteLocalLoginData(), logUserOut(), googleProfileData = getGoogleUserData()"
                 variant="text"
                 prepend-icon="mdi-logout"
               >Log Out</v-btn>
@@ -228,7 +230,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
@@ -238,10 +240,27 @@ import { useGoogleUserData } from '../stores/useDataStore'
 
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
-const { getGoogleUserData, redirectToGoogleAuth, logUserOut } = useGoogleUserData()
+const { getGoogleUserData, redirectToGoogleAuth, logUserOut, logUserIn } = useGoogleUserData()
+
+
+const checkIfKeepLoggedIn = () => {
+  try {
+    const googleProfileData = localStorage.getItem('googleProfileData')
+    return googleProfileData !== null
+  } catch (error) {
+    console.error('Error retrieving variable from localStorage:', error)
+    return false;
+  }
+}
+
+const keepUserLoggedIn = ref(checkIfKeepLoggedIn())
 
 const googleProfileData = computed(() => {
   return getGoogleUserData()
+})
+
+onMounted(() => {
+  if (keepUserLoggedIn.value) logUserIn(loadLocalLoginData())
 })
 
 const router = useRouter()
@@ -258,6 +277,44 @@ const showProfileMenu = ref(false)
 const showDrawer = ref(false)
 
 const handleNavDrawerLogInOutClick = () => {
-  googleProfileData.value.id === '' ? redirectToGoogleAuth() : logUserOut()
+  if (googleProfileData.value.id === '') redirectToGoogleAuth() 
+  else {
+    deleteLocalLoginData()
+    logUserOut()
+  }
+}
+
+const updateLocalLoginData = () => {
+  if (keepUserLoggedIn.value) saveLoginDataLocally()
+  else deleteLocalLoginData()
+
+}
+
+const saveLoginDataLocally = () => {
+  try {
+    localStorage.setItem('googleProfileData', JSON.stringify(googleProfileData.value))
+  } catch (error) {
+      console.error('Error writing variable to localStorage:', error)
+  }
+}
+
+const deleteLocalLoginData = () => {
+  try {
+    localStorage.removeItem('googleProfileData')
+  } catch (error) {
+    console.error('Error deleting variable from localStorage:', error)
+  }
+}
+
+const loadLocalLoginData = () => {
+  try {
+    const localLoginData = localStorage.getItem('googleProfileData')
+    if (localLoginData) return JSON.parse(localLoginData)
+    else return getGoogleUserData()
+
+  } catch (error) {
+    console.error('Error retrieving variable from localStorage:', error)
+    return getGoogleUserData()
+  }
 }
 </script>
