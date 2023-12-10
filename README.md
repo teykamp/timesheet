@@ -111,7 +111,7 @@ CREATE TABLE TimesheetEntry (
 ```SQL
 CREATE TABLE Timesheet (
     timesheetId INT PRIMARY KEY,
-    userId INT,
+    userId VARCHAR(255),
     endDate DATE,
     FOREIGN KEY (userId) REFERENCES TimesheetUser(userId)
 );
