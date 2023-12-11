@@ -3,9 +3,11 @@
     flat
     :style="{
       'min-width': '600px',
+      'white-space': 'nowrap',
+      'overflow-x': 'scroll', // need horiz scroll
   }">
     <v-card
-      class="d-flex justify-center rounded-0"
+      class="d-flex justify-center rounded-0 pr-8 pl-1"
       elevation="2"
     >
       <v-col
@@ -28,7 +30,7 @@
       </v-col>
     </v-card>
     <v-sheet :style="{
-      'max-height': '79vh',
+      'max-height': 'calc(95vh - 170px)',
       overflow: 'auto',
     }">
       <v-sheet 
@@ -60,9 +62,11 @@
           />
         </v-col>
         <v-btn 
-          size="small" 
+          size="small"
+          variant="tonal"
+          color="red" 
           icon="mdi-delete"
-          class="mt-3"
+          class="mt-3 mx-2"
         ></v-btn>
       </v-sheet>
     </v-sheet>
