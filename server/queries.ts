@@ -4,6 +4,7 @@ import { Pool, QueryResult } from 'pg';
 const router = express.Router();
 const pool = new Pool({
   connectionString: process.env.DB_CONNECTION_URL,
+  max: -1,
 });
 
 async function handleQuery(
@@ -16,7 +17,8 @@ async function handleQuery(
     const result = await client.query(queryText, queryParams);
     return result;
   } catch (error) {
-    res.status(500).json({ error: 'Database error' });
+    
+    res.status(500).json({ error: 'Database error: ' + error });
   }
 }
 
@@ -99,7 +101,7 @@ router.post('/timesheets', async (req, res) => {
 router.get('/timesheets/:timesheetId', async (req, res) => {
   const { timesheetId } = req.params;
   try {
-    const result = await handleQuery(res, 'SELECT * FROM timesheet WHERE timesheetId = $1', [timesheetId]);
+    const result = await handleQuery(res, 'SELECT * FROM Timesheet WHERE timesheetId = $1', [timesheetId]);
     if (result) {
       if (result.rows.length === 0) return res.status(404).json({ error: 'No projects found' });
       res.json(result.rows);
@@ -112,7 +114,7 @@ router.get('/timesheets/:timesheetId', async (req, res) => {
 // GET all timesheets
 router.get('/timesheets', async (req, res) => {
   try {
-    const result = await handleQuery(res, 'SELECT * FROM timesheet');
+    const result = await handleQuery(res, 'SELECT * FROM Timesheet');
     if (result) res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheets from the database' });
@@ -123,7 +125,7 @@ router.get('/timesheets', async (req, res) => {
 router.delete('/timesheets/:timesheetId', async (req, res) => {
   const { timesheetId } = req.params;
   try {
-    const result = await handleQuery(res, 'DELETE FROM timesheet WHERE timesheetId = $1 RETURNING *', [timesheetId]);
+    const result = await handleQuery(res, 'DELETE FROM Timesheet WHERE timesheetId = $1 RETURNING *', [timesheetId]);
     if (result) {
       if (result.rows.length === 0) return res.status(404).json({ error: 'Timesheet not found' });
       res.json(result.rows[0]);
@@ -136,7 +138,7 @@ router.delete('/timesheets/:timesheetId', async (req, res) => {
 // DELETE all timesheets
 router.delete('/timesheets', async (req, res) => {
   try {
-    const result = await handleQuery(res, 'DELETE FROM timesheet RETURNING *');
+    const result = await handleQuery(res, 'DELETE FROM Timesheet RETURNING *');
 
     if (result) {
       if (result.rows.length === 0) return res.status(404).json({ error: 'No Timesheets found' });
@@ -156,16 +158,16 @@ router.post('/timesheetEntries', async (req, res) => {
   const { timesheetId, entryId, projectId, hoursWorked, Date } = req.body;
   const result = await handleQuery(
     res,
-    'INSERT INTO timesheetEntry (timesheetId, entryId, projectId, hoursWorked, Date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    'INSERT INTO TimesheetEntry (timesheetId, entryId, projectId, hoursWorked, Date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
     [timesheetId, entryId, projectId, hoursWorked, Date]
   );
   if (result) res.status(201).json(result.rows[0]);
 });
 
-// GET a timesheetEntry by entryId
-router.get('/timesheetEntries/:entryId', async (req, res) => {
-  const { entryId } = req.params;
-  const result = await handleQuery(res, 'SELECT * FROM timesheetEntry WHERE entryId = $1', [entryId]);
+// GET a timesheetEntry by timesheetId
+router.get('/timesheetEntries/:timesheetId', async (req, res) => {
+  const { timesheetId } = req.params;
+  const result = await handleQuery(res, 'SELECT * FROM TimesheetEntry WHERE timesheetId = $1', [timesheetId]);
   if (result) {
     if (result.rows.length === 0) return res.status(404).json({ error: 'TimesheetEntry not found' });
     res.json(result.rows[0]);
@@ -174,14 +176,14 @@ router.get('/timesheetEntries/:entryId', async (req, res) => {
 
 // GET all timesheetEntries
 router.get('/timesheetEntries', async (req, res) => {
-  const result = await handleQuery(res, 'SELECT * FROM timesheetEntry');
+  const result = await handleQuery(res, 'SELECT * FROM TimesheetEntry');
   if (result) res.json(result.rows);
 });
 
 // DELETE a timesheetEntry by entryId
 router.delete('/timesheetEntries/:entryId', async (req, res) => {
   const { entryId } = req.params;
-  const result = await handleQuery(res, 'DELETE FROM timesheetEntry WHERE entryId = $1 RETURNING *', [entryId]);
+  const result = await handleQuery(res, 'DELETE FROM TimesheetEntry WHERE entryId = $1 RETURNING *', [entryId]);
   if (result) {
     if (result.rows.length === 0) return res.status(404).json({ error: 'TimesheetEntry not found' });
     res.json(result.rows[0]);
@@ -190,7 +192,7 @@ router.delete('/timesheetEntries/:entryId', async (req, res) => {
 
 // DELETE all timesheetEntries
 router.delete('/timesheetEntries', async (req, res) => {
-  const result = await handleQuery(res, 'DELETE FROM timesheetEntry RETURNING *');
+  const result = await handleQuery(res, 'DELETE FROM TimesheetEntry RETURNING *');
 
   if (result) {
     if (result.rows.length === 0) return res.status(404).json({ error: 'No timesheetEntries found' });
@@ -205,7 +207,7 @@ router.put('/timesheetEntries/:entryId', async (req, res) => {
 
   const result = await handleQuery(
     res,
-    'UPDATE timesheetEntry SET timesheetId = $1, projectId = $2, hoursWorked = $3, Date = $4 WHERE entryId = $5 RETURNING *',
+    'UPDATE TimesheetEntry SET timesheetId = $1, projectId = $2, hoursWorked = $3, Date = $4 WHERE entryId = $5 RETURNING *',
     [timesheetId, projectId, hoursWorked, Date, entryId]
   );
 
