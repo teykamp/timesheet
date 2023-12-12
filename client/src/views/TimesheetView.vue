@@ -48,11 +48,19 @@
         >
           <v-autocomplete
             v-if="colIndex === 0"
+            v-model="cell.text"
             label="Project Name"
             :items="projectList"
             variant="outlined"
             density="compact"
-          ></v-autocomplete>
+          >
+            <template v-slot:item="{ props, item }">
+              <v-list-item
+                v-bind="props"
+                :disabled="selectedProjects.includes(item.title)"
+              ></v-list-item>
+            </template>
+          </v-autocomplete>
           <v-text-field
             v-if="colIndex !== 0"
             v-model="cell.text"  
@@ -78,8 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useDisplay } from 'vuetify'
 
 const { lgAndUp } = useDisplay()
@@ -113,30 +120,9 @@ const grid = ref(
   )
 )
 
-const getTimesheets = async () => {
-  try {
-    const response = await axios.get('/api/timesheets')
-    const { data } = response
-    timesheets.value = data
-  } catch (error) {
-    console.error('Error fetching timesheets:', error)
-  }
-}
-
-const timesheets = ref([])
-
-const getTimesheetEntries = async () => {
-  try {
-    const response = await axios.get(`api/timesheetEntries/${1}`)
-    const { data } = response
-    console.log(data)
-    return data
-  } catch (error) {
-    console.error('Error fetching timesheetEntries:', error)
-  }
-}
-
 const projectList = ['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']
 
-
+const selectedProjects = computed(() => {
+  return grid.value.map(row => row[0].text)
+})
 </script>
