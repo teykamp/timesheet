@@ -1,50 +1,79 @@
 <template>
-  <v-card 
+  <v-card
     flat 
     :class="`mt-6 ${xs ? '' : 'px-12'}`"
   >
-    <v-data-table
-      :items="items"
-      :items-per-page="-1"
-      :headers="headerData"
-      >
-      <template v-slot:item.approved="{ item }">
-        <div>
-          <v-chip
-            :color="item.approved ? 'green' : 'orange'"
-            :text="item.approved ? 'Approved' : 'Submitted'"
-            class="text-uppercase"
-            label
+    <div class="flex flex-col sm:flex-row justify-space-between align-center">
+      <v-card flat>
+        <template v-slot:title>
+          View Timesheets
+        </template>
+      </v-card>
+      <v-card flat>
+        <template v-slot:text>
+          <v-text-field
+            v-model="search"
+            label="Search"
+            prepend-inner-icon="mdi-magnify"
+            single-line
+            variant="outlined"
+            hide-details
+            style="max-width: 400px; min-width: 250px;"
+          ></v-text-field>
+        </template>
+      </v-card>
+    </div>
+    <div style="max-height: calc(95vh - 190px); overflow-y: auto;">
+      <v-data-table
+        :items="items"
+        :items-per-page="-1"
+        :headers="headerData"
+        :search="search"
+        >
+        <template v-slot:item.status="{ item }">
+          <div>
+            <v-chip
+              :color="getStatusChipColor(item.status)"
+              :text="item.status"
+              class="text-uppercase"
+              label
+              size="small"
+            ></v-chip>
+          </div>
+        </template>
+      
+        <template v-slot:item.view="{ item }">
+          <v-btn
+            flat
             size="small"
-          ></v-chip>
-        </div>
-      </template>
-
-      <template v-slot:item.view="{ item }">
-        <v-btn
-          flat
-          size="small"
-          prepend-icon="mdi-eye"
-        >View</v-btn>
-      </template>
-
-      <template v-slot:item.actions="{ item }">
-        <div class="d-flex justify-end">
-          <v-icon
-            class="mr-1"
-            size="small"
-            @click="editTimesheet(item)"
-          >mdi-pencil</v-icon>
-          <v-icon
-            class="ml-1"
-            size="small"
-            color="red"
-            @click="deleteTimesheet(item)"
-          >mdi-delete</v-icon>
-        </div>
-      </template>
-      <template v-slot:bottom></template>
-    </v-data-table>
+            prepend-icon="mdi-eye"
+          >View</v-btn>
+        </template>
+      
+        <template v-slot:item.actions="{ item }">
+          <div class="d-flex justify-end">
+            <v-btn
+              @click="editTimesheet(item)"
+              icon="mdi-pencil"
+              class="mr-1"
+              variant="tonal"
+              size="small"
+              :disabled="item.status === 'approved'"
+            ></v-btn>
+            <v-btn
+              @click="deleteTimesheet(item)"
+              icon="mdi-delete"
+              class="ml-1"
+              variant="tonal"
+              size="small"
+              color="red"
+              :disabled="item.status === 'approved'"
+            ></v-btn>
+          </div>
+        </template>
+        <template v-slot:bottom></template>
+      </v-data-table>
+    </div>
   </v-card>
 </template>
 
@@ -54,13 +83,32 @@ import { useDisplay } from 'vuetify'
 
 const { xs } = useDisplay()
 
-const deleteTimesheet = (item: any) => {
+type Item = {
+  endDate: String,
+  totalHoursWorked: Number,
+  status: 'working' | 'submitted' | 'approved'
+}
+
+const getStatusChipColor = (status: Item['status']) => {
+  switch (status) {
+    case 'working':
+      return 'primary'
+    case 'submitted':
+      return 'orange'
+    case 'approved':
+      return 'success'
+  }
+}
+
+const deleteTimesheet = (item: Item) => {
   return
 }
 
-const editTimesheet = (item: any) => {
+const editTimesheet = (item: Item) => {
   return
 }
+
+const search = ref('')
 
 const headerData = ref([
   {
@@ -73,7 +121,7 @@ const headerData = ref([
   },
   { 
     title: 'Status',
-    key: 'approved',
+    key: 'status',
   },
   {
     title: '',
@@ -93,27 +141,77 @@ const items = ref([
   {
     endDate: '12/11/23',
     totalHoursWorked: 50,
-    approved: true,
+    status: 'approved',
   },
   {
     endDate: '4/18/22',
     totalHoursWorked: 29,
-    approved: false,
+    status: 'approved',
   },
   {
     endDate: '9/1/21',
     totalHoursWorked: 40,
-    approved: true,
+    status: 'approved',
   },
   {
     endDate: '9/18/23',
     totalHoursWorked: 40,
-    approved: true,
+    status: 'approved',
   },
   {
     endDate: '2/29/00',
     totalHoursWorked: 40,
-    approved: false,
+    status: 'working',
+  },
+  {
+    endDate: '12/11/23',
+    totalHoursWorked: 50,
+    status: 'submitted',
+  },
+  {
+    endDate: '4/18/22',
+    totalHoursWorked: 29,
+    status: 'submitted',
+  },
+  {
+    endDate: '9/1/21',
+    totalHoursWorked: 40,
+    status: 'submitted',
+  },
+  {
+    endDate: '9/18/23',
+    totalHoursWorked: 40,
+    status: 'submitted',
+  },
+  {
+    endDate: '2/29/00',
+    totalHoursWorked: 40,
+    status: 'working',
+  },
+  {
+    endDate: '12/11/23',
+    totalHoursWorked: 50,
+    status: 'working',
+  },
+  {
+    endDate: '4/18/22',
+    totalHoursWorked: 29,
+    status: 'working',
+  },
+  {
+    endDate: '9/1/21',
+    totalHoursWorked: 40,
+    status: 'working',
+  },
+  {
+    endDate: '9/18/23',
+    totalHoursWorked: 40,
+    status: 'working',
+  },
+  {
+    endDate: '2/29/00',
+    totalHoursWorked: 40,
+    status: 'working',
   },
 ])
 </script>

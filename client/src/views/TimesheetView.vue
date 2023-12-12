@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <TimesheetListDisplay 
       v-if="state === 'allTimesheets'"
     />
