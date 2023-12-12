@@ -64,7 +64,7 @@ const editTimesheet = (item: any) => {
 
 const headerData = ref([
   {
-    title: 'EndDate',
+    title: 'End Date',
     key: 'endDate',
   },
   { 
