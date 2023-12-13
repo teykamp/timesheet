@@ -91,14 +91,14 @@ Aliases
 - Setting up projects table
 ```SQL
 CREATE TABLE Project (
-    projectId INT PRIMARY KEY,
+    projectId SERIAL PRIMARY KEY,
     projectName VARCHAR(255) NOT NULL
 );
 ```
 - Setting up timesheetEntries table
 ```SQL
 CREATE TABLE TimesheetEntry (
-    entryId INT PRIMARY KEY,
+    entryId SERIAL PRIMARY KEY,
     timesheetId INT,
     projectId INT,
     hoursWorked INT,
@@ -110,7 +110,7 @@ CREATE TABLE TimesheetEntry (
 - Setting up the timesheets table
 ```SQL
 CREATE TABLE Timesheet (
-    timesheetId INT PRIMARY KEY,
+    timesheetId SERIAL PRIMARY KEY,
     userId VARCHAR(255),
     endDate DATE,
     FOREIGN KEY (userId) REFERENCES TimesheetUser(userId)
