@@ -92,7 +92,7 @@
         prepend-icon="mdi-plus"
       >Add</v-btn>
       <v-btn
-        @click="handleAddRow()"
+        @click="handleSubmit()"
         class="mr-10 mb-10"
         color="success"
         append-icon="mdi-forward"
