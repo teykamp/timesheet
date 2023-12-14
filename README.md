@@ -16,6 +16,7 @@ Timesheet
 |-- timesheetId
 |-- userId (FK)
 |-- endDate
+|-- status
 
 TimesheetEntry
 |-- entryId
@@ -53,6 +54,7 @@ Aliases
     - timesheetId
     - userId (foreign key)
     - endDate
+    - status
 
 - **Relationships:**
     - One timesheet belongs to one user.
