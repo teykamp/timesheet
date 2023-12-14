@@ -16,6 +16,7 @@ Timesheet
 |-- timesheetId
 |-- userId (FK)
 |-- endDate
+|-- status
 
 TimesheetEntry
 |-- entryId
