@@ -117,6 +117,59 @@ router.delete('/projects', async (req, res) => {
   TIMESHEETS
 */
 
+// PUT or PATCH a timesheet with entries
+router.put('/timesheets/:timesheetId', async (req, res) => {
+  const { timesheetId } = req.params;
+  const { userId, endDate, status, entries } = req.body;
+
+  if (!userId || !endDate || !status || !Array.isArray(entries) || entries.length === 0) {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
+
+  try {
+    await handleDatabaseTransaction(res, async (client) => {
+      let timesheetIdToUpdate = timesheetId;
+
+      // Check if the timesheet already exists
+      const existingTimesheetResult = await client.query('SELECT * FROM Timesheet WHERE timesheetId = $1', [timesheetId]);
+
+      if (existingTimesheetResult.rows.length === 0) {
+        // If the timesheet doesn't exist, insert a new one
+        const newTimesheetResult = await client.query(
+          'INSERT INTO Timesheet (userId, endDate, status) VALUES ($1, $2, $3) RETURNING timesheetId',
+          [userId, endDate, status]
+        );
+
+        timesheetIdToUpdate = newTimesheetResult.rows[0].timesheetId;
+      }
+
+      // Update or insert timesheet entries
+      const entryPromises = entries.map(async (entry) => {
+        if (entry.entryId) {
+          // If entryId is present, update the existing entry
+          await client.query(
+            'UPDATE TimesheetEntry SET projectId = $1, hoursWorked = $2, date = $3 WHERE entryId = $4 AND timesheetId = $5',
+            [entry.projectId, entry.hoursWorked, entry.date, entry.entryId, timesheetIdToUpdate]
+          );
+        } else {
+          // If entryId is not present, insert a new entry
+          await client.query(
+            'INSERT INTO TimesheetEntry (timesheetId, projectId, hoursWorked, date) VALUES ($1, $2, $3, $4)',
+            [timesheetIdToUpdate, entry.projectId, entry.hoursWorked, entry.date]
+          );
+        }
+      });
+
+      await Promise.all(entryPromises);
+
+      res.status(200).json({ timesheetId: timesheetIdToUpdate });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating or inserting timesheet and entries to the database' });
+  }
+});
+
+
 // GET all submitted timesheets and entries for a manager
 router.get('/timesheets/manager/:managerId', async (req, res) => {
   const { managerId } = req.params;
@@ -342,8 +395,6 @@ router.put('/timesheets/:timesheetId/status', async (req, res) => {
     res.status(500).json({ error: 'Error updating timesheet status in the database' });
   }
 });
-
-
 
 /*
   TIMESHEETENTRIES
