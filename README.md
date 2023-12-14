@@ -113,6 +113,7 @@ CREATE TABLE Timesheet (
     timesheetId SERIAL PRIMARY KEY,
     userId VARCHAR(255),
     endDate DATE,
+    status VARCHAR(10) CHECK (status IN ('approved', 'working', 'submitted')),
     FOREIGN KEY (userId) REFERENCES TimesheetUser(userId)
 );
 ```
