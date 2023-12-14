@@ -56,8 +56,6 @@ router.get('/projects', async (req, res) => {
   })
 })
 
-
-
 // GET specific project
 router.get('/projects/:projectId', async (req, res) => {
   const { projectId } = req.params;
@@ -119,8 +117,117 @@ router.delete('/projects', async (req, res) => {
   TIMESHEETS
 */
 
-// POST a timesheet
+// GET all submitted timesheets and entries for a manager
+router.get('/timesheets/manager/:managerId', async (req, res) => {
+  const { managerId } = req.params;
+
+  try {
+    await handleDatabaseTransaction(res, async (client) => {
+      const result = await client.query(
+        'SELECT t.timesheetId, t.userId, t.endDate, t.status, te.entryId, te.projectId, te.hoursWorked, te.date ' +
+        'FROM Timesheet t ' +
+        'JOIN TimesheetEntry te ON t.timesheetId = te.timesheetId ' +
+        'WHERE t.status = $1 AND t.userId IN (SELECT userId FROM TimesheetUser WHERE managerId = $2)',
+        ['submitted', managerId]
+      );
+
+      const timesheets: any[] = [];
+
+      // Process the result to organize timesheets and entries
+      result.rows.forEach((row) => {
+      const existingTimesheet = timesheets.find((t) => t.timesheetId === row.timesheetId);
+
+      if (existingTimesheet) {
+        // Add entry to existing timesheet
+        existingTimesheet.entries.push({
+          entryId: row.entryId,
+          projectId: row.projectId,
+          hoursWorked: row.hoursWorked,
+          date: row.date,
+        });
+      } else {
+        // If a timesheet always exists before its entries, this block should not be reached
+        console.error('Unexpected scenario: Timesheet does not exist for entry');
+      }
+    });
+
+      res.json(timesheets);
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving timesheets and entries for the manager' + error });
+  }
+});
+
+
+// GET timesheets and total hours for a user by userId
+router.get('/timesheets/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    await handleDatabaseTransaction(res, async (client) => {
+      // Fetch timesheets for the given userId
+      const timesheetsResult = await client.query(
+        'SELECT * FROM Timesheet WHERE userId = $1',
+        [userId]
+      );
+
+      // Calculate total hours for each timesheet
+      const timesheetsWithTotalHours = await Promise.all(
+        timesheetsResult.rows.map(async (timesheet) => {
+          const totalHoursResult = await client.query(
+            'SELECT COALESCE(SUM(hoursWorked), 0) AS totalHours FROM TimesheetEntry WHERE timesheetId = $1',
+            [timesheet.timesheetId]
+          );
+
+          const totalHours = totalHoursResult.rows[0].totalHours;
+          return { ...timesheet, totalHours };
+        })
+      );
+
+      res.json(timesheetsWithTotalHours);
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving timesheets and total hours from the database' });
+  }
+});
+
+// POST a timesheet with entries
 router.post('/timesheets', async (req, res) => {
+  const { userId, endDate, status, entries } = req.body;
+
+  if (!userId || !endDate || !status || !Array.isArray(entries) || entries.length === 0) {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
+
+  try {
+    await handleDatabaseTransaction(res, async (client) => {
+      // Insert the timesheet
+      const timesheetResult = await client.query(
+        'INSERT INTO Timesheet (userId, endDate, status) VALUES ($1, $2, $3) RETURNING timesheetId',
+        [userId, endDate, status]
+      );
+
+      const timesheetId = timesheetResult.rows[0].timesheetId;
+
+      // Insert timesheet entries
+      const entryPromises = entries.map(async (entry) => {
+        await client.query(
+          'INSERT INTO TimesheetEntry (timesheetId, projectId, hoursWorked, date) VALUES ($1, $2, $3, $4)',
+          [timesheetId, entry.projectId, entry.hoursWorked, entry.date]
+        );
+      });
+
+      await Promise.all(entryPromises);
+
+      res.status(201).json({ timesheetId });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error posting timesheet and entries to the database' });
+  }
+});
+
+// POST a timesheet
+router.post('/timesheets/solo', async (req, res) => {
   const { userId, endDate, status, timesheetEntries } = req.body;
 
   if (!userId || !endDate || !status || !timesheetEntries) {
