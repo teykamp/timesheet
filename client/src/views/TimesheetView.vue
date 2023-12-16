@@ -18,11 +18,25 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios'
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
 
 import { ref } from 'vue'
 
+import { useGoogleUserData } from '../stores/useDataStore'
+
+const { id } = useGoogleUserData()
+
 const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
+
+axios.get(`/api/timesheets/user/${id}`)
+  .then(response => {
+    const { data } = response
+    console.log(data)
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error.message)
+  })
 
 </script>

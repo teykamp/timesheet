@@ -224,9 +224,12 @@ router.get('/timesheets/user/:userId', async (req, res) => {
         [userId]
       );
 
+      // Check if timesheets exist
+      const timesheets = timesheetsResult.rows || [];
+
       // Calculate total hours for each timesheet
       const timesheetsWithTotalHours = await Promise.all(
-        timesheetsResult.rows.map(async (timesheet) => {
+        timesheets.map(async (timesheet) => {
           const totalHoursResult = await client.query(
             'SELECT COALESCE(SUM(hoursWorked), 0) AS totalHours FROM TimesheetEntry WHERE timesheetId = $1',
             [timesheet.timesheetId]
@@ -243,6 +246,7 @@ router.get('/timesheets/user/:userId', async (req, res) => {
     res.status(500).json({ error: 'Error retrieving timesheets and total hours from the database' });
   }
 });
+
 
 // POST a timesheet with entries
 router.post('/timesheets', async (req, res) => {
