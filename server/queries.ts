@@ -4,9 +4,8 @@ import { Client } from 'pg';
 const router = express.Router();
 
 async function handleDatabaseTransaction(
-  res: any,
   callback: (client: Client) => Promise<any>,
-): Promise<void> {
+): Promise<any> {
   const client = new Client({
     connectionString: process.env.DB_CONNECTION_URL,
   });
@@ -24,13 +23,12 @@ async function handleDatabaseTransaction(
     // Commit the transaction
     await client.query('COMMIT');
 
-    // Respond with the result
-    res.json(result.rows);
+    return result;
   } catch (error) {
     // Rollback the transaction in case of an error
     await client.query('ROLLBACK');
     console.error('Database error:', error);
-    res.status(500).json({ error: 'Database error: ' + error });
+    throw error; // Re-throw the error to be caught by the API call function
   } finally {
     try {
       // Disconnect from the database
@@ -42,6 +40,7 @@ async function handleDatabaseTransaction(
   }
 }
 
+
 /*
 
 PROJECTS
@@ -50,24 +49,35 @@ PROJECTS
 
 // GET all projects
 router.get('/projects', async (req, res) => {
-  await handleDatabaseTransaction(res, async (client) => {
-    const queryText = 'SELECT * FROM project'
-    return await client.query(queryText)
-  })
-})
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      const queryText = 'SELECT * FROM project';
+      return await client.query(queryText);
+    });
+
+    res.status(200).json(result.rows || []);
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving projects from the database' });
+  }
+});
 
 // GET specific project
 router.get('/projects/:projectId', async (req, res) => {
   const { projectId } = req.params;
-  await handleDatabaseTransaction(res, async (client) => {
-    const result = await client.query('SELECT * FROM project WHERE projectId = $1', [projectId]);
+
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM project WHERE projectId = $1', [projectId]);
+    });
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Project not found' });
+      res.status(404).json({ error: 'Project not found' });
+    } else {
+      res.json(result.rows[0]);
     }
-
-    res.json(result.rows[0]);
-  });
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving project from the database' });
+  }
 });
 
 // POST a project
@@ -75,47 +85,56 @@ router.post('/projects', async (req, res) => {
   const { projectName } = req.body;
 
   if (!projectName) {
-    return res.status(400).json({ error: 'Project name is required' });
+    res.status(400).json({ error: 'Project name is required' });
+    return;
   }
 
-  await handleDatabaseTransaction(res, async (client) => {
-    const result = await client.query('INSERT INTO project (projectName) VALUES ($1) RETURNING *', [projectName]);
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('INSERT INTO project (projectName) VALUES ($1) RETURNING *', [projectName]);
+    });
 
     res.status(201).json(result.rows[0]);
-  });
+  } catch (error) {
+    res.status(500).json({ error: 'Error inserting project into the database' });
+  }
 });
 
 // DELETE a project by projectId
 router.delete('/projects/:projectId', async (req, res) => {
   const { projectId } = req.params;
 
-  await handleDatabaseTransaction(res, async (client) => {
-    const result = await client.query('DELETE FROM project WHERE projectId = $1 RETURNING *', [projectId]);
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('DELETE FROM project WHERE projectId = $1 RETURNING *', [projectId]);
+    });
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Project not found' });
+      res.status(404).json({ error: 'Project not found' });
+    } else {
+      res.json(result.rows[0]);
     }
-
-    res.json(result.rows[0]);
-  });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting project from the database' });
+  }
 });
 
 // DELETE all projects
 router.delete('/projects', async (req, res) => {
-  await handleDatabaseTransaction(res, async (client) => {
-    const result = await client.query('DELETE FROM project RETURNING *');
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('DELETE FROM project RETURNING *');
+    });
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'No projects found' });
+      res.status(404).json({ error: 'No projects found' });
+    } else {
+      res.json(result.rows);
     }
-
-    res.json(result.rows);
-  });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting projects from the database' });
+  }
 });
-
-/*
-  TIMESHEETS
-*/
 
 // PUT or PATCH a timesheet with entries
 router.put('/timesheets/:timesheetId', async (req, res) => {
@@ -123,11 +142,12 @@ router.put('/timesheets/:timesheetId', async (req, res) => {
   const { userId, endDate, status, entries } = req.body;
 
   if (!userId || !endDate || !status || !Array.isArray(entries) || entries.length === 0) {
-    return res.status(400).json({ error: 'Invalid request body' });
+    res.status(400).json({ error: 'Invalid request body' });
+    return;
   }
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
+    const result = await handleDatabaseTransaction(async (client) => {
       let timesheetIdToUpdate = timesheetId;
 
       // Check if the timesheet already exists
@@ -162,32 +182,34 @@ router.put('/timesheets/:timesheetId', async (req, res) => {
 
       await Promise.all(entryPromises);
 
-      res.status(200).json({ timesheetId: timesheetIdToUpdate });
+      return { timesheetId: timesheetIdToUpdate };
     });
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: 'Error updating or inserting timesheet and entries to the database' });
   }
 });
-
 
 // GET all submitted timesheets and entries for a manager
 router.get('/timesheets/manager/:managerId', async (req, res) => {
   const { managerId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query(
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
         'SELECT t.timesheetId, t.userId, t.endDate, t.status, te.entryId, te.projectId, te.hoursWorked, te.date ' +
         'FROM Timesheet t ' +
         'JOIN TimesheetEntry te ON t.timesheetId = te.timesheetId ' +
         'WHERE t.status = $1 AND t.userId IN (SELECT userId FROM TimesheetUser WHERE managerId = $2)',
         ['submitted', managerId]
       );
+    });
 
-      const timesheets: any[] = [];
+    const timesheets: any[] = [];
 
-      // Process the result to organize timesheets and entries
-      result.rows.forEach((row) => {
+    // Process the result to organize timesheets and entries
+    result.rows.forEach((row: any) => {
       const existingTimesheet = timesheets.find((t) => t.timesheetId === row.timesheetId);
 
       if (existingTimesheet) {
@@ -204,12 +226,12 @@ router.get('/timesheets/manager/:managerId', async (req, res) => {
       }
     });
 
-      res.json(timesheets);
-    });
+    res.json(timesheets);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheets and entries for the manager' + error });
   }
 });
+
 
 
 // GET timesheets and total hours for a user by userId
@@ -217,7 +239,7 @@ router.get('/timesheets/user/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
+    const result = await handleDatabaseTransaction(async (client) => {
       // Fetch timesheets for the given userId
       const timesheetsResult = await client.query(
         'SELECT * FROM Timesheet WHERE userId = $1',
@@ -240,8 +262,12 @@ router.get('/timesheets/user/:userId', async (req, res) => {
         })
       );
 
-      res.json(timesheetsWithTotalHours);
+      // Always return an empty list if no timesheets are found
+      return timesheetsWithTotalHours || [];
     });
+
+    // Respond with the result
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheets and total hours from the database' });
   }
@@ -257,7 +283,7 @@ router.post('/timesheets', async (req, res) => {
   }
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
+    const result = await handleDatabaseTransaction(async (client) => {
       // Insert the timesheet
       const timesheetResult = await client.query(
         'INSERT INTO Timesheet (userId, endDate, status) VALUES ($1, $2, $3) RETURNING timesheetId',
@@ -276,8 +302,10 @@ router.post('/timesheets', async (req, res) => {
 
       await Promise.all(entryPromises);
 
-      res.status(201).json({ timesheetId });
+      return { timesheetId };
     });
+
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ error: 'Error posting timesheet and entries to the database' });
   }
@@ -292,14 +320,14 @@ router.post('/timesheets/solo', async (req, res) => {
   }
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query(
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
         'INSERT INTO Timesheet (userId, endDate, status) VALUES ($1, $2, $3) RETURNING *',
         [userId, endDate, status]
       );
-
-      res.status(201).json(result.rows[0]);
     });
+
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: 'Error inserting timesheet into the database' });
   }
@@ -310,15 +338,15 @@ router.get('/timesheets/:timesheetId', async (req, res) => {
   const { timesheetId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('SELECT * FROM Timesheet WHERE timesheetId = $1', [timesheetId]);
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Timesheet not found' });
-      }
-
-      res.json(result.rows[0]);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM Timesheet WHERE timesheetId = $1', [timesheetId]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Timesheet not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheet from the database' });
   }
@@ -327,11 +355,11 @@ router.get('/timesheets/:timesheetId', async (req, res) => {
 // GET all timesheets
 router.get('/timesheets', async (req, res) => {
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('SELECT * FROM Timesheet');
-
-      res.json(result.rows);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM Timesheet');
     });
+
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheets from the database' });
   }
@@ -342,15 +370,15 @@ router.delete('/timesheets/:timesheetId', async (req, res) => {
   const { timesheetId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('DELETE FROM Timesheet WHERE timesheetId = $1 RETURNING *', [timesheetId]);
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Timesheet not found' });
-      }
-
-      res.json(result.rows[0]);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('DELETE FROM Timesheet WHERE timesheetId = $1 RETURNING *', [timesheetId]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Timesheet not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error deleting timesheet from the database' });
   }
@@ -359,15 +387,15 @@ router.delete('/timesheets/:timesheetId', async (req, res) => {
 // DELETE all timesheets
 router.delete('/timesheets', async (req, res) => {
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('DELETE FROM Timesheet RETURNING *');
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'No Timesheets found' });
-      }
-
-      res.json(result.rows);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('DELETE FROM Timesheet RETURNING *');
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'No Timesheets found' });
+    } else {
+      res.json(result.rows);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error deleting timesheets from the database' });
   }
@@ -383,18 +411,18 @@ router.put('/timesheets/:timesheetId/status', async (req, res) => {
   }
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query(
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
         'UPDATE Timesheet SET status = $1 WHERE timesheetId = $2 RETURNING *',
         [status, timesheetId]
       );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Timesheet not found' });
-      }
-
-      res.json(result.rows[0]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Timesheet not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error updating timesheet status in the database' });
   }
@@ -413,14 +441,14 @@ router.post('/timesheetEntries', async (req, res) => {
   }
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query(
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
         'INSERT INTO TimesheetEntry (timesheetId, entryId, projectId, hoursWorked, Date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
         [timesheetId, entryId, projectId, hoursWorked, Date]
       );
-
-      res.status(201).json(result.rows[0]);
     });
+
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: 'Error inserting timesheet entry into the database' });
   }
@@ -431,15 +459,15 @@ router.get('/timesheetEntries/:timesheetId', async (req, res) => {
   const { timesheetId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('SELECT * FROM TimesheetEntry WHERE timesheetId = $1', [timesheetId]);
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'TimesheetEntry not found' });
-      }
-
-      res.json(result.rows[0]);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM TimesheetEntry WHERE timesheetId = $1', [timesheetId]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'TimesheetEntry not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheet entry from the database' });
   }
@@ -448,11 +476,11 @@ router.get('/timesheetEntries/:timesheetId', async (req, res) => {
 // GET all timesheetEntries
 router.get('/timesheetEntries', async (req, res) => {
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('SELECT * FROM TimesheetEntry');
-
-      res.json(result.rows);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM TimesheetEntry');
     });
+
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheet entries from the database' });
   }
@@ -463,15 +491,15 @@ router.delete('/timesheetEntries/:entryId', async (req, res) => {
   const { entryId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('DELETE FROM TimesheetEntry WHERE entryId = $1 RETURNING *', [entryId]);
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'TimesheetEntry not found' });
-      }
-
-      res.json(result.rows[0]);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('DELETE FROM TimesheetEntry WHERE entryId = $1 RETURNING *', [entryId]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'TimesheetEntry not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error deleting timesheet entry from the database' });
   }
@@ -480,15 +508,15 @@ router.delete('/timesheetEntries/:entryId', async (req, res) => {
 // DELETE all timesheetEntries
 router.delete('/timesheetEntries', async (req, res) => {
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('DELETE FROM TimesheetEntry RETURNING *');
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'No timesheetEntries found' });
-      }
-
-      res.json(result.rows);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('DELETE FROM TimesheetEntry RETURNING *');
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'No timesheetEntries found' });
+    } else {
+      res.json(result.rows);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error deleting timesheet entries from the database' });
   }
@@ -500,18 +528,18 @@ router.put('/timesheetEntries/:entryId', async (req, res) => {
   const { timesheetId, projectId, hoursWorked, Date } = req.body;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query(
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
         'UPDATE TimesheetEntry SET timesheetId = $1, projectId = $2, hoursWorked = $3, Date = $4 WHERE entryId = $5 RETURNING *',
         [timesheetId, projectId, hoursWorked, Date, entryId]
       );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'TimesheetEntry not found' });
-      }
-
-      res.json(result.rows[0]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'TimesheetEntry not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error updating timesheet entry in the database' });
   }
@@ -521,6 +549,7 @@ router.put('/timesheetEntries/:entryId', async (req, res) => {
 /*
   USERS
 */
+
 // POST a user
 router.post('/users', async (req, res) => {
   const { username, email, managerId, isManager } = req.body;
@@ -530,14 +559,14 @@ router.post('/users', async (req, res) => {
   }
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query(
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
         'INSERT INTO "timesheetuser" (userId, email, managerId, isManager) VALUES ($1, $2, $3, $4) RETURNING *',
         [username, email, managerId, isManager]
       );
-
-      res.status(201).json(result.rows[0]);
     });
+
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: 'Error inserting user into the database' });
   }
@@ -548,15 +577,15 @@ router.get('/users/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('SELECT * FROM "timesheetuser" WHERE userId = $1', [userId]);
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      res.json(result.rows[0]);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM "timesheetuser" WHERE userId = $1', [userId]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'User not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving user from the database' });
   }
@@ -565,11 +594,11 @@ router.get('/users/:userId', async (req, res) => {
 // GET all users
 router.get('/users', async (req, res) => {
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('SELECT * FROM "timesheetuser"');
-
-      res.json(result.rows);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM "timesheetuser"');
     });
+
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving users from the database' });
   }
@@ -580,15 +609,15 @@ router.delete('/users/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('DELETE FROM "timesheetuser" WHERE userId = $1 RETURNING *', [userId]);
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      res.json(result.rows[0]);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('DELETE FROM "timesheetuser" WHERE userId = $1 RETURNING *', [userId]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'User not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error deleting user from the database' });
   }
@@ -597,15 +626,15 @@ router.delete('/users/:userId', async (req, res) => {
 // DELETE all users
 router.delete('/users', async (req, res) => {
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('DELETE FROM "timesheetuser" RETURNING *');
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'No users found' });
-      }
-
-      res.json(result.rows);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('DELETE FROM "timesheetuser" RETURNING *');
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'No users found' });
+    } else {
+      res.json(result.rows);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error deleting users from the database' });
   }
@@ -614,11 +643,11 @@ router.delete('/users', async (req, res) => {
 // GET all managers
 router.get('/managers', async (req, res) => {
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('SELECT * FROM "timesheetuser" WHERE isManager = true');
-
-      res.json(result.rows);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM "timesheetuser" WHERE isManager = true');
     });
+
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving managers from the database' });
   }
@@ -629,11 +658,11 @@ router.get('/users/manager/:managerId', async (req, res) => {
   const { managerId } = req.params;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query('SELECT * FROM "timesheetuser" WHERE managerId = $1', [managerId]);
-
-      res.json(result.rows);
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query('SELECT * FROM "timesheetuser" WHERE managerId = $1', [managerId]);
     });
+
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving users of a manager from the database' });
   }
@@ -645,18 +674,18 @@ router.put('/users/:userId/manager', async (req, res) => {
   const { managerId } = req.body;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query(
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
         'UPDATE "timesheetuser" SET managerId = $1 WHERE userId = $2 RETURNING *',
         [managerId, userId]
       );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      res.json(result.rows[0]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'User not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error updating user\'s manager in the database' });
   }
@@ -668,21 +697,22 @@ router.put('/users/:userId/manager/status', async (req, res) => {
   const { isManager } = req.body;
 
   try {
-    await handleDatabaseTransaction(res, async (client) => {
-      const result = await client.query(
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
         'UPDATE "timesheetuser" SET isManager = $1 WHERE userId = $2 RETURNING *',
         [isManager, userId]
       );
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      res.json(result.rows[0]);
     });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'User not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Error updating user\'s manager status in the database' });
   }
 });
+
 
 export = router;

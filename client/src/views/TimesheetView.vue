@@ -26,7 +26,7 @@ import { ref } from 'vue'
 
 import { useGoogleUserData } from '../stores/useDataStore'
 
-const { id } = useGoogleUserData()
+const { id } = useGoogleUserData() // need to check if user logged in too
 
 const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
 
