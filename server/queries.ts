@@ -544,12 +544,11 @@ router.put('/timesheetEntries/:entryId', async (req, res) => {
   }
 });
 
-
 /*
   USERS
 */
 
-// Check if user first time login
+// Check if user first time login and POST if does not exist
 router.get('/userFirstTimeLogin/:userId/:email', async (req, res) => {
   const { userId, email } = req.params;
 
