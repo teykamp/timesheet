@@ -38,6 +38,14 @@ export const useGoogleUserData = defineStore('googleUserData',{
       this.family_name = googleProfile.family_name
       this.picture = googleProfile.picture
       this.locale = googleProfile.locale
+
+      axios.get(`api/userFirstTimeLogin/${this.id}/${encodeURIComponent(this.email)}`)
+      .then((response) => {
+        console.log('Response:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error:', error.response.data);
+      });
     },
     logUserOut() {
       this.id = ''

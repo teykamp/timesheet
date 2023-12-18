@@ -33,8 +33,7 @@ const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
 const userTimesheets = ref(null)
 
 const getUserTimesheets = () => {
-  if (!isUserLoggedIn) return // can do something to ask user to log in
-
+  if (!isUserLoggedIn()) return // can do something to ask user to log in
   axios.get(`/api/timesheets/user/${id}`)
   .then(response => {
     const { data } = response

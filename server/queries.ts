@@ -40,7 +40,6 @@ async function handleDatabaseTransaction(
   }
 }
 
-
 /*
 
 PROJECTS
@@ -201,7 +200,7 @@ router.get('/timesheets/manager/:managerId', async (req, res) => {
         'SELECT t.timesheetId, t.userId, t.endDate, t.status, te.entryId, te.projectId, te.hoursWorked, te.date ' +
         'FROM Timesheet t ' +
         'JOIN TimesheetEntry te ON t.timesheetId = te.timesheetId ' +
-        'WHERE t.status = $1 AND t.userId IN (SELECT userId FROM TimesheetUser WHERE managerId = $2)',
+        'WHERE t.status = $1 AND t.userId IN (SELECT userId FROM timesheetuser WHERE managerId = $2)',
         ['submitted', managerId]
       );
     });
@@ -550,6 +549,32 @@ router.put('/timesheetEntries/:entryId', async (req, res) => {
   USERS
 */
 
+// Check if user first time login
+router.get('/userFirstTimeLogin/:userId/:email', async (req, res) => {
+  const { userId, email } = req.params;
+
+  try {
+    const userResponse = await handleDatabaseTransaction(async (client) => {
+      const result = await client.query('SELECT * FROM "timesheetuser" WHERE userId = $1', [userId]);
+
+      if (!result || !result.rows || result.rows.length === 0) {
+        const createUserResult = await client.query(
+          'INSERT INTO "timesheetuser" (userId, email) VALUES ($1, $2) RETURNING *',
+          [userId, email]
+        );
+
+        return createUserResult.rows[0];
+      }
+
+      return result.rows[0];
+    });
+
+    res.json(userResponse);
+  } catch (error) {
+    res.status(500).json({ error: 'Error checking or creating user' });
+  }
+});
+
 // POST a user
 router.post('/users', async (req, res) => {
   const { username, email, managerId, isManager } = req.body;
@@ -713,6 +738,5 @@ router.put('/users/:userId/manager/status', async (req, res) => {
     res.status(500).json({ error: 'Error updating user\'s manager status in the database' });
   }
 });
-
 
 export = router;
