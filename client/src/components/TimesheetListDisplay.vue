@@ -25,7 +25,7 @@
     </div>
     <div style="max-height: calc(95vh - 190px); overflow-y: auto;">
       <v-data-table
-        :items="items"
+        :items="userTimesheets"
         :items-per-page="-1"
         :headers="headerData"
         :search="search"
@@ -89,6 +89,7 @@ const { id, isUserLoggedIn } = useGoogleUserData()
 const { xs } = useDisplay()
 
 type Item = {
+  id: number
   endDate: String,
   totalHoursWorked: Number,
   status: 'working' | 'submitted' | 'approved'
@@ -104,23 +105,47 @@ const getStatusChipColor = (status: Item['status']) => {
       return 'success'
   }
 }
+const userTimesheets = ref<Item[]>([])
 
-const deleteTimesheet = (item: Item) => {
-  return
+const deleteTimesheet = async (item: Item) => {
+  try {
+    const response = await axios.delete(`/api/timesheets/${item.id}`)
+
+    if (response.status === 200) {
+      const updatedTimesheets = userTimesheets.value.filter(timesheet => timesheet.id !== item.id)
+      userTimesheets.value = updatedTimesheets
+    } else {
+      console.error('Failed to delete timesheet:', response.data.error)
+    }
+  } catch (error) {
+    console.error('Error deleting timesheet:', error.message)
+  }
 }
 
 const editTimesheet = (item: Item) => {
   return
 }
 
-const userTimesheets = ref(null)
 
 const getUserTimesheets = () => {
-  if (!isUserLoggedIn()) return // can do something to ask user to log in
+  if (!isUserLoggedIn()) return
   axios.get(`/api/timesheets/user/${id}`)
     .then(response => {
       const { data } = response
       userTimesheets.value = data
+      // add temp data
+      userTimesheets.value.push({
+        id:100000000,
+        endDate: '12/11/23',
+        totalHoursWorked: 50,
+        status: 'working',
+      },
+      {
+        id: 10000000000001,
+        endDate: '4/18/22',
+        totalHoursWorked: 29,
+        status: 'approved',
+      })
     })
     .catch(error => {
       console.error('Error fetching data:', error.message)
@@ -155,84 +180,6 @@ const headerData = ref([
     key: 'actions',
     align: 'end',
     sortable: false,
-  },
-],)
-
-const items = ref([
-  {
-    endDate: '12/11/23',
-    totalHoursWorked: 50,
-    status: 'approved',
-  },
-  {
-    endDate: '4/18/22',
-    totalHoursWorked: 29,
-    status: 'approved',
-  },
-  {
-    endDate: '9/1/21',
-    totalHoursWorked: 40,
-    status: 'approved',
-  },
-  {
-    endDate: '9/18/23',
-    totalHoursWorked: 40,
-    status: 'approved',
-  },
-  {
-    endDate: '2/29/00',
-    totalHoursWorked: 40,
-    status: 'working',
-  },
-  {
-    endDate: '12/11/23',
-    totalHoursWorked: 50,
-    status: 'submitted',
-  },
-  {
-    endDate: '4/18/22',
-    totalHoursWorked: 29,
-    status: 'submitted',
-  },
-  {
-    endDate: '9/1/21',
-    totalHoursWorked: 40,
-    status: 'submitted',
-  },
-  {
-    endDate: '9/18/23',
-    totalHoursWorked: 40,
-    status: 'submitted',
-  },
-  {
-    endDate: '2/29/00',
-    totalHoursWorked: 40,
-    status: 'working',
-  },
-  {
-    endDate: '12/11/23',
-    totalHoursWorked: 50,
-    status: 'working',
-  },
-  {
-    endDate: '4/18/22',
-    totalHoursWorked: 29,
-    status: 'working',
-  },
-  {
-    endDate: '9/1/21',
-    totalHoursWorked: 40,
-    status: 'working',
-  },
-  {
-    endDate: '9/18/23',
-    totalHoursWorked: 40,
-    status: 'working',
-  },
-  {
-    endDate: '2/29/00',
-    totalHoursWorked: 40,
-    status: 'working',
   },
 ])
 </script>

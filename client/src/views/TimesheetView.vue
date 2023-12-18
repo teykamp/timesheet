@@ -3,11 +3,14 @@
     <Suspense v-if="state === 'allTimesheets'">
       <TimesheetListDisplay />
       <template #fallback>
-
-        <p>Loading...</p>
-
+        <v-card
+          flat
+          style="width:100%; margin-top: 40vh;"
+          class="d-flex justify-center"
+        >
+          <v-progress-circular indeterminate :size="57"></v-progress-circular>
+        </v-card>
       </template>
-
     </Suspense>
     <v-btn
       v-if="state === 'editTimesheet'"
