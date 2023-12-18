@@ -44,6 +44,7 @@
       
         <template #item.view="{ item }">
           <v-btn
+            @click="viewTimesheet(item)"
             flat
             size="small"
             prepend-icon="mdi-eye"
@@ -126,6 +127,9 @@ const editTimesheet = (item: Item) => {
   return
 }
 
+const viewTimesheet = (item: Item) => {
+  return
+}
 
 const getUserTimesheets = () => {
   if (!isUserLoggedIn()) return
@@ -145,7 +149,7 @@ const getUserTimesheets = () => {
         endDate: '4/18/22',
         totalHoursWorked: 29,
         status: 'approved',
-      })
+      },)
     })
     .catch(error => {
       console.error('Error fetching data:', error.message)

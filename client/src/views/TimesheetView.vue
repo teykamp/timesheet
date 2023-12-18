@@ -1,7 +1,17 @@
 <template>
   <div>
     <Suspense v-if="state === 'allTimesheets'">
-      <TimesheetListDisplay />
+      <div>
+        <TimesheetListDisplay />
+        <v-container class="d-flex justify-end">
+          <v-btn
+            @click="handleAddNewTimesheet()"
+            prepend-icon="mdi-plus"
+          >
+            New
+          </v-btn>
+        </v-container>
+      </div>
       <template #fallback>
         <v-card
           flat
@@ -17,9 +27,8 @@
       @click="state = 'allTimesheets'"
       icon="mdi-chevron-left"
       flat
-      class="ml-11 position-absolute z-20"
+      class="ml-11 mt-2"
     ></v-btn>
-    <!-- probably pass in timesheet data -->
     <EditTimesheet 
       v-if="state === 'editTimesheet'"
     />
@@ -37,5 +46,8 @@ const TimesheetListDisplay = defineAsyncComponent(() =>
 
 const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
 
-
+const handleAddNewTimesheet = () => {
+  state.value = 'editTimesheet'
+  return
+}
 </script>

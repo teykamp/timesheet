@@ -34,7 +34,7 @@
         <v-sheet 
           class="mt-6"
           :style="{
-            'max-height': 'calc(95vh - 170px)',
+            'max-height': 'calc(88vh - 170px)',
             overflow: 'auto',
           }"
         >
@@ -85,15 +85,15 @@
         </v-sheet>
       </v-card>
     </div>
-    <div class="d-flex justify-space-between">
+    <div class="d-flex justify-space-between mt-8">
       <v-btn
         @click="handleAddRow()"
-        class="ml-10 mb-10"
+        class="ml-10"
         prepend-icon="mdi-plus"
       >Add</v-btn>
       <v-btn
         @click="handleSubmit()"
-        class="mr-10 mb-10"
+        class="mr-10"
         color="success"
         append-icon="mdi-forward"
       >Submit</v-btn>
