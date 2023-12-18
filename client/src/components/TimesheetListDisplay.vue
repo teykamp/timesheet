@@ -10,7 +10,7 @@
         </template>
       </v-card>
       <v-card flat>
-        <template v-slot:text>
+        <template #text>
           <v-text-field
             v-model="search"
             label="Search"
@@ -30,7 +30,7 @@
         :headers="headerData"
         :search="search"
         >
-        <template v-slot:item.status="{ item }">
+        <template #item.status="{ item }">
           <div>
             <v-chip
               :color="getStatusChipColor(item.status)"
@@ -42,7 +42,7 @@
           </div>
         </template>
       
-        <template v-slot:item.view="{ item }">
+        <template #item.view="{ item }">
           <v-btn
             flat
             size="small"
@@ -50,7 +50,7 @@
           >View</v-btn>
         </template>
       
-        <template v-slot:item.actions="{ item }">
+        <template #item.actions="{ item }">
           <div class="d-flex justify-end">
             <v-btn
               @click="editTimesheet(item)"
@@ -71,15 +71,20 @@
             ></v-btn>
           </div>
         </template>
-        <template v-slot:bottom></template>
+        <template #bottom></template>
       </v-data-table>
     </div>
   </v-card>
 </template>
 
 <script setup lang="ts">
+import axios from 'axios'
+
 import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
+
+import { useGoogleUserData } from '../stores/useDataStore'
+const { id, isUserLoggedIn } = useGoogleUserData()
 
 const { xs } = useDisplay()
 
@@ -107,6 +112,22 @@ const deleteTimesheet = (item: Item) => {
 const editTimesheet = (item: Item) => {
   return
 }
+
+const userTimesheets = ref(null)
+
+const getUserTimesheets = () => {
+  if (!isUserLoggedIn()) return // can do something to ask user to log in
+  axios.get(`/api/timesheets/user/${id}`)
+    .then(response => {
+      const { data } = response
+      userTimesheets.value = data
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error.message)
+    })
+}
+
+getUserTimesheets()
 
 const search = ref('')
 

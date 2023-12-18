@@ -1,8 +1,14 @@
 <template>
   <div>
-    <TimesheetListDisplay 
-      v-if="state === 'allTimesheets'"
-    />
+    <Suspense v-if="state === 'allTimesheets'">
+      <TimesheetListDisplay />
+      <template #fallback>
+
+        <p>Loading...</p>
+
+      </template>
+
+    </Suspense>
     <v-btn
       v-if="state === 'editTimesheet'"
       @click="state = 'allTimesheets'"
@@ -18,31 +24,15 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
+import { ref, defineAsyncComponent } from 'vue'
+
 import EditTimesheet from '../components/EditTimesheet.vue'
-import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
 
-import { ref } from 'vue'
-
-import { useGoogleUserData } from '../stores/useDataStore'
-
-const { id, isUserLoggedIn } = useGoogleUserData()
+const TimesheetListDisplay = defineAsyncComponent(() => 
+  import('../components/TimesheetListDisplay.vue')
+)
 
 const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
 
-const userTimesheets = ref(null)
 
-const getUserTimesheets = () => {
-  if (!isUserLoggedIn()) return // can do something to ask user to log in
-  axios.get(`/api/timesheets/user/${id}`)
-  .then(response => {
-    const { data } = response
-    userTimesheets.value = data
-  })
-  .catch(error => {
-    console.error('Error fetching data:', error.message)
-  })
-}
-
-getUserTimesheets()
 </script>
