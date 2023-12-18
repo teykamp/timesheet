@@ -26,17 +26,24 @@ import { ref } from 'vue'
 
 import { useGoogleUserData } from '../stores/useDataStore'
 
-const { id } = useGoogleUserData() // need to check if user logged in too
+const { id, isUserLoggedIn } = useGoogleUserData()
 
 const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
 
-axios.get(`/api/timesheets/user/${id}`)
-  .then(response => {
-    const { data } = response
-    console.log(data)
-  })
-  .catch(error => {
-    console.error('Error fetching data:', error.message)
-  })
+const x = ref(null)
 
+const getUserdata = () => {
+  if (isUserLoggedIn()) {
+    axios.get(`/api/timesheets/user/${id}`)
+    .then(response => {
+      const { data } = response
+      x.value = data
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error.message)
+    })
+  }
+}
+
+getUserdata()
 </script>
