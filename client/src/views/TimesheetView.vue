@@ -30,20 +30,20 @@ const { id, isUserLoggedIn } = useGoogleUserData()
 
 const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
 
-const x = ref(null)
+const userTimesheets = ref(null)
 
-const getUserdata = () => {
-  if (isUserLoggedIn()) {
-    axios.get(`/api/timesheets/user/${id}`)
-    .then(response => {
-      const { data } = response
-      x.value = data
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error.message)
-    })
-  }
+const getUserTimesheets = () => {
+  if (!isUserLoggedIn) return // can do something to ask user to log in
+
+  axios.get(`/api/timesheets/user/${id}`)
+  .then(response => {
+    const { data } = response
+    userTimesheets.value = data
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error.message)
+  })
 }
 
-getUserdata()
+getUserTimesheets()
 </script>
