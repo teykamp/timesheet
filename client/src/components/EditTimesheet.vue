@@ -32,7 +32,6 @@
           </v-col>
         </v-card>
         <v-sheet 
-          class="mt-6"
           :style="{
             'max-height': 'calc(88vh - 170px)',
             overflow: 'auto',
@@ -100,7 +99,6 @@
         append-icon="mdi-forward"
       >Submit</v-btn>
     </div>
-    {{ grid }}
   </div>
 </template>
 
@@ -153,10 +151,16 @@ const selectedProjects = computed(() => {
 })
 
 const handleAddRow = () => {
-  return
+  const newRow = []
+  newRow.push({ projectId: null })
+  for (let i = 0; i < cols - 1; i++) {
+    newRow.push({ entry: { date: '', hours: 0 } })
+  }
+  grid.value.push(newRow)
 }
 
 const handleSubmit = () => {
+  // sackbar display
   return
 }
 
