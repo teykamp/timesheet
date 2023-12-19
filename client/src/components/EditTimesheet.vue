@@ -76,6 +76,7 @@
               />
             </v-col>
             <v-btn 
+              @click="handleDeleteRow(rowIndex)"
               size="small"
               variant="tonal"
               color="red" 
@@ -157,6 +158,10 @@ const handleAddRow = () => {
     newRow.push({ entry: { date: '', hours: 0 } })
   }
   grid.value.push(newRow)
+}
+
+const handleDeleteRow = (rowIndex: number) => {
+  grid.value.splice(rowIndex, 1);
 }
 
 const handleSubmit = () => {
