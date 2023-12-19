@@ -53,22 +53,24 @@
             >
               <v-autocomplete
                 v-if="colIndex === 0"
-                v-model="cell.text"
+                v-model="cell.projectId"
                 label="Project Name"
-                :items="projectList"
-                variant="outlined"
+                :items="projects"
+                item-title="projectname"
+                item-value="projectid"
                 density="compact"
+                variant="outlined"
               >
-                <template v-slot:item="{ props, item }">
+                <template #item="{ props, item }">
                   <v-list-item
                     v-bind="props"
-                    :disabled="selectedProjects.includes(item.title)"
+                    :disabled="selectedProjects.includes(item.value)"
                   ></v-list-item>
                 </template>
               </v-autocomplete>
               <v-text-field
-                v-if="colIndex !== 0"
-                v-model="cell.text"  
+                v-else
+                v-model="cell.entry.hours"  
                 variant="outlined" 
                 label="Hours" 
                 density="compact" 
@@ -98,12 +100,15 @@
         append-icon="mdi-forward"
       >Submit</v-btn>
     </div>
+    {{ grid }}
   </div>
 </template>
 
 <script setup lang="ts">
+import axios from 'axios'
 import { ref, computed } from 'vue'
 import { useDisplay } from 'vuetify'
+import type { Project } from '../stores/useDataStore'
 
 const { lgAndUp } = useDisplay()
 const rows = 3
@@ -131,15 +136,20 @@ colLabels.unshift({
 })
 
 const grid = ref(
-  Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => ({ text: '' }))
-  )
+  Array.from({ length: rows }, () => {
+    const row = [];
+    row.push({ projectId: null })
+    for (let i = 0; i < cols - 1; i++) {
+      row.push({ entry: { date: '', hours: 0 } })
+    }
+    return row
+  })
 )
 
-const projectList = ['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']
+const projects = ref<Project[]>([])
 
 const selectedProjects = computed(() => {
-  return grid.value.map(row => row[0].text)
+  return grid.value.map(row => row[0].projectId === null ? null : row[0].projectId)
 })
 
 const handleAddRow = () => {
@@ -149,4 +159,17 @@ const handleAddRow = () => {
 const handleSubmit = () => {
   return
 }
+
+const getProjects = () => {
+  axios.get(`/api/projects`)
+    .then(response => {
+      const { data } = response
+      projects.value = data
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error.message)
+    })
+}
+
+getProjects()
 </script>

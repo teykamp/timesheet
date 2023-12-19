@@ -14,6 +14,18 @@ export type GoogleProfile = {
   locale: string
 }
 
+export type Project = {
+  projectid: Number,
+  projectname: String
+}
+
+export type TimesheetEntry = {
+  id: Number,
+  hours: Number,
+  timesheetId: Number,
+  date: String
+}
+
 export const useGoogleUserData = defineStore('googleUserData',{
   state: () => ({
     id: '',

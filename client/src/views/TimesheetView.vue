@@ -29,7 +29,7 @@
       flat
       class="ml-11 mt-2"
     ></v-btn>
-    <EditTimesheet 
+    <EditTimesheet
       v-if="state === 'editTimesheet'"
     />
   </div>
@@ -47,6 +47,8 @@ const TimesheetListDisplay = defineAsyncComponent(() =>
 const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
 
 const handleAddNewTimesheet = () => {
+  // probably pass in the timesheet id at a minimum
+  // probably need to do an emit event or something from timesheetListDisplay depending on what is clicked on
   state.value = 'editTimesheet'
   return
 }
