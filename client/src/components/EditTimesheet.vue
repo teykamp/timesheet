@@ -95,6 +95,7 @@
       >Add</v-btn>
       <v-btn
         @click="handleSubmit()"
+        :disabled="grid.length === 0"
         class="mr-10"
         color="success"
         append-icon="mdi-forward"
@@ -166,6 +167,8 @@ const handleDeleteRow = (rowIndex: number) => {
 
 const handleSubmit = () => {
   // sackbar display
+  // check if grid empty (disable)
+  // add content if grid empty saying add here
   return
 }
 
