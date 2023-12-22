@@ -67,10 +67,12 @@
                   ></v-list-item>
                 </template>
               </v-autocomplete>
+              <!-- error handled thorugh v-if -->
               <v-text-field
                 v-else
-                v-model="cell.entry.hours"  
+                v-model="cell.entry.hoursWorked"  
                 variant="outlined" 
+                :rules="[validateAllRules]"
                 label="Hours" 
                 density="compact" 
               />
@@ -90,12 +92,13 @@
     <div class="d-flex justify-space-between mt-8">
       <v-btn
         @click="handleAddRow()"
-        class="ml-10"
+        :color="`${grid.length === 0 ? 'red' : ''}`"
+        :class="`ml-10 ${grid.length === 0 ? 'animate-bounce' : ''}`"
         prepend-icon="mdi-plus"
       >Add</v-btn>
       <v-btn
         @click="handleSubmit()"
-        :disabled="grid.length === 0"
+        :disabled="grid.length === 0 || !allRulesPassed || !grid.every(row => row[0].projectId !== null)"
         class="mr-10"
         color="success"
         append-icon="mdi-forward"
@@ -109,6 +112,9 @@ import axios from 'axios'
 import { ref, computed } from 'vue'
 import { useDisplay } from 'vuetify'
 import type { Project } from '../stores/useDataStore'
+import { useGoogleUserData } from '../stores/useDataStore'
+
+const { id } = useGoogleUserData()
 
 const { lgAndUp } = useDisplay()
 const rows = 3
@@ -135,12 +141,35 @@ colLabels.unshift({
   xs: 'PN'
 })
 
+const allRulesPassed = ref(false)
+
+const positiveNumberRule = (value: any) => {
+  return /^[+]?\d*\.?\d+$/.test(value) || 'Error NaN'
+}
+const multipleOfQuarterRule = (value: any) => {
+  return (parseFloat(value) % 0.25 === 0) || 'Error *.25'
+}
+const validateAllRules = (value: any) => {
+  const rules = [positiveNumberRule, multipleOfQuarterRule]
+  for (const rule of rules) {
+    const result = rule(value)
+    if (result !== true) {
+      allRulesPassed.value = false
+      console.log(allRulesPassed.value)
+      return result
+    }
+  }
+  allRulesPassed.value = true
+  return true
+}
+
+
 const grid = ref(
   Array.from({ length: rows }, () => {
     const row = [];
     row.push({ projectId: null })
     for (let i = 0; i < cols - 1; i++) {
-      row.push({ entry: { date: '', hours: 0 } })
+      row.push({ entry: { date: '', hoursWorked: 0, projectId: null } })
     }
     return row
   })
@@ -156,7 +185,7 @@ const handleAddRow = () => {
   const newRow = []
   newRow.push({ projectId: null })
   for (let i = 0; i < cols - 1; i++) {
-    newRow.push({ entry: { date: '', hours: 0 } })
+    newRow.push({ entry: { date: '', hoursWorked: 0, projectId: null } })
   }
   grid.value.push(newRow)
 }
@@ -166,9 +195,36 @@ const handleDeleteRow = (rowIndex: number) => {
 }
 
 const handleSubmit = () => {
+
+  if (grid.value.some(row => row[0].projectId === null)) {
+    // show snackbar saying project Id's cannot be 0
+    return
+  }
+
+  axios.post('/api/timesheets', { 
+    userId: id,
+    endDate: 'now',
+    status: 'submitted',
+    entries: grid.value.map((row) => {
+      const [, ...entryColumns] = row
+
+      return entryColumns.map((cell) => ({
+        ...cell,
+        entry: {
+          ...cell.entry,
+          projectId: row[0].projectId,
+        },
+      }))
+    }) // remove first column (PN)
+  })
+    .then(response => {
+      console.log('Successfully posted timesheet:', response.data);
+    })
+    .catch(error => {
+      console.error('Error posting timesheet:', error.response ? error.response.data : error.message);
+    });
+
   // sackbar display
-  // check if grid empty (disable)
-  // add content if grid empty saying add here
   return
 }
 
