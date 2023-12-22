@@ -244,28 +244,22 @@ router.get('/timesheets/user/:userId', async (req, res) => {
         'SELECT * FROM Timesheet WHERE userId = $1',
         [userId]
       );
-
-      // Check if timesheets exist
       const timesheets = timesheetsResult.rows || [];
 
-      // Calculate total hours for each timesheet
       const timesheetsWithTotalHours = await Promise.all(
         timesheets.map(async (timesheet) => {
           const totalHoursResult = await client.query(
             'SELECT COALESCE(SUM(hoursWorked), 0) AS totalHours FROM TimesheetEntry WHERE timesheetId = $1',
-            [timesheet.timesheetId]
+            [timesheet.timesheetid]
           );
 
-          const totalHours = totalHoursResult.rows[0].totalHours;
+          const totalHours = totalHoursResult.rows[0].totalhours
           return { ...timesheet, totalHours };
         })
       );
-
-      // Always return an empty list if no timesheets are found
       return timesheetsWithTotalHours || [];
     });
 
-    // Respond with the result
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheets and total hours from the database' });

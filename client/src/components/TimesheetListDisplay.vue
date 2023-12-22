@@ -23,7 +23,7 @@
         </template>
       </v-card>
     </div>
-    <div style="max-height: calc(95vh - 190px); overflow-y: auto;">
+    <div style="max-height: calc(88vh - 210px); overflow-y: auto;">
       <v-data-table
         :items="userTimesheets"
         :items-per-page="-1"
@@ -92,7 +92,7 @@ const { xs } = useDisplay()
 type Item = {
   timesheetid: number
   endDate: String,
-  totalHoursWorked: Number,
+  totalHours: Number,
   status: 'working' | 'submitted' | 'approved'
 }
 
@@ -137,19 +137,6 @@ const getUserTimesheets = () => {
     .then(response => {
       const { data } = response
       userTimesheets.value = data
-      // add temp data
-      userTimesheets.value.push({
-        timesheetid:100000000,
-        endDate: '12/11/23',
-        totalHoursWorked: 50,
-        status: 'working',
-      },
-      {
-        timesheetid: 10000000000001,
-        endDate: '4/18/22',
-        totalHoursWorked: 29,
-        status: 'approved',
-      },)
     })
     .catch(error => {
       console.error('Error fetching data:', error.message)
@@ -167,7 +154,7 @@ const headerData = ref([
   },
   { 
     title: 'Hours', 
-    key: 'totalHoursWorked',
+    key: 'totalHours',
   },
   { 
     title: 'Status',
