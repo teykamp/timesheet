@@ -358,8 +358,30 @@ router.get('/timesheets', async (req, res) => {
   }
 });
 
-// DELETE a timesheet by timesheetId
+// DELETE a timesheet by timesheetId and all associated timesheet entries
 router.delete('/timesheets/:timesheetId', async (req, res) => {
+  const { timesheetId } = req.params;
+
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      await client.query('DELETE FROM TimesheetEntry WHERE timesheetId = $1', [timesheetId]);
+
+      return await client.query('DELETE FROM Timesheet WHERE timesheetId = $1 RETURNING *', [timesheetId]);
+    });
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Timesheet not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting timesheet and entries from the database' });
+  }
+});
+
+
+// DELETE a timesheet by timesheetId
+router.delete('/timesheets/solo/:timesheetId', async (req, res) => {
   const { timesheetId } = req.params;
 
   try {
