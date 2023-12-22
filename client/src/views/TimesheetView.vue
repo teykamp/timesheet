@@ -27,7 +27,7 @@
       @click="state = 'allTimesheets'"
       icon="mdi-chevron-left"
       flat
-      class="position-absolute ml-11 mt-2"
+      class="position-absolute ml-4 mt-2"
     ></v-btn>
     <EditTimesheet
       v-if="state === 'editTimesheet'"
