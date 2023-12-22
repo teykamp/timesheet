@@ -52,7 +52,7 @@
             >
               <v-autocomplete
                 v-if="colIndex === 0"
-                v-model="cell.projectId"
+                v-model="cell.projectid"
                 label="Project Name"
                 :items="projects"
                 item-title="projectname"
@@ -98,7 +98,7 @@
       >Add</v-btn>
       <v-btn
         @click="handleSubmit()"
-        :disabled="grid.length === 0 || !allRulesPassed || !grid.every(row => row[0].projectId !== null)"
+        :disabled="grid.length === 0 || !allRulesPassed || !grid.every(row => row[0].projectid !== null)"
         class="mr-10"
         color="success"
         append-icon="mdi-forward"
@@ -167,9 +167,9 @@ const validateAllRules = (value: any) => {
 const grid = ref(
   Array.from({ length: rows }, () => {
     const row = [];
-    row.push({ projectId: null })
+    row.push({ projectid: null })
     for (let i = 0; i < cols - 1; i++) {
-      row.push({ entry: { date: '', hoursWorked: 0, projectId: null } })
+      row.push({ entry: {  projectid: null, hoursWorked: 0, date: 'now' } })
     }
     return row
   })
@@ -178,14 +178,14 @@ const grid = ref(
 const projects = ref<Project[]>([])
 
 const selectedProjects = computed(() => {
-  return grid.value.map(row => row[0].projectId === null ? null : row[0].projectId)
+  return grid.value.map(row => row[0].projectid === null ? null : row[0].projectid)
 })
 
 const handleAddRow = () => {
   const newRow = []
-  newRow.push({ projectId: null })
+  newRow.push({ projectid: null })
   for (let i = 0; i < cols - 1; i++) {
-    newRow.push({ entry: { date: '', hoursWorked: 0, projectId: null } })
+    newRow.push({ entry: { date: '', hoursWorked: 0, projectid: null } })
   }
   grid.value.push(newRow)
 }
@@ -195,12 +195,6 @@ const handleDeleteRow = (rowIndex: number) => {
 }
 
 const handleSubmit = () => {
-
-  if (grid.value.some(row => row[0].projectId === null)) {
-    // show snackbar saying project Id's cannot be 0
-    return
-  }
-
   axios.post('/api/timesheets', { 
     userId: id,
     endDate: 'now',
@@ -212,7 +206,7 @@ const handleSubmit = () => {
         ...cell,
         entry: {
           ...cell.entry,
-          projectId: row[0].projectId,
+          projectid: row[0].projectid,
         },
       }))
     }) // remove first column (PN)

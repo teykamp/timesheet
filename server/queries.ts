@@ -276,36 +276,30 @@ router.get('/timesheets/user/:userId', async (req, res) => {
 // POST a timesheet with entries
 router.post('/timesheets', async (req, res) => {
   const { userId, endDate, status, entries } = req.body;
-
   if (!userId || !endDate || !status || !Array.isArray(entries) || entries.length === 0) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
   try {
     const result = await handleDatabaseTransaction(async (client) => {
-      // Insert the timesheet
       const timesheetResult = await client.query(
         `INSERT INTO Timesheet (userId, endDate, status) VALUES ($1, $2, $3)
         RETURNING timesheetId`,
         [userId, endDate, status]
       );
-
-      const timesheetId = timesheetResult.rows[0].timesheetId;
-
-      // Insert timesheet entries
-      await client.query(
-        `WITH NewTimesheet AS (
-          SELECT timesheetId
-          FROM Timesheet
-          WHERE timesheetId = $1
-        )
-        INSERT INTO TimesheetEntry (timesheetId, projectId, hoursWorked, date)
-        SELECT nt.timesheetId, te.projectId, te.hoursWorked, te.date
-        FROM NewTimesheet nt
-        JOIN UNNEST($2::json[]::text[]::json[]) AS te ON true`,
-        [timesheetId, entries]
-      );
-
+      const timesheetId = timesheetResult.rows[0].timesheetid;
+      for (const entry of entries[0]) { // for some reason its array of arrays
+          const { projectid, hoursWorked, date } = entry.entry;
+          const entryResult = await client.query(
+            `WITH NewTimesheet AS (
+              SELECT timesheetId
+              FROM Timesheet
+              WHERE timesheetId = $1
+            )
+            INSERT INTO TimesheetEntry(timesheetId, projectId, hoursWorked, date) VALUES((SELECT timesheetId FROM NewTimesheet), $2, $3, $4) RETURNING *`,
+            [timesheetId, projectid, hoursWorked, date]
+          );
+      }
       return { timesheetId };
     });
 
@@ -315,7 +309,6 @@ router.post('/timesheets', async (req, res) => {
     res.status(500).json({ error: 'Error posting timesheet and entries to the database' });
   }
 });
-
 
 // POST a timesheet
 router.post('/timesheets/solo', async (req, res) => {
