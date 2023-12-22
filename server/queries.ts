@@ -285,30 +285,37 @@ router.post('/timesheets', async (req, res) => {
     const result = await handleDatabaseTransaction(async (client) => {
       // Insert the timesheet
       const timesheetResult = await client.query(
-        'INSERT INTO Timesheet (userId, endDate, status) VALUES ($1, $2, $3) RETURNING timesheetId',
+        `INSERT INTO Timesheet (userId, endDate, status) VALUES ($1, $2, $3)
+        RETURNING timesheetId`,
         [userId, endDate, status]
       );
 
       const timesheetId = timesheetResult.rows[0].timesheetId;
 
       // Insert timesheet entries
-      const entryPromises = entries.map(async (entry) => {
-        await client.query(
-          'INSERT INTO TimesheetEntry (timesheetId, projectId, hoursWorked, date) VALUES ($1, $2, $3, $4)',
-          [timesheetId, entry.projectId, entry.hoursWorked, entry.date]
-        );
-      });
-
-      await Promise.all(entryPromises);
+      await client.query(
+        `WITH NewTimesheet AS (
+          SELECT timesheetId
+          FROM Timesheet
+          WHERE timesheetId = $1
+        )
+        INSERT INTO TimesheetEntry (timesheetId, projectId, hoursWorked, date)
+        SELECT nt.timesheetId, te.projectId, te.hoursWorked, te.date
+        FROM NewTimesheet nt
+        JOIN UNNEST($2::json[]::text[]::json[]) AS te ON true`,
+        [timesheetId, entries]
+      );
 
       return { timesheetId };
     });
 
     res.status(201).json(result);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Error posting timesheet and entries to the database' });
   }
 });
+
 
 // POST a timesheet
 router.post('/timesheets/solo', async (req, res) => {
