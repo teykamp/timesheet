@@ -90,7 +90,7 @@ const { id, isUserLoggedIn } = useGoogleUserData()
 const { xs } = useDisplay()
 
 type Item = {
-  id: number
+  timesheetid: number
   endDate: String,
   totalHoursWorked: Number,
   status: 'working' | 'submitted' | 'approved'
@@ -110,10 +110,10 @@ const userTimesheets = ref<Item[]>([])
 
 const deleteTimesheet = async (item: Item) => {
   try {
-    const response = await axios.delete(`/api/timesheets/${item.id}`)
+    const response = await axios.delete(`/api/timesheets/${item.timesheetid}`)
 
     if (response.status === 200) {
-      const updatedTimesheets = userTimesheets.value.filter(timesheet => timesheet.id !== item.id)
+      const updatedTimesheets = userTimesheets.value.filter(timesheet => timesheet.timesheetid !== item.timesheetid)
       userTimesheets.value = updatedTimesheets
     } else {
       console.error('Failed to delete timesheet:', response.data.error)
@@ -139,13 +139,13 @@ const getUserTimesheets = () => {
       userTimesheets.value = data
       // add temp data
       userTimesheets.value.push({
-        id:100000000,
+        timesheetid:100000000,
         endDate: '12/11/23',
         totalHoursWorked: 50,
         status: 'working',
       },
       {
-        id: 10000000000001,
+        timesheetid: 10000000000001,
         endDate: '4/18/22',
         totalHoursWorked: 29,
         status: 'approved',
