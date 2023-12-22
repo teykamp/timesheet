@@ -1,5 +1,13 @@
 <template>
   <div>
+    <div class="w-100 d-flex justify-end">
+      <v-btn
+        @click="handleSubmit('working')"
+        :disabled="grid.length === 0 || !allRulesPassed || !grid.every(row => row[0].projectid !== null)"
+        class="ma-4"
+        color="primary"
+      >Save</v-btn>
+    </div>
     <div :style="{
       'overflow-x': 'auto',
     }">
@@ -33,7 +41,7 @@
         </v-card>
         <v-sheet 
           :style="{
-            'max-height': 'calc(88vh - 170px)',
+            'max-height': 'calc(88vh - 200px)',
             overflow: 'auto',
           }"
         >
@@ -97,7 +105,7 @@
         prepend-icon="mdi-plus"
       >Add</v-btn>
       <v-btn
-        @click="handleSubmit()"
+        @click="handleSubmit('submitted')"
         :disabled="grid.length === 0 || !allRulesPassed || !grid.every(row => row[0].projectid !== null)"
         class="mr-10"
         color="success"
@@ -194,11 +202,11 @@ const handleDeleteRow = (rowIndex: number) => {
   grid.value.splice(rowIndex, 1);
 }
 
-const handleSubmit = () => {
+const handleSubmit = (status: 'submitted' | 'working') => {
   axios.post('/api/timesheets', { 
     userId: id,
     endDate: 'now',
-    status: 'submitted',
+    status: status,
     entries: grid.value.map((row) => {
       const [, ...entryColumns] = row
 
