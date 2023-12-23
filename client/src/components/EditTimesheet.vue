@@ -1,6 +1,26 @@
 <template>
   <div>
     <div class="w-100 d-flex justify-end">
+      <v-menu>
+        <template v-slot:activator="{ props }">
+          <v-btn
+            v-bind="props"
+            class="ma-4"
+            flat
+          >
+            {{ 'Week Ending In:' +  formatDateToDDMMYY(weekEndingIn)}}
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item
+          v-for="(date, index) in dateRange"
+          :key="index"
+          @click="weekEndingIn = date.friday"
+          >
+          <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <v-btn
         @click="handleSubmit('working')"
         :disabled="grid.length === 0 || !allRulesPassed || !grid.every(row => row[0].projectid !== null)"
@@ -122,6 +142,8 @@ import { useDisplay } from 'vuetify'
 import type { Project } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 
+import { getMonthRange, formatDateToDDMMYY, getMondayAndFriday } from '../functions/dateUtils'
+
 const { id } = useGoogleUserData()
 
 const { lgAndUp } = useDisplay()
@@ -242,4 +264,7 @@ const getProjects = () => {
 }
 
 getProjects()
+
+const dateRange = ref(getMonthRange())
+const weekEndingIn = ref(getMondayAndFriday(new Date()).friday)
 </script>
