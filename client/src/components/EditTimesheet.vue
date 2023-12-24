@@ -66,7 +66,7 @@
           }"
         >
           <v-sheet 
-            v-for="(row, rowIndex) in grid" 
+            v-for="(row, rowIndex) in timesheetData" 
             :key="rowIndex"
             class="d-flex justify-center"
           >
@@ -81,12 +81,13 @@
               <v-autocomplete
                 v-if="colIndex === 0"
                 v-model="cell.projectid"
-                label="Project Name"
                 :items="projects"
+                label="Project Name"
                 item-title="projectname"
                 item-value="projectid"
                 density="compact"
                 variant="outlined"
+                :readonly="isViewTimesheet"
               >
                 <template #item="{ props, item }">
                   <v-list-item
@@ -99,9 +100,10 @@
               <v-text-field
                 v-else
                 v-model="cell.entry.hoursWorked"  
-                variant="outlined" 
                 :rules="[validateAllRules]"
+                :readonly="isViewTimesheet"
                 label="Hours" 
+                variant="outlined" 
                 density="compact" 
               />
             </v-col>
@@ -132,6 +134,7 @@
         append-icon="mdi-forward"
       >Submit</v-btn>
     </div>
+    {{ timesheetData }}
   </div>
 </template>
 
@@ -147,6 +150,9 @@ import { getMonthRange, formatDateToDDMMYY, getMondayAndFriday } from '../functi
 const { id } = useGoogleUserData()
 
 const { lgAndUp } = useDisplay()
+
+const { updateState } = defineProps(['updateState'])
+
 const rows = 3
 const cols = 6
 
@@ -257,6 +263,7 @@ const handleSubmit = (status: 'submitted' | 'working') => {
     })
 
   // sackbar display
+  updateState('allTimesheets')
   return
 }
 
@@ -275,4 +282,20 @@ getProjects()
 
 const dateRange = ref(getMonthRange())
 const weekEndingIn = ref(getMondayAndFriday(new Date()).friday)
+
+const isViewTimesheet = ref(false)
+
+const timesheetData = ref()
+const getViewTimesheetData = () => {
+  axios.get(`/api/timesheetEntriesFormatted/39`)
+    .then(response => {
+      const { data } = response
+      timesheetData.value = data.reverse()
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error.message)
+    })
+}
+
+getViewTimesheetData()
 </script>

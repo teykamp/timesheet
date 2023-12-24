@@ -488,6 +488,52 @@ router.get('/timesheetEntries/:timesheetId', async (req, res) => {
   }
 });
 
+// GET timesheet entries formatted for the grid
+router.get('/timesheetEntriesFormatted/:timesheetId', async (req, res) => {
+  const { timesheetId } = req.params;
+
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      return await client.query(
+        'SELECT * FROM TimesheetEntry WHERE timesheetId = $1 ORDER BY projectid, date',
+        [timesheetId]
+      );
+    });
+
+    const formattedData: any[] = [];
+
+    result.rows.forEach((entry: any) => {
+      const existingRow = formattedData.find((row) => row[0].projectid === entry.projectid);
+
+      if (existingRow) {
+        existingRow.push({
+          entry: {
+            projectid: entry.projectid,
+            hoursWorked: entry.hoursworked,
+            date: entry.date,
+          },
+        });
+      } else {
+        const newRow = [
+          { projectid: entry.projectid },
+          {
+            entry: {
+              projectid: entry.projectid,
+              hoursWorked: entry.hoursworked,
+              date: entry.date,
+            },
+          },
+        ];
+        formattedData.push(newRow);
+      }
+    });
+    res.json(formattedData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error fetching and formatting timesheet entries from the database' });
+  }
+});
+
 // GET all timesheetEntries
 router.get('/timesheetEntries', async (req, res) => {
   try {

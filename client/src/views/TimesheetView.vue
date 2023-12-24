@@ -2,7 +2,7 @@
   <div>
     <Suspense v-if="state === 'allTimesheets'">
       <div>
-        <TimesheetListDisplay />
+        <TimesheetListDisplay :updateState="updateState"/>
         <v-container class="d-flex justify-end">
           <v-btn
             @click="handleAddNewTimesheet()"
@@ -18,18 +18,22 @@
           style="width:100%; margin-top: 40vh;"
           class="d-flex justify-center"
         >
-          <v-progress-circular indeterminate :size="57"></v-progress-circular>
+          <v-progress-circular 
+            indeterminate 
+            :size="57"
+          ></v-progress-circular>
         </v-card>
       </template>
     </Suspense>
     <v-btn
       v-if="state === 'editTimesheet'"
-      @click="state = 'allTimesheets'"
+      @click="state = updateState('allTimesheets')"
       icon="mdi-chevron-left"
       flat
       class="position-absolute ml-4 mt-2"
     ></v-btn>
     <EditTimesheet
+      :updateState="updateState"
       v-if="state === 'editTimesheet'"
     />
   </div>
@@ -43,13 +47,18 @@ import EditTimesheet from '../components/EditTimesheet.vue'
 const TimesheetListDisplay = defineAsyncComponent(() => 
   import('../components/TimesheetListDisplay.vue')
 )
+type StateTypes = 'allTimesheets' | 'editTimesheet'
 
-const state = ref<'allTimesheets' | 'editTimesheet'>('allTimesheets')
+const state = ref<StateTypes>('allTimesheets')
+
+const updateState = (newState: StateTypes) => {
+  state.value = newState
+}
 
 const handleAddNewTimesheet = () => {
   // probably pass in the timesheet id at a minimum
   // probably need to do an emit event or something from timesheetListDisplay depending on what is clicked on
-  state.value = 'editTimesheet'
+  updateState('editTimesheet')
   return
 }
 </script>

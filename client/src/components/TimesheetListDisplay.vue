@@ -103,6 +103,8 @@ type Item = {
   status: 'working' | 'submitted' | 'approved'
 }
 
+const { updateState } = defineProps(['updateState'])
+
 const getStatusChipColor = (status: Item['status']) => {
   switch (status) {
     case 'working':
@@ -143,7 +145,7 @@ const getUserTimesheets = () => {
   axios.get(`/api/timesheets/user/${id}`)
     .then(response => {
       const { data } = response
-      userTimesheets.value = data
+      userTimesheets.value = data.reverse()
     })
     .catch(error => {
       console.error('Error fetching data:', error.message)
