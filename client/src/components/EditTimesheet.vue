@@ -13,11 +13,11 @@
         </template>
         <v-list>
           <v-list-item
-          v-for="(date, index) in dateRange"
-          :key="index"
-          @click="weekEndingIn = date.friday"
+            v-for="(date, index) in dateRange"
+            :key="index"
+            @click="weekEndingIn = date.friday"
           >
-          <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
+            <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -199,7 +199,7 @@ const grid = ref(
     const row = [];
     row.push({ projectid: null })
     for (let i = 0; i < cols - 1; i++) {
-      row.push({ entry: {  projectid: null, hoursWorked: 0, date: 'now' } })
+      row.push({ entry: {  projectid: null, hoursWorked: 0, date: null } })
     }
     return row
   })
@@ -215,7 +215,7 @@ const handleAddRow = () => {
   const newRow = []
   newRow.push({ projectid: null })
   for (let i = 0; i < cols - 1; i++) {
-    newRow.push({ entry: { date: '', hoursWorked: 0, projectid: null } })
+    newRow.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
   }
   grid.value.push(newRow)
 }
@@ -227,18 +227,26 @@ const handleDeleteRow = (rowIndex: number) => {
 const handleSubmit = (status: 'submitted' | 'working') => {
   axios.post('/api/timesheets', { 
     userId: id,
-    endDate: 'now',
+    endDate: weekEndingIn.value,
     status: status,
     entries: grid.value.map((row) => {
       const [, ...entryColumns] = row
 
-      return entryColumns.map((cell) => ({
-        ...cell,
-        entry: {
-          ...cell.entry,
-          projectid: row[0].projectid,
-        },
-      }))
+      const endDate = new Date(weekEndingIn.value)
+
+      return entryColumns.map((cell, columnIndex) => {
+        const currentDate = new Date(endDate)
+        currentDate.setDate(endDate.getDate() - (entryColumns.length - columnIndex - 1))
+
+        return {
+          ...cell,
+          entry: {
+            ...cell.entry,
+            projectid: row[0].projectid,
+            date: currentDate,
+          },
+        }
+      })
     }) // remove first column (PN)
   })
     .then(response => {
@@ -246,7 +254,7 @@ const handleSubmit = (status: 'submitted' | 'working') => {
     })
     .catch(error => {
       console.error('Error posting timesheet:', error.response ? error.response.data : error.message);
-    });
+    })
 
   // sackbar display
   return
