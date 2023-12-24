@@ -30,6 +30,11 @@
         :headers="headerData"
         :search="search"
         >
+        <template #item.enddate="{ item }">
+          <div>
+            {{ formatDateToDDMMYY(new Date(item.enddate)) }}
+          </div>
+        </template>
         <template #item.status="{ item }">
           <div>
             <v-chip
@@ -85,6 +90,8 @@ import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
 
 import { useGoogleUserData } from '../stores/useDataStore'
+import { formatDateToDDMMYY } from '../functions/dateUtils'
+
 const { id, isUserLoggedIn } = useGoogleUserData()
 
 const { xs } = useDisplay()
@@ -150,7 +157,7 @@ const search = ref('')
 const headerData = ref([
   {
     title: 'End Date',
-    key: 'endDate',
+    key: 'enddate',
   },
   { 
     title: 'Hours', 
