@@ -27,7 +27,7 @@
     </Suspense>
     <v-btn
       v-if="state === 'editTimesheet'"
-      @click="state = updateState('allTimesheets')"
+      @click="updateState('allTimesheets')"
       icon="mdi-chevron-left"
       flat
       class="position-absolute ml-4 mt-2"
@@ -42,16 +42,17 @@
 <script setup lang="ts">
 import { ref, defineAsyncComponent } from 'vue'
 
+import type { TimesheetStateTypes } from '../stores/useDataStore'
+
 import EditTimesheet from '../components/EditTimesheet.vue'
 
 const TimesheetListDisplay = defineAsyncComponent(() => 
   import('../components/TimesheetListDisplay.vue')
 )
-type StateTypes = 'allTimesheets' | 'editTimesheet'
 
-const state = ref<StateTypes>('allTimesheets')
+const state = ref<TimesheetStateTypes>('allTimesheets')
 
-const updateState = (newState: StateTypes) => {
+const updateState = (newState: TimesheetStateTypes) => {
   state.value = newState
 }
 
