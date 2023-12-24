@@ -90,20 +90,26 @@ import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
 
 import { useGoogleUserData } from '../stores/useDataStore'
+import { useHandleTimesheetDisplay } from '../stores/useDataStore'
+import type { TimesheetStateTypes } from '../stores/useDataStore'
+
 import { formatDateToDDMMYY } from '../functions/dateUtils'
 
 const { id, isUserLoggedIn } = useGoogleUserData()
+const { setCurrentTimesheet, setTimesheetDisplayStatus } = useHandleTimesheetDisplay()
 
 const { xs } = useDisplay()
 
+const props = defineProps<{
+  updateState: (newState: TimesheetStateTypes) => void,
+}>()
+
 type Item = {
-  timesheetid: number
-  endDate: String,
-  totalHours: Number,
+  timesheetid: number,
+  enddate: string,
+  totalHours: number,
   status: 'working' | 'submitted' | 'approved'
 }
-
-const { updateState } = defineProps(['updateState'])
 
 const getStatusChipColor = (status: Item['status']) => {
   switch (status) {
@@ -133,11 +139,15 @@ const deleteTimesheet = async (item: Item) => {
 }
 
 const editTimesheet = (item: Item) => {
-  return
+  setCurrentTimesheet(item.timesheetid)
+  setTimesheetDisplayStatus('edit')
+  props.updateState('editTimesheet')
 }
 
 const viewTimesheet = (item: Item) => {
-  return
+  setCurrentTimesheet(item.timesheetid)
+  setTimesheetDisplayStatus('view')
+  props.updateState('editTimesheet')
 }
 
 const getUserTimesheets = () => {

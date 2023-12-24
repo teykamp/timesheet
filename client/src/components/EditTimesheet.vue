@@ -3,12 +3,17 @@
     <div class="w-100 d-flex justify-end">
       <v-menu>
         <template v-slot:activator="{ props }">
+          <div 
+            v-if="timesheetDisplayStatus === 'view'"
+            class="ma-4 mr-10"
+          >{{ 'Week Ending In:' + formatDateToDDMMYY(weekEndingIn) }}</div>
           <v-btn
+            v-if="timesheetDisplayStatus !== 'view'"
             v-bind="props"
             class="ma-4"
             flat
           >
-            {{ 'Week Ending In:' +  formatDateToDDMMYY(weekEndingIn)}}
+            {{ 'Week Ending In:' +  formatDateToDDMMYY(weekEndingIn) }}
           </v-btn>
         </template>
         <v-list>
@@ -22,11 +27,12 @@
         </v-list>
       </v-menu>
       <v-btn
+        v-if="timesheetDisplayStatus !== 'view'"
         @click="handleSubmit('working')"
-        :disabled="grid.length === 0 || !allRulesPassed || !grid.every(row => row[0].projectid !== null)"
+        :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null) || timesheetDisplayStatus === 'view'"
         class="ma-4"
         color="primary"
-      >Save</v-btn>
+      >{{ timesheetDisplayStatus === 'edit' ? 'Update' : 'Save' }}</v-btn>
     </div>
     <div :style="{
       'overflow-x': 'auto',
@@ -121,20 +127,21 @@
     </div>
     <div class="d-flex justify-space-between mt-8">
       <v-btn
+        v-if="timesheetDisplayStatus !== 'view'"
         @click="handleAddRow()"
-        :color="`${grid.length === 0 ? 'red' : ''}`"
-        :class="`ml-10 ${grid.length === 0 ? 'animate-bounce' : ''}`"
+        :color="`${timesheetData.length === 0 ? 'red' : ''}`"
+        :class="`ml-10 ${timesheetData.length === 0 ? 'animate-bounce' : ''}`"
         prepend-icon="mdi-plus"
       >Add</v-btn>
       <v-btn
+        v-if="timesheetDisplayStatus !== 'view'"
         @click="handleSubmit('submitted')"
-        :disabled="grid.length === 0 || !allRulesPassed || !grid.every(row => row[0].projectid !== null)"
+        :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null)"
         class="mr-10"
         color="success"
         append-icon="mdi-forward"
       >Submit</v-btn>
     </div>
-    {{ timesheetData }}
   </div>
 </template>
 
@@ -142,21 +149,25 @@
 import axios from 'axios'
 import { ref, computed } from 'vue'
 import { useDisplay } from 'vuetify'
-import type { Project } from '../stores/useDataStore'
+import type { Project, TimesheetStateTypes } from '../stores/useDataStore'
+import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
-
 import { getMonthRange, formatDateToDDMMYY, getMondayAndFriday } from '../functions/dateUtils'
 
 const { id } = useGoogleUserData()
 
+const { timesheetDisplayStatus, resetTimesheetDisplay, currentEditTimesheet } = useHandleTimesheetDisplay()
+
 const { lgAndUp } = useDisplay()
 
-const { updateState } = defineProps(['updateState'])
+const props = defineProps<{
+  updateState: (newState: TimesheetStateTypes) => void,
+}>()
 
+// display default
 const rows = 3
 const cols = 6
 
-// need function here to get dates (library probably)
 const colLabelsBase = [
   'Monday',
   'Tuesday',
@@ -200,7 +211,7 @@ const validateAllRules = (value: any) => {
 }
 
 
-const grid = ref(
+const timesheetData = ref(
   Array.from({ length: rows }, () => {
     const row = [];
     row.push({ projectid: null })
@@ -214,7 +225,7 @@ const grid = ref(
 const projects = ref<Project[]>([])
 
 const selectedProjects = computed(() => {
-  return grid.value.map(row => row[0].projectid === null ? null : row[0].projectid)
+  return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
 })
 
 const handleAddRow = () => {
@@ -223,11 +234,11 @@ const handleAddRow = () => {
   for (let i = 0; i < cols - 1; i++) {
     newRow.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
   }
-  grid.value.push(newRow)
+  timesheetData.value.push(newRow)
 }
 
 const handleDeleteRow = (rowIndex: number) => {
-  grid.value.splice(rowIndex, 1);
+  timesheetData.value.splice(rowIndex, 1);
 }
 
 const handleSubmit = (status: 'submitted' | 'working') => {
@@ -235,7 +246,7 @@ const handleSubmit = (status: 'submitted' | 'working') => {
     userId: id,
     endDate: weekEndingIn.value,
     status: status,
-    entries: grid.value.map((row) => {
+    entries: timesheetData.value.map((row) => {
       const [, ...entryColumns] = row
 
       const endDate = new Date(weekEndingIn.value)
@@ -263,7 +274,7 @@ const handleSubmit = (status: 'submitted' | 'working') => {
     })
 
   // sackbar display
-  updateState('allTimesheets')
+  props.updateState('allTimesheets')
   return
 }
 
@@ -283,11 +294,10 @@ getProjects()
 const dateRange = ref(getMonthRange())
 const weekEndingIn = ref(getMondayAndFriday(new Date()).friday)
 
-const isViewTimesheet = ref(false)
+const isViewTimesheet = ref(timesheetDisplayStatus === 'view')
 
-const timesheetData = ref()
-const getViewTimesheetData = () => {
-  axios.get(`/api/timesheetEntriesFormatted/39`)
+const getViewTimesheetData = (timesheetId: number) => {
+  axios.get(`/api/timesheetEntriesFormatted/${timesheetId}`)
     .then(response => {
       const { data } = response
       timesheetData.value = data.reverse()
@@ -297,5 +307,8 @@ const getViewTimesheetData = () => {
     })
 }
 
-getViewTimesheetData()
+if (timesheetDisplayStatus === 'view' || timesheetDisplayStatus === 'edit') {
+  getViewTimesheetData(currentEditTimesheet)
+  resetTimesheetDisplay()
+}
 </script>

@@ -33,8 +33,8 @@
       class="position-absolute ml-4 mt-2"
     ></v-btn>
     <EditTimesheet
-      :updateState="updateState"
       v-if="state === 'editTimesheet'"
+      :updateState="updateState"
     />
   </div>
 </template>

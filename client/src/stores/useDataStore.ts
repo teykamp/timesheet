@@ -14,6 +14,8 @@ export type GoogleProfile = {
   locale: string
 }
 
+export type TimesheetStateTypes = 'allTimesheets' | 'editTimesheet'
+
 export type Project = {
   projectid: Number,
   projectname: String
@@ -25,6 +27,27 @@ export type TimesheetEntry = {
   timesheetId: Number,
   date: String
 }
+
+type TimesheetDisplayStatus = 'view' | 'edit' | 'new'
+
+export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', {
+  state: () => ({
+    timesheetDisplayStatus: '',
+    currentEditTimesheet: -1
+  }),
+  actions: {
+    resetTimesheetDisplay() {
+      this.timesheetDisplayStatus = ''
+      this.currentEditTimesheet = -1
+    },
+    setTimesheetDisplayStatus(newStatus: TimesheetDisplayStatus) {
+      this.timesheetDisplayStatus = newStatus
+    },
+    setCurrentTimesheet(newTimesheetId: number) {
+      this.currentEditTimesheet = newTimesheetId
+    }
+  }
+})
 
 export const useGoogleUserData = defineStore('googleUserData',{
   state: () => ({
