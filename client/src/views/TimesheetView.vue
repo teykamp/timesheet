@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Suspense v-if="state === 'allTimesheets'">
       <div>
         <TimesheetListDisplay :updateState="updateState"/>
         <v-container class="d-flex justify-end">
@@ -12,19 +11,6 @@
           </v-btn>
         </v-container>
       </div>
-      <template #fallback>
-        <v-card
-          flat
-          style="width:100%; margin-top: 40vh;"
-          class="d-flex justify-center"
-        >
-          <v-progress-circular 
-            indeterminate 
-            :size="57"
-          ></v-progress-circular>
-        </v-card>
-      </template>
-    </Suspense>
     <v-btn
       v-if="state === 'editTimesheet'"
       @click="updateState('allTimesheets')"
@@ -40,15 +26,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineAsyncComponent } from 'vue'
+import { ref } from 'vue'
 
 import type { TimesheetStateTypes } from '../stores/useDataStore'
 
 import EditTimesheet from '../components/EditTimesheet.vue'
-
-const TimesheetListDisplay = defineAsyncComponent(() => 
-  import('../components/TimesheetListDisplay.vue')
-)
+import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
 
 const state = ref<TimesheetStateTypes>('allTimesheets')
 

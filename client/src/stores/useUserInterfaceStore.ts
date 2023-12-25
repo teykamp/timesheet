@@ -1,5 +1,27 @@
 import { defineStore } from 'pinia'
 
+interface LoadingState {
+  isTimesheetListLoading: boolean;
+  isTimesheetContentLoading: boolean;
+}
+
+export const useLoadingScreen = defineStore('loading', {
+  state: () => ({
+    isTimesheetListLoading: true,
+    isTimesheetContentLoading: true
+  }),
+
+  actions: {
+    toggleLoadingState(variableName: keyof LoadingState) {
+      if (this.$state.hasOwnProperty(variableName)) {
+        this.$state[variableName] = !this.$state[variableName]
+      } else {
+        console.warn(`Variable '${variableName}' not found in state.`)
+      }
+    },
+  }
+})
+
 export const useColorPalette = defineStore('colors',{
 	state: () => ({
 		white: '#ffffff',
