@@ -114,6 +114,7 @@
               />
             </v-col>
             <v-btn 
+              v-if="timesheetDisplayStatus !== 'view'"
               @click="handleDeleteRow(rowIndex)"
               size="small"
               variant="tonal"
