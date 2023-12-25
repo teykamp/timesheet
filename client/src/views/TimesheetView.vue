@@ -4,7 +4,10 @@
       <TimesheetListDisplay
         :updateState="updateState"
       />
-      <v-container class="d-flex justify-end">
+      <v-container 
+        v-if="!isTimesheetListLoading"
+        class="d-flex justify-end"
+      >
         <v-btn
           @click="handleAddNewTimesheet()"
           prepend-icon="mdi-plus"
@@ -29,11 +32,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 
 import type { TimesheetStateTypes } from '../stores/useDataStore'
+import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
+
+const useLoadingScreenStore = useLoadingScreen()
+const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
 
 const state = ref<TimesheetStateTypes>('allTimesheets')
 
@@ -42,8 +50,6 @@ const updateState = (newState: TimesheetStateTypes) => {
 }
 
 const handleAddNewTimesheet = () => {
-  // probably pass in the timesheet id at a minimum
-  // probably need to do an emit event or something from timesheetListDisplay depending on what is clicked on
   updateState('editTimesheet')
   return
 }

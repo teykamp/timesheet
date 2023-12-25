@@ -167,6 +167,7 @@ const viewTimesheet = (item: Item) => {
 
 const getUserTimesheets = () => {
   if (!isUserLoggedIn()) return
+  console.log(userTimesheets.value)
   setLoadingState('isTimesheetListLoading', true)
   axios.get(`/api/timesheets/user/${id}`)
     .then(response => {
@@ -179,7 +180,7 @@ const getUserTimesheets = () => {
     })
 }
 
-getUserTimesheets()
+getUserTimesheets() // cache this to a store value to remove db calls
 
 const search = ref('')
 
