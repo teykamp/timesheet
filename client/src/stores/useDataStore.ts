@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-
 export type GoogleProfile = {
   id: string,
   email: string,
@@ -76,7 +75,7 @@ export const useGoogleUserData = defineStore('googleUserData',{
 
       axios.get(`api/userFirstTimeLogin/${this.id}/${encodeURIComponent(this.email)}`)
       .then((response) => {
-        console.log('Response:', response.data);
+        console.log('Response: User Logged Back In Successfully');
       })
       .catch((error) => {
         console.error('Error:', error.response.data);

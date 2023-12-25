@@ -167,7 +167,7 @@ const viewTimesheet = (item: Item) => {
 
 const getUserTimesheets = () => {
   if (!isUserLoggedIn()) return
-  console.log(userTimesheets.value)
+  
   setLoadingState('isTimesheetListLoading', true)
   axios.get(`/api/timesheets/user/${id}`)
     .then(response => {
