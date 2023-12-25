@@ -12,9 +12,9 @@ export const useLoadingScreen = defineStore('loading', {
   }),
 
   actions: {
-    toggleLoadingState(variableName: keyof LoadingState) {
+    setLoadingState(variableName: keyof LoadingState, value: boolean) {
       if (this.$state.hasOwnProperty(variableName)) {
-        this.$state[variableName] = !this.$state[variableName]
+        this.$state[variableName] = value
       } else {
         console.warn(`Variable '${variableName}' not found in state.`)
       }

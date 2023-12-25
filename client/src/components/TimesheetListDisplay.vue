@@ -109,7 +109,7 @@ import { formatDateToDDMMYY } from '../functions/dateUtils'
 
 const { id, isUserLoggedIn } = useGoogleUserData()
 const { setCurrentTimesheet, setTimesheetDisplayStatus } = useHandleTimesheetDisplay()
-const { toggleLoadingState } = useLoadingScreen()
+const { setLoadingState } = useLoadingScreen()
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
 
@@ -167,11 +167,12 @@ const viewTimesheet = (item: Item) => {
 
 const getUserTimesheets = () => {
   if (!isUserLoggedIn()) return
+  setLoadingState('isTimesheetListLoading', true)
   axios.get(`/api/timesheets/user/${id}`)
     .then(response => {
       const { data } = response
       userTimesheets.value = data.reverse()
-      toggleLoadingState('isTimesheetListLoading')
+      setLoadingState('isTimesheetListLoading', false)
     })
     .catch(error => {
       console.error('Error fetching data:', error.message)

@@ -1,16 +1,18 @@
 <template>
   <div>
-      <div>
-        <TimesheetListDisplay :updateState="updateState"/>
-        <v-container class="d-flex justify-end">
-          <v-btn
-            @click="handleAddNewTimesheet()"
-            prepend-icon="mdi-plus"
-          >
-            New
-          </v-btn>
-        </v-container>
-      </div>
+    <div v-if="state === 'allTimesheets'">
+      <TimesheetListDisplay
+        :updateState="updateState"
+      />
+      <v-container class="d-flex justify-end">
+        <v-btn
+          @click="handleAddNewTimesheet()"
+          prepend-icon="mdi-plus"
+        >
+          New
+        </v-btn>
+      </v-container>
+    </div>
     <v-btn
       v-if="state === 'editTimesheet'"
       @click="updateState('allTimesheets')"
