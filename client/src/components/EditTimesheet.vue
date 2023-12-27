@@ -1,6 +1,12 @@
 <template>
   <div>
-    <div v-if="isTimesheetContentLoading && timesheetDisplayStatus !== 'new'">
+    {{ timesheetDisplayStatus }}
+    sASADDSA
+    <div 
+      v-if="isTimesheetContentLoading && timesheetDisplayStatus !== 'new'"
+      style="height: 500px; width: 100%"
+      class="d-flex align-center justify-center"
+    >
       <v-progress-circular 
         indeterminate 
         :size="57"
@@ -50,7 +56,7 @@
           'min-width': '600px',
       }">
           <v-card
-            class="d-flex justify-center rounded-0 pr-8 pl-1"
+            class="d-flex justify-center rounded-0 pr-8 pl-1 mb-4"
             elevation="2"
           >
             <v-col
@@ -178,6 +184,8 @@ const useHandleTimesheetDisplayStore = useHandleTimesheetDisplay()
 const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplayStore)
 
 const { lgAndUp } = useDisplay()
+
+console.log(timesheetDisplayStatus.value)
 
 const props = defineProps<{
   updateState: (newState: TimesheetStateTypes) => void,
@@ -328,6 +336,5 @@ const getViewTimesheetData = (timesheetId: number) => {
 
 if (timesheetDisplayStatus.value === 'view' || timesheetDisplayStatus.value === 'edit') {
   getViewTimesheetData(currentEditTimesheet)
-  resetTimesheetDisplay()
 }
 </script>

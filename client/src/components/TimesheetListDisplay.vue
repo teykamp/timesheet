@@ -3,7 +3,11 @@
     flat 
     :class="`mt-6 ${xs ? '' : 'px-12'}`"
   >
-    <div v-if="isTimesheetListLoading">
+    <div 
+      v-if="isTimesheetListLoading"
+      style="height: 500px; width: 100%"
+      class="d-flex align-center justify-center"
+    >
       <v-progress-circular 
         indeterminate 
         :size="57"
@@ -154,14 +158,14 @@ const deleteTimesheet = async (item: Item) => {
 }
 
 const editTimesheet = (item: Item) => {
-  setCurrentTimesheet(item.timesheetid)
   setTimesheetDisplayStatus('edit')
+  setCurrentTimesheet(item.timesheetid)
   props.updateState('editTimesheet')
 }
 
 const viewTimesheet = (item: Item) => {
-  setCurrentTimesheet(item.timesheetid)
   setTimesheetDisplayStatus('view')
+  setCurrentTimesheet(item.timesheetid)
   props.updateState('editTimesheet')
 }
 
