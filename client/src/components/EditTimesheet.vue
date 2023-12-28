@@ -30,7 +30,7 @@
           </v-menu>
           <v-btn
             v-if="timesheetDisplayStatus !== 'view'"
-            @click="handleSubmit('working')"
+            @click="timesheetDisplayStatus === 'edit' ? handleUpdateTimesheet('working') : handleSubmitTimesheet('working')"
             :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null) || timesheetDisplayStatus === 'view'"
             class="ma-4"
             color="primary"
@@ -138,12 +138,12 @@
           >Add</v-btn>
           <v-btn
             v-if="timesheetDisplayStatus !== 'view'"
-            @click="handleSubmit('submitted')"
+            @click="timesheetDisplayStatus === 'edit' ? handleUpdateTimesheet('submitted') : handleSubmitTimesheet('submitted')"
             :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null)"
             class="mr-10"
             color="success"
             append-icon="mdi-forward"
-          >Submit</v-btn>
+          >{{ timesheetDisplayStatus === 'edit' ? 'Resubmit' : 'Submit' }}</v-btn>
         </div>
       </template>
     </IsContentLoadingWrapper>
@@ -259,40 +259,73 @@ const handleDeleteRow = (rowIndex: number) => {
   timesheetData.value.splice(rowIndex, 1);
 }
 
-const handleSubmit = (status: 'submitted' | 'working') => {
-  axios.post('/api/timesheets', { 
-    userId: id,
-    endDate: weekEndingIn.value,
-    status: status,
-    entries: timesheetData.value.map((row) => {
-      const [, ...entryColumns] = row
+const handleSubmitTimesheet = async (status: 'submitted' | 'working') => {
+  try {
+    await axios.post('/api/timesheets', {
+      userId: id,
+      endDate: weekEndingIn.value,
+      status: status,
+      entries: timesheetData.value.map((row) => {
+        const [, ...entryColumns] = row
 
-      const endDate = new Date(weekEndingIn.value)
+        const endDate = new Date(weekEndingIn.value)
 
-      return entryColumns.map((cell, columnIndex) => {
-        const currentDate = new Date(endDate)
-        currentDate.setDate(endDate.getDate() - (entryColumns.length - columnIndex - 1))
+        return entryColumns.map((cell, columnIndex) => {
+          const currentDate = new Date(endDate)
+          currentDate.setDate(endDate.getDate() - (entryColumns.length - columnIndex - 1))
 
-        return {
-          ...cell,
-          entry: {
-            ...cell.entry,
-            projectid: row[0].projectid,
-            date: currentDate,
-          },
-        }
+          return {
+            ...cell,
+            entry: {
+              ...cell.entry,
+              projectid: row[0].projectid,
+              date: currentDate,
+            },
+          }
+        })
+      }) // remove the first column (PN)
+    })
+
+    showSnackbar(`Timesheet ${status === 'submitted' ? 'submitted' : 'saved'}!`)
+    props.updateState('allTimesheets')
+  } catch (error) {
+    console.error('Error posting timesheet:', error.response ? error.response.data : error.message)
+  }
+}
+
+const handleUpdateTimesheet = async (status: 'submitted' | 'working') => {
+  try {
+    await axios.put(`/api/timesheets/${currentEditTimesheet}`, {
+      userId: id,
+      endDate: weekEndingIn.value,
+      status: status,
+      entries: timesheetData.value.map((row) => {
+        const [, ...entryColumns] = row
+
+        const endDate = new Date(weekEndingIn.value)
+
+        return entryColumns.map((cell, columnIndex) => {
+          const currentDate = new Date(endDate)
+          currentDate.setDate(endDate.getDate() - (entryColumns.length - columnIndex - 1))
+
+          return {
+            ...cell,
+            entry: {
+              ...cell.entry,
+              projectid: row[0].projectid,
+              date: currentDate,
+            },
+          }
+        })
       })
-    }) // remove first column (PN)
-  })
-    .then(response => {
-      showSnackbar('Timesheet Posted!')
-      props.updateState('allTimesheets')
-    })
-    .catch(error => {
-      console.error('Error posting timesheet:', error.response ? error.response.data : error.message);
     })
 
-  return
+    showSnackbar(`Timesheet ${status === 'submitted' ? 're-submitted' : 'updated'}!`)
+    props.updateState('allTimesheets')
+
+  } catch (error) {
+    console.error('Error updating timesheet:', error)
+  }
 }
 
 const getProjects = () => {
