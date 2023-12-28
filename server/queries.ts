@@ -220,7 +220,7 @@ router.get('/timesheets/manager/:managerId', async (req, res) => {
           date: row.date,
         });
       } else {
-        // If a timesheet always exists before its entries, this block should not be reached
+        // This block should not be reached
         console.error('Unexpected scenario: Timesheet does not exist for entry');
       }
     });
@@ -230,7 +230,6 @@ router.get('/timesheets/manager/:managerId', async (req, res) => {
     res.status(500).json({ error: 'Error retrieving timesheets and entries for the manager' + error });
   }
 });
-
 
 
 // GET timesheets and total hours for a user by userId
@@ -304,6 +303,7 @@ router.post('/timesheets', async (req, res) => {
   }
 });
 
+
 // POST a timesheet
 router.post('/timesheets/solo', async (req, res) => {
   const { userId, endDate, status, timesheetEntries } = req.body;
@@ -326,6 +326,7 @@ router.post('/timesheets/solo', async (req, res) => {
   }
 });
 
+
 // GET a timesheet by timesheetId
 router.get('/timesheets/:timesheetId', async (req, res) => {
   const { timesheetId } = req.params;
@@ -345,6 +346,7 @@ router.get('/timesheets/:timesheetId', async (req, res) => {
   }
 });
 
+
 // GET all timesheets
 router.get('/timesheets', async (req, res) => {
   try {
@@ -357,6 +359,7 @@ router.get('/timesheets', async (req, res) => {
     res.status(500).json({ error: 'Error retrieving timesheets from the database' });
   }
 });
+
 
 // DELETE a timesheet by timesheetId and all associated timesheet entries
 router.delete('/timesheets/:timesheetId', async (req, res) => {
@@ -399,6 +402,7 @@ router.delete('/timesheets/solo/:timesheetId', async (req, res) => {
   }
 });
 
+
 // DELETE all timesheets
 router.delete('/timesheets', async (req, res) => {
   try {
@@ -415,6 +419,7 @@ router.delete('/timesheets', async (req, res) => {
     res.status(500).json({ error: 'Error deleting timesheets from the database' });
   }
 });
+
 
 // UPDATE the status of a timesheet by timesheetId
 router.put('/timesheets/:timesheetId/status', async (req, res) => {
@@ -469,6 +474,7 @@ router.post('/timesheetEntries', async (req, res) => {
   }
 });
 
+
 // GET a timesheetEntry by timesheetId
 router.get('/timesheetEntries/:timesheetId', async (req, res) => {
   const { timesheetId } = req.params;
@@ -487,6 +493,7 @@ router.get('/timesheetEntries/:timesheetId', async (req, res) => {
     res.status(500).json({ error: 'Error retrieving timesheet entry from the database' });
   }
 });
+
 
 // GET timesheet entries formatted for the grid
 router.get('/timesheetEntriesFormatted/:timesheetId', async (req, res) => {
