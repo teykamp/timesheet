@@ -184,7 +184,7 @@ const getUserTimesheets = () => {
     })
 }
 
-getUserTimesheets() // cache this to a store value to remove db calls
+getUserTimesheets()
 
 const search = ref('')
 

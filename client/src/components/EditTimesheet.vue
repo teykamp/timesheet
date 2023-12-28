@@ -1,7 +1,5 @@
 <template>
   <div>
-    {{ timesheetDisplayStatus }}
-    sASADDSA
     <div 
       v-if="isTimesheetContentLoading && timesheetDisplayStatus !== 'new'"
       style="height: 500px; width: 100%"
@@ -170,7 +168,7 @@ import { useDisplay } from 'vuetify'
 import type { Project, TimesheetStateTypes } from '../stores/useDataStore'
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
-import { useLoadingScreen } from '../stores/useUserInterfaceStore'
+import { useLoadingScreen, useSnackbar } from '../stores/useUserInterfaceStore'
 
 import { getMonthRange, formatDateToDDMMYY, getMondayAndFriday } from '../functions/dateUtils'
 
@@ -179,13 +177,12 @@ const { setLoadingState } = useLoadingScreen()
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetContentLoading } = storeToRefs(useLoadingScreenStore)
 
-const { resetTimesheetDisplay, currentEditTimesheet } = useHandleTimesheetDisplay()
+const { currentEditTimesheet } = useHandleTimesheetDisplay()
 const useHandleTimesheetDisplayStore = useHandleTimesheetDisplay()
 const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplayStore)
+const { showSnackbar } = useSnackbar()
 
 const { lgAndUp } = useDisplay()
-
-console.log(timesheetDisplayStatus.value)
 
 const props = defineProps<{
   updateState: (newState: TimesheetStateTypes) => void,
@@ -294,14 +291,13 @@ const handleSubmit = (status: 'submitted' | 'working') => {
     }) // remove first column (PN)
   })
     .then(response => {
-      console.log('Successfully posted timesheet:', response.data);
+      showSnackbar('Timesheet Posted!')
+      props.updateState('allTimesheets')
     })
     .catch(error => {
       console.error('Error posting timesheet:', error.response ? error.response.data : error.message);
     })
 
-  // sackbar display
-  props.updateState('allTimesheets')
   return
 }
 

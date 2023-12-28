@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 import express from 'express';
 
+import queriesRoute from './queries';
+
+
 const cors = require('cors');
 
 const { google } = require('googleapis');
@@ -52,11 +55,7 @@ function getAuthUrl() {
   });
 }
 
-import queriesRoute from './queries'
-
 app.use('/api', queriesRoute);
-
-
 
 app.get('/api/auth/url', (req, res) => {
   res.json({ url: getAuthUrl() });

@@ -35,6 +35,7 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import type { TimesheetStateTypes } from '../stores/useDataStore'
+import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 
 import EditTimesheet from '../components/EditTimesheet.vue'
@@ -42,6 +43,7 @@ import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
 
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
+const { resetTimesheetDisplay, setTimesheetDisplayStatus } = useHandleTimesheetDisplay()
 
 const state = ref<TimesheetStateTypes>('allTimesheets')
 
@@ -50,6 +52,8 @@ const updateState = (newState: TimesheetStateTypes) => {
 }
 
 const handleAddNewTimesheet = () => {
+  resetTimesheetDisplay()
+  setTimesheetDisplayStatus('new')
   updateState('editTimesheet')
   return
 }
