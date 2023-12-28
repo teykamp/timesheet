@@ -12,6 +12,7 @@
               <v-btn
                 v-if="timesheetDisplayStatus !== 'view'"
                 v-bind="props"
+                append-icon="mdi-menu-down"
                 class="ma-4"
                 flat
               >
