@@ -1,165 +1,159 @@
 <template>
   <div>
-    <div 
-      v-if="isTimesheetContentLoading && timesheetDisplayStatus !== 'new'"
-      style="height: 500px; width: 100%"
-      class="d-flex align-center justify-center"
-    >
-      <v-progress-circular 
-        indeterminate 
-        :size="57"
-      ></v-progress-circular>
-    </div>
-    <div v-else>
-      <div class="w-100 d-flex justify-end">
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <div 
-              v-if="timesheetDisplayStatus === 'view'"
-              class="ma-4 mr-10"
-            >{{ 'Week Ending In:' + formatDateToDDMMYY(weekEndingIn) }}</div>
-            <v-btn
-              v-if="timesheetDisplayStatus !== 'view'"
-              v-bind="props"
-              class="ma-4"
-              flat
+    <IsContentLoadingWrapper :displayCondition="!(isTimesheetContentLoading && timesheetDisplayStatus !== 'new')">
+      <template #loadedContent>
+        <div class="w-100 d-flex justify-end">
+          <v-menu>
+            <template v-slot:activator="{ props }">
+              <div 
+                v-if="timesheetDisplayStatus === 'view'"
+                class="ma-4 mr-10"
+              >{{ 'Week Ending In:' + formatDateToDDMMYY(weekEndingIn) }}</div>
+              <v-btn
+                v-if="timesheetDisplayStatus !== 'view'"
+                v-bind="props"
+                class="ma-4"
+                flat
+              >
+                {{ 'Week Ending In:' +  formatDateToDDMMYY(weekEndingIn) }}
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item
+                v-for="(date, index) in dateRange"
+                :key="index"
+                @click="weekEndingIn = date.friday"
+              >
+                <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <v-btn
+            v-if="timesheetDisplayStatus !== 'view'"
+            @click="handleSubmit('working')"
+            :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null) || timesheetDisplayStatus === 'view'"
+            class="ma-4"
+            color="primary"
+          >{{ timesheetDisplayStatus === 'edit' ? 'Update' : 'Save' }}</v-btn>
+        </div>
+        <div :style="{
+          'overflow-x': 'auto',
+        }">
+        <v-card 
+          flat
+          :style="{
+            'min-width': '600px',
+        }">
+            <v-card
+              class="d-flex justify-center rounded-0 pr-8 pl-1 mb-4"
+              elevation="2"
             >
-              {{ 'Week Ending In:' +  formatDateToDDMMYY(weekEndingIn) }}
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="(date, index) in dateRange"
-              :key="index"
-              @click="weekEndingIn = date.friday"
-            >
-              <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <v-btn
-          v-if="timesheetDisplayStatus !== 'view'"
-          @click="handleSubmit('working')"
-          :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null) || timesheetDisplayStatus === 'view'"
-          class="ma-4"
-          color="primary"
-        >{{ timesheetDisplayStatus === 'edit' ? 'Update' : 'Save' }}</v-btn>
-      </div>
-      <div :style="{
-        'overflow-x': 'auto',
-      }">
-      <v-card 
-        flat
-        :style="{
-          'min-width': '600px',
-      }">
-          <v-card
-            class="d-flex justify-center rounded-0 pr-8 pl-1 mb-4"
-            elevation="2"
-          >
-            <v-col
-              v-for="(label, index) in colLabels"
-              :key="index"
-              :style="{
-                'min-width': index === 0 ? '200px' : '50px',
-                'max-width': index === 0 ? '500px' : '150px'
-              }"
-            >
-                <div 
-                  v-if="lgAndUp"
-                  class="text-truncate"
-                  >{{ label.lg }}</div>
-                <div
-                  v-else
-                  class="text-truncate"
-                >{{ label.sm || label.lg }}</div>
-                <!-- <div v-else>{{ label.xs || label.sm || label.lg }}</div> -->
-            </v-col>
-          </v-card>
-          <v-sheet 
-            :style="{
-              'max-height': 'calc(88vh - 200px)',
-              overflow: 'auto',
-            }"
-          >
-            <v-sheet 
-              v-for="(row, rowIndex) in timesheetData" 
-              :key="rowIndex"
-              class="d-flex justify-center"
-            >
-              <v-col 
-                v-for="(cell, colIndex) in row" 
-                :key="colIndex" 
+              <v-col
+                v-for="(label, index) in colLabels"
+                :key="index"
                 :style="{
-                  'min-width': colIndex === 0 ? '200px' : '50px',
-                  'max-width': colIndex === 0 ? '500px' : '150px'
+                  'min-width': index === 0 ? '200px' : '50px',
+                  'max-width': index === 0 ? '500px' : '150px'
                 }"
               >
-                <v-autocomplete
-                  v-if="colIndex === 0"
-                  v-model="cell.projectid"
-                  :items="projects"
-                  label="Project Name"
-                  item-title="projectname"
-                  item-value="projectid"
-                  density="compact"
-                  variant="outlined"
-                  :readonly="timesheetDisplayStatus === 'view'"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item
-                      v-bind="props"
-                      :disabled="selectedProjects.includes(item.value)"
-                    ></v-list-item>
-                  </template>
-                </v-autocomplete>
-                <!-- error handled thorugh v-if -->
-                <v-text-field
-                  v-else
-                  v-model="cell.entry.hoursWorked"  
-                  :rules="[validateAllRules]"
-                  :readonly="timesheetDisplayStatus === 'view'"
-                  label="Hours" 
-                  variant="outlined" 
-                  density="compact" 
-                />
+                  <div 
+                    v-if="lgAndUp"
+                    class="text-truncate"
+                    >{{ label.lg }}</div>
+                  <div
+                    v-else
+                    class="text-truncate"
+                  >{{ label.sm || label.lg }}</div>
+                  <!-- <div v-else>{{ label.xs || label.sm || label.lg }}</div> -->
               </v-col>
-              <v-btn 
-                v-if="timesheetDisplayStatus !== 'view'"
-                @click="handleDeleteRow(rowIndex)"
-                size="small"
-                variant="tonal"
-                color="red" 
-                icon="mdi-delete"
-                class="mt-3 mx-2"
-              ></v-btn>
+            </v-card>
+            <v-sheet 
+              :style="{
+                'max-height': 'calc(88vh - 200px)',
+                overflow: 'auto',
+              }"
+            >
+              <v-sheet 
+                v-for="(row, rowIndex) in timesheetData" 
+                :key="rowIndex"
+                class="d-flex justify-center"
+              >
+                <v-col 
+                  v-for="(cell, colIndex) in row" 
+                  :key="colIndex" 
+                  :style="{
+                    'min-width': colIndex === 0 ? '200px' : '50px',
+                    'max-width': colIndex === 0 ? '500px' : '150px'
+                  }"
+                >
+                  <v-autocomplete
+                    v-if="colIndex === 0"
+                    v-model="cell.projectid"
+                    :items="projects"
+                    label="Project Name"
+                    item-title="projectname"
+                    item-value="projectid"
+                    density="compact"
+                    variant="outlined"
+                    :readonly="timesheetDisplayStatus === 'view'"
+                  >
+                    <template #item="{ props, item }">
+                      <v-list-item
+                        v-bind="props"
+                        :disabled="selectedProjects.includes(item.value)"
+                      ></v-list-item>
+                    </template>
+                  </v-autocomplete>
+                  <!-- error handled thorugh v-if -->
+                  <v-text-field
+                    v-else
+                    v-model="cell.entry.hoursWorked"  
+                    :rules="[validateAllRules]"
+                    :readonly="timesheetDisplayStatus === 'view'"
+                    label="Hours" 
+                    variant="outlined" 
+                    density="compact" 
+                  />
+                </v-col>
+                <v-btn 
+                  v-if="timesheetDisplayStatus !== 'view'"
+                  @click="handleDeleteRow(rowIndex)"
+                  size="small"
+                  variant="tonal"
+                  color="red" 
+                  icon="mdi-delete"
+                  class="mt-3 mx-2"
+                ></v-btn>
+              </v-sheet>
             </v-sheet>
-          </v-sheet>
-        </v-card>
-      </div>
-      <div class="d-flex justify-space-between mt-8">
-        <v-btn
-          v-if="timesheetDisplayStatus !== 'view'"
-          @click="handleAddRow()"
-          :color="`${timesheetData.length === 0 ? 'red' : ''}`"
-          :class="`ml-10 ${timesheetData.length === 0 ? 'animate-bounce' : ''}`"
-          prepend-icon="mdi-plus"
-        >Add</v-btn>
-        <v-btn
-          v-if="timesheetDisplayStatus !== 'view'"
-          @click="handleSubmit('submitted')"
-          :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null)"
-          class="mr-10"
-          color="success"
-          append-icon="mdi-forward"
-        >Submit</v-btn>
-      </div>
-    </div>
+          </v-card>
+        </div>
+        <div class="d-flex justify-space-between mt-8">
+          <v-btn
+            v-if="timesheetDisplayStatus !== 'view'"
+            @click="handleAddRow()"
+            :color="`${timesheetData.length === 0 ? 'red' : ''}`"
+            :class="`ml-10 ${timesheetData.length === 0 ? 'animate-bounce' : ''}`"
+            prepend-icon="mdi-plus"
+          >Add</v-btn>
+          <v-btn
+            v-if="timesheetDisplayStatus !== 'view'"
+            @click="handleSubmit('submitted')"
+            :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null)"
+            class="mr-10"
+            color="success"
+            append-icon="mdi-forward"
+          >Submit</v-btn>
+        </div>
+      </template>
+    </IsContentLoadingWrapper>
   </div>
 </template>
 
 <script setup lang="ts">
 import axios from 'axios'
+
+import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'

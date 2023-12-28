@@ -33,6 +33,4 @@
 import { useGoogleUserData } from '../stores/useDataStore'
 
 const { isUserLoggedIn, redirectToGoogleAuth } = useGoogleUserData()
-
-
 </script>
