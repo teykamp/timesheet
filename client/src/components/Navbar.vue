@@ -84,6 +84,7 @@
              
               <v-list-item 
                 v-if="xs"
+                @click="showDialog(true, '', {}, {})"
                 class="my-2"
                 prepend-icon="mdi-cog"
                 :style="{
@@ -193,6 +194,7 @@
               >
                 <template v-slot:append>
                     <v-btn
+                      @click="loadDynamicComponent()"
                       flat
                       icon="mdi-cog"
                     ></v-btn>
@@ -235,13 +237,19 @@ import { useRouter, useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 import { useDisplay } from 'vuetify'
-import { useColorPalette } from '../stores/useUserInterfaceStore'
+import { useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 import { useGoogleUserData } from '../stores/useDataStore'
+
+const loadDynamicComponent = async () => {
+  const componentName = 'TestComponent';
+
+  showDialog(true, componentName, {}, {});
+}
 
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
 const { getGoogleUserData, redirectToGoogleAuth, logUserOut, logUserIn } = useGoogleUserData()
-
+const { showDialog } = useDialog()
 
 const checkIfKeepLoggedIn = () => {
   try {

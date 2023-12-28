@@ -2,13 +2,14 @@
   <!-- needs to become full width and bottom on mobile -->
   <v-sheet class="pa-5">
     <h1>
-      {{ dialog.body.title }}
+      {{ body.title }}
     </h1>
     <p class="my-3">
-      {{ dialog.body.description }} dshajkdshkjdshakjdksa
+      {{ body.description }}
     </p>
+    <component :is="selectedComponent" :props="componentProps"></component>
     <v-btn 
-      v-for="button in dialog.body.buttons" 
+      v-for="button in body.buttons" 
       :key="button.text" 
       @click="button.onClick" 
       :color="button.color"
@@ -19,7 +20,19 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useDialog } from '../stores/useUserInterfaceStore'
 
-const dialog = useDialog()
-</script>../stores/useUserInterfaceStore
+import TestComponent from './TestComponent.vue';
+
+const { body } = useDialog()
+const useDialogStore = useDialog()
+
+const { componentName, componentProps } = storeToRefs(useDialogStore)
+
+const componentsMap = {
+  TestComponent,
+}
+
+const selectedComponent = componentsMap[componentName.value]
+</script>

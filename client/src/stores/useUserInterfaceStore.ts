@@ -76,6 +76,8 @@ type DialogBody = {
 export const useDialog = defineStore('dialog', {
   state: () => ({
     show: false,
+    componentName: '',
+    componentProps: {},
     body: {
       title: '',
       description: '',
@@ -85,8 +87,10 @@ export const useDialog = defineStore('dialog', {
   }),
 
   actions: {
-    showDialog(persistent: boolean = false, body: DialogBody ) {
+    showDialog(persistent: boolean, componentName: string, componentProps: object, body: DialogBody ) {
       this.show = true
+      this.componentName = componentName
+      this.componentProps = componentProps
       this.body.title = body.title || ''
       this.body.description = body.description || ''
       this.body.buttons = body.buttons || []
