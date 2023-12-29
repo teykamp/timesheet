@@ -7,7 +7,7 @@
     <p class="my-3">
       {{ body.description }}
     </p>
-    <component :is="selectedComponent" :props="componentProps"></component>
+    <component :is="component" :props="componentProps"></component>
     <v-btn 
       v-for="button in body.buttons" 
       :key="button.text" 
@@ -20,19 +20,19 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
+// import { storeToRefs } from 'pinia'
 import { useDialog } from '../stores/useUserInterfaceStore'
 
 import TestComponent from './TestComponent.vue';
 
-const { body } = useDialog()
+const { component, componentProps, body } = useDialog()
 const useDialogStore = useDialog()
 
-const { componentName, componentProps } = storeToRefs(useDialogStore)
+// const { componentName, componentProps } = storeToRefs(useDialogStore)
 
-const componentsMap = {
-  TestComponent,
-}
+// const componentsMap = {
+//   TestComponent,
+// }
 
-const selectedComponent = componentsMap[componentName.value]
+// const selectedComponent = componentsMap[componentName.value]
 </script>

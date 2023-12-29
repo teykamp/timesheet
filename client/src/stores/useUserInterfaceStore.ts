@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { markRaw } from 'vue'
 
 interface LoadingState {
   isTimesheetListLoading: boolean;
@@ -76,7 +77,7 @@ type DialogBody = {
 export const useDialog = defineStore('dialog', {
   state: () => ({
     show: false,
-    componentName: '',
+    component: '',
     componentProps: {},
     body: {
       title: '',
@@ -87,9 +88,10 @@ export const useDialog = defineStore('dialog', {
   }),
 
   actions: {
-    showDialog(persistent: boolean, componentName: string, componentProps: object, body: DialogBody ) {
+    showDialog(persistent: boolean, component: any, componentProps: object, body: DialogBody ) {
+      // close first then wait 120 ms and recall showdialog
       this.show = true
-      this.componentName = componentName
+      this.component = markRaw(component)
       this.componentProps = componentProps
       this.body.title = body.title || ''
       this.body.description = body.description || ''

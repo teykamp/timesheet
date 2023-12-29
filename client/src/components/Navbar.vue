@@ -240,10 +240,12 @@ import { useDisplay } from 'vuetify'
 import { useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 
-const loadDynamicComponent = async () => {
-  const componentName = 'TestComponent';
 
-  showDialog(true, componentName, {}, {});
+import TestComponent from './TestComponent.vue'
+const loadDynamicComponent = async () => {
+  // const componentName = 'TestComponent';
+
+  showDialog(true, TestComponent, {}, {});
 }
 
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
