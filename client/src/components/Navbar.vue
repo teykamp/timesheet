@@ -84,7 +84,7 @@
              
               <v-list-item 
                 v-if="xs"
-                @click="showDialog(true, '', {}, {})"
+                @click="showDialog(true, TestComponent, {}, {})"
                 class="my-2"
                 prepend-icon="mdi-cog"
                 :style="{
@@ -194,7 +194,7 @@
               >
                 <template v-slot:append>
                     <v-btn
-                      @click="loadDynamicComponent()"
+                      @click="showDialog(true, TestComponent, {}, {})"
                       flat
                       icon="mdi-cog"
                     ></v-btn>
@@ -240,13 +240,7 @@ import { useDisplay } from 'vuetify'
 import { useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 
-
 import TestComponent from './TestComponent.vue'
-const loadDynamicComponent = async () => {
-  // const componentName = 'TestComponent';
-
-  showDialog(true, TestComponent, {}, {});
-}
 
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()

@@ -88,15 +88,19 @@ export const useDialog = defineStore('dialog', {
   }),
 
   actions: {
+    closeDialog() {
+      this.show = false
+    },
+
     showDialog(persistent: boolean, component: any, componentProps: object, body: DialogBody ) {
-      // close first then wait 120 ms and recall showdialog
-      this.show = true
+
       this.component = markRaw(component)
       this.componentProps = componentProps
       this.body.title = body.title || ''
       this.body.description = body.description || ''
       this.body.buttons = body.buttons || []
       this.persistent = persistent
+      this.show = true
     },
   }
 })
