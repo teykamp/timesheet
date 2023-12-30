@@ -195,39 +195,39 @@ router.put('/timesheets/:timesheetId', async (req, res) => {
 // GET all submitted timesheets and entries for a manager
 router.get('/timesheets/manager/:managerId', async (req, res) => {
   const { managerId } = req.params;
-
   try {
     const result = await handleDatabaseTransaction(async (client) => {
-      return await client.query(
-        'SELECT t.timesheetId, t.userId, t.endDate, t.status, te.entryId, te.projectId, te.hoursWorked, te.date ' +
-        'FROM Timesheet t ' +
-        'JOIN TimesheetEntry te ON t.timesheetId = te.timesheetId ' +
-        'WHERE t.status = $1 AND t.userId IN (SELECT userId FROM timesheetuser WHERE managerId = $2)',
-        ['submitted', managerId]
+      const userIdsQueryResult = await client.query(
+        'SELECT userId, email FROM timesheetuser WHERE managerId = $1',
+        [managerId]
       );
-    });
-
-    const timesheets: any[] = [];
-
-    // Process the result to organize timesheets and entries
-    result.rows.forEach((row: any) => {
-      const existingTimesheet = timesheets.find((t) => t.timesheetId === row.timesheetId);
-
-      if (existingTimesheet) {
-        // Add entry to existing timesheet
-        existingTimesheet.entries.push({
-          entryId: row.entryId,
-          projectId: row.projectId,
-          hoursWorked: row.hoursWorked,
-          date: row.date,
-        });
-      } else {
-        // This block should not be reached
-        console.error('Unexpected scenario: Timesheet does not exist for entry');
+      const userData = userIdsQueryResult.rows.map((row) => row.userid);
+      const userEmailsMap = new Map(userIdsQueryResult.rows.map((user) => [user.userId, user.email]))
+      
+      if (userData.length === 0) {
+        return [];
       }
+      const timesheets = []
+      for (const userId of userData) {
+        const timesheetsQueryResult = await client.query(
+          'SELECT t.timesheetId, t.userId, t.endDate, t.status ' +
+          'FROM Timesheet t ' +
+          'WHERE t.status = $1 AND t.userId = $2',
+          ['submitted', userId]
+        );
+
+        const timesheetsWithEmails = timesheetsQueryResult.rows.map((timesheet) => ({
+          ...timesheet,
+          email: userEmailsMap.get(timesheet.userId),
+        }));
+
+        timesheets.push(...timesheetsWithEmails);
+      }
+
+      return timesheets;
     });
 
-    res.json(timesheets);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheets and entries for the manager' + error });
   }
