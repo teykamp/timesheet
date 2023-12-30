@@ -104,6 +104,7 @@ import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 import type { TimesheetStateTypes } from '../stores/useDataStore'
 
 import { formatDateToDDMMYY } from '../functions/dateUtils'
+import headerData from '../functions/headerData'
 
 const { id, isUserLoggedIn } = useGoogleUserData()
 const { setCurrentTimesheet, setTimesheetDisplayStatus } = useHandleTimesheetDisplay()
@@ -181,31 +182,4 @@ const getUserTimesheets = () => {
 getUserTimesheets()
 
 const search = ref('')
-
-const headerData = ref([
-  {
-    title: 'End Date',
-    key: 'enddate',
-  },
-  { 
-    title: 'Hours', 
-    key: 'totalHours',
-  },
-  { 
-    title: 'Status',
-    key: 'status',
-  },
-  {
-    title: '',
-    key: 'view',
-    align: 'center',
-    sortable: false,
-  },
-  { 
-    title: 'Actions',
-    key: 'actions',
-    align: 'end',
-    sortable: false,
-  },
-])
 </script>
