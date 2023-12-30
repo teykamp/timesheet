@@ -20,19 +20,7 @@
 </template>
 
 <script setup lang="ts">
-// import { storeToRefs } from 'pinia'
 import { useDialog } from '../stores/useUserInterfaceStore'
 
-import TestComponent from './TestComponent.vue';
-
 const { component, componentProps, body } = useDialog()
-const useDialogStore = useDialog()
-
-// const { componentName, componentProps } = storeToRefs(useDialogStore)
-
-// const componentsMap = {
-//   TestComponent,
-// }
-
-// const selectedComponent = componentsMap[componentName.value]
 </script>
