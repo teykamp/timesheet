@@ -10,7 +10,7 @@
                 class="ma-4 mr-10"
               >{{ 'Week Ending In:' + formatDateToDDMMYY(weekEndingIn) }}</div>
               <v-btn
-                v-if="timesheetDisplayStatus !== 'view'"
+                v-else
                 v-bind="props"
                 append-icon="mdi-menu-down"
                 class="ma-4"
@@ -24,6 +24,11 @@
                 v-for="(date, index) in dateRange"
                 :key="index"
                 @click="weekEndingIn = date.friday"
+                :style="{
+                  background: formatDateToDDMMYY(weekEndingIn) === formatDateToDDMMYY(date.friday) ? blueShadow : '',
+                  color: formatDateToDDMMYY(weekEndingIn) === formatDateToDDMMYY(date.friday) ? white : ''
+                }"
+                :appendIcon="formatDateToDDMMYY(date.friday) === formatDateToDDMMYY(getMondayAndFriday(new Date).friday) ? 'mdi-calendar-today' : ''"
               >
                 <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
               </v-list-item>
@@ -163,7 +168,7 @@ import { useDisplay } from 'vuetify'
 import type { Project, TimesheetStateTypes } from '../stores/useDataStore'
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
-import { useLoadingScreen, useSnackbar } from '../stores/useUserInterfaceStore'
+import { useLoadingScreen, useSnackbar, useColorPalette } from '../stores/useUserInterfaceStore'
 
 import { getMonthRange, formatDateToDDMMYY, getMondayAndFriday } from '../functions/dateUtils'
 
@@ -176,6 +181,8 @@ const { currentEditTimesheet } = useHandleTimesheetDisplay()
 const useHandleTimesheetDisplayStore = useHandleTimesheetDisplay()
 const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplayStore)
 const { showSnackbar } = useSnackbar()
+
+const { blueShadow, white } = useColorPalette()
 
 const { lgAndUp } = useDisplay()
 
