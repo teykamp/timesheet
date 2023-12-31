@@ -118,14 +118,15 @@ const props = defineProps<{
   updateState: (newState: TimesheetStateTypes) => void,
 }>()
 
-type Item = {
+// extract out
+type Timesheet = {
   timesheetid: number,
   enddate: string,
   totalHours: number,
-  status: 'working' | 'submitted' | 'approved'
+  status: 'working' | 'submitted' | 'approved' | 'revise'
 }
 
-const getStatusChipColor = (status: Item['status']) => {
+const getStatusChipColor = (status: Timesheet['status']) => {
   switch (status) {
     case 'working':
       return 'primary'
@@ -135,9 +136,9 @@ const getStatusChipColor = (status: Item['status']) => {
       return 'success'
   }
 }
-const userTimesheets = ref<Item[]>([])
+const userTimesheets = ref<Timesheet[]>([])
 
-const deleteTimesheet = async (item: Item) => {
+const deleteTimesheet = async (item: Timesheet) => {
   try {
     const response = await axios.delete(`/api/timesheets/${item.timesheetid}`)
 
@@ -148,17 +149,17 @@ const deleteTimesheet = async (item: Item) => {
       console.error('Failed to delete timesheet:', response.data.error)
     }
   } catch (error) {
-    console.error('Error deleting timesheet:', error.message)
+    console.error('Error deleting timesheet:', error)
   }
 }
 
-const editTimesheet = (item: Item) => {
+const editTimesheet = (item: Timesheet) => {
   setTimesheetDisplayStatus('edit')
   setCurrentTimesheet(item.timesheetid)
   props.updateState('editTimesheet')
 }
 
-const viewTimesheet = (item: Item) => {
+const viewTimesheet = (item: Timesheet) => {
   setTimesheetDisplayStatus('view')
   setCurrentTimesheet(item.timesheetid)
   props.updateState('editTimesheet')
