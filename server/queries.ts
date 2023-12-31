@@ -203,7 +203,7 @@ router.get('/timesheets/manager/:managerId', async (req, res) => {
       );
       const userData = userIdsQueryResult.rows.map((row) => row.userid);
       const userEmailsMap = new Map(userIdsQueryResult.rows.map((user) => [user.userId, user.email]))
-      
+
       if (userData.length === 0) {
         return [];
       }
@@ -216,9 +216,19 @@ router.get('/timesheets/manager/:managerId', async (req, res) => {
           ['submitted', userId]
         );
 
-        const timesheetsWithEmails = timesheetsQueryResult.rows.map((timesheet) => ({
-          ...timesheet,
-          email: userEmailsMap.get(timesheet.userId),
+        const timesheetsWithEmails = await Promise.all(timesheetsQueryResult.rows.map(async (timesheet) => {
+          const totalHoursResult = await client.query(
+            'SELECT COALESCE(SUM(hoursWorked), 0) AS totalHours FROM TimesheetEntry WHERE timesheetId = $1',
+            [timesheet.timesheetid]
+          );
+
+          const totalHours = totalHoursResult.rows[0].totalhours;
+
+          return {
+            ...timesheet,
+            email: userEmailsMap.get(timesheet.userId),
+            totalHours,
+          };
         }));
 
         timesheets.push(...timesheetsWithEmails);
