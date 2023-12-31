@@ -1,11 +1,16 @@
 <template>
-  <div>{{ stuff }}</div>
-  <!-- <v-data-table
-    :items="userTimesheets"
+  <v-data-table
+    v-if="managerTimesheets.length > 0"
+    :items="managerTimesheets"
     :items-per-page="-1"
     :headers="headerData"
     :search="search"
     >
+    <template #item.email="{ item }">
+      <div>
+        {{ item.email }}
+      </div>
+    </template>
     <template #item.enddate="{ item }">
       <div>
         {{ formatDateToDDMMYY(new Date(item.enddate)) }}
@@ -35,35 +40,88 @@
     <template #item.actions="{ item }">
       <div class="d-flex justify-end">
         <v-btn
-          @click="editTimesheet(item)"
-          icon="mdi-pencil"
-          class="mr-1"
-          variant="tonal"
+          @click="deleteTimesheet(item)"
+          icon="mdi-delete"
+          class="mx-1"
           size="small"
+          variant="tonal"
+          color="red"
           :disabled="item.status === 'approved'"
         ></v-btn>
         <v-btn
           @click="deleteTimesheet(item)"
-          icon="mdi-delete"
-          class="ml-1"
-          variant="tonal"
+          icon="mdi-comment"
+          class="mx-1"
           size="small"
-          color="red"
+          variant="tonal"
+          :disabled="item.status === 'approved'"
+        ></v-btn>
+        <v-btn
+          @click="deleteTimesheet(item)"
+          icon="mdi-file-check-outline"
+          class="mx-1"
+          size="small"
+          variant="tonal"
+          color="green"
           :disabled="item.status === 'approved'"
         ></v-btn>
       </div>
     </template>
     <template #bottom></template>
-  </v-data-table> -->
+  </v-data-table>
 </template>
 
 <script setup lang="ts">
 import axios from 'axios'
 import { ref } from 'vue'
 
-import headerData from '../functions/headerData'
+import { formatDateToDDMMYY } from '../functions/dateUtils'
+// import headerData from '../functions/headerData'
 
-const stuff = ref(null)
+const headerData = [
+  {
+    title: 'Email',
+    key: 'email',
+  },
+  {
+    title: 'End Date',
+    key: 'enddate',
+  },
+  {
+    title: 'Hours',
+    key: 'totalHours',
+  },
+  {
+    title: 'Status',
+    key: 'status',
+  },
+  {
+    title: '',
+    key: 'view',
+    align: 'center',
+    sortable: false,
+  },
+  {
+    title: 'Actions',
+    key: 'actions',
+    align: 'end',
+    sortable: false,
+  },
+]
+
+const search = ref('')
+const managerTimesheets = ref([])
+
+const getStatusChipColor = (status: any) => {
+  switch (status) {
+    case 'working':
+      return 'primary'
+    case 'submitted':
+      return 'orange'
+    case 'approved':
+      return 'success'
+  }
+}
 
 const managerId = '115112513480272962705'
 
@@ -71,9 +129,7 @@ const getStuff = () => {
   axios.get(`/api/timesheets/manager/${managerId}`)
     .then(response => {
       const { data } = response
-      console.log(data)
-      stuff.value = data
-      // stuff.value = data.reverse()
+      managerTimesheets.value = data.reverse()
     })
     .catch(error => {
       console.error('Error fetching data:', error.message)
