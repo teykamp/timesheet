@@ -105,6 +105,7 @@ import type { TimesheetStateTypes } from '../stores/useDataStore'
 
 import { formatDateToDDMMYY } from '../functions/dateUtils'
 import headerData from '../functions/headerData'
+import type { Timesheet } from '../stores/types'
 
 const { id, isUserLoggedIn } = useGoogleUserData()
 const { setCurrentTimesheet, setTimesheetDisplayStatus } = useHandleTimesheetDisplay()
@@ -118,13 +119,6 @@ const props = defineProps<{
   updateState: (newState: TimesheetStateTypes) => void,
 }>()
 
-// extract out
-type Timesheet = {
-  timesheetid: number,
-  enddate: string,
-  totalHours: number,
-  status: 'working' | 'submitted' | 'approved' | 'revise'
-}
 
 const getStatusChipColor = (status: Timesheet['status']) => {
   switch (status) {
@@ -183,4 +177,4 @@ const getUserTimesheets = () => {
 getUserTimesheets()
 
 const search = ref('')
-</script>
+</script>@/stores/types

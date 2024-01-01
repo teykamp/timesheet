@@ -335,7 +335,7 @@ const weekEndingIn = ref(getMondayAndFriday(new Date()).friday)
 
 const getViewTimesheetData = (timesheetId: number) => {
   setLoadingState('isTimesheetContentLoading', true)
-  axios.get(`/api/timesheetEntriesFormatted/${timesheetId}`)
+  axios.get(`/api/timesheetEntries/FormattedBy/${timesheetId}`)
     .then(response => {
       const { data } = response
       timesheetData.value = data.reverse()

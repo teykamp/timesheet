@@ -1,8 +1,12 @@
 import dotenv from 'dotenv';
 import express from 'express';
 
-import queriesRoute from './queries';
-
+import {router as queriesRoute}from './queries';
+import {router as projectRouter} from "./routes/projectRoutes";
+import {router as timesheetRouter} from "./routes/timesheetsRoutes";
+import {router as timesheetEntriesRouter} from './routes/timesheetEntriesRoutes';
+import {router as usersRouter} from './routes/usersRoutes';
+import { timeStamp } from 'console';
 
 const cors = require('cors');
 
@@ -55,7 +59,11 @@ function getAuthUrl() {
   });
 }
 
-app.use('/api', queriesRoute);
+app.use('/api/projects',projectRouter);
+app.use('/api/timesheets', timesheetRouter)
+app.use('/api/timesheetEntries', timesheetEntriesRouter);
+app.use('/api/users',usersRouter);
+// app.use('/api', queriesRoute);
 
 app.get('/api/auth/url', (req, res) => {
   res.json({ url: getAuthUrl() });

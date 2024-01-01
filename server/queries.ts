@@ -821,4 +821,4 @@ router.put('/users/:userId/manager/status', async (req, res) => {
   }
 });
 
-export = router;
+export {router , handleDatabaseTransaction};
