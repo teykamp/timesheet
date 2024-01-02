@@ -5,6 +5,7 @@
         <div v-if="state === 'allTimesheets'">
           <TimesheetListDisplay
             :updateState="updateState"
+            :timesheetListDisplayActions="timesheetListDisplayActions"
           />
           <v-container 
             v-if="!isTimesheetListLoading"
@@ -41,6 +42,8 @@ import { storeToRefs } from 'pinia'
 import type { TimesheetStateTypes } from '../stores/useDataStore'
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
+import type { Timesheet } from '../stores/types'
+
 
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
@@ -48,7 +51,7 @@ import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
 
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
-const { resetTimesheetDisplay, setTimesheetDisplayStatus } = useHandleTimesheetDisplay()
+const { resetTimesheetDisplay, setTimesheetDisplayStatus, setCurrentTimesheet } = useHandleTimesheetDisplay()
 
 const state = ref<TimesheetStateTypes>('allTimesheets')
 
@@ -62,4 +65,17 @@ const handleAddNewTimesheet = () => {
   updateState('editTimesheet')
   return
 }
+
+const timesheetListDisplayActions = ref({
+  editTimesheet: (item: Timesheet) => {
+    setTimesheetDisplayStatus('edit')
+    setCurrentTimesheet(item.timesheetid)
+    updateState('editTimesheet')
+  },
+  viewTimesheet: (item: Timesheet) => {
+    setTimesheetDisplayStatus('view')
+    setCurrentTimesheet(item.timesheetid)
+    updateState('editTimesheet')
+  }
+})
 </script>

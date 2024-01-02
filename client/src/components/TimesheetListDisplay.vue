@@ -53,7 +53,7 @@
           
             <template #item.view="{ item }">
               <v-btn
-                @click="viewTimesheet(item)"
+                @click="timesheetListDisplayActions.viewTimesheet(item)"
                 flat
                 size="small"
                 prepend-icon="mdi-eye"
@@ -63,7 +63,7 @@
             <template #item.actions="{ item }">
               <div class="d-flex justify-end">
                 <v-btn
-                  @click="editTimesheet(item)"
+                  @click="timesheetListDisplayActions.editTimesheet(item)"
                   icon="mdi-pencil"
                   class="mr-1"
                   variant="tonal"
@@ -117,6 +117,7 @@ const { xs } = useDisplay()
 
 const props = defineProps<{
   updateState: (newState: TimesheetStateTypes) => void,
+  timesheetListDisplayActions: { [key: string]: (item: Timesheet) => void };
 }>()
 
 
@@ -145,18 +146,6 @@ const deleteTimesheet = async (item: Timesheet) => {
   } catch (error) {
     console.error('Error deleting timesheet:', error)
   }
-}
-
-const editTimesheet = (item: Timesheet) => {
-  setTimesheetDisplayStatus('edit')
-  setCurrentTimesheet(item.timesheetid)
-  props.updateState('editTimesheet')
-}
-
-const viewTimesheet = (item: Timesheet) => {
-  setTimesheetDisplayStatus('view')
-  setCurrentTimesheet(item.timesheetid)
-  props.updateState('editTimesheet')
 }
 
 const getUserTimesheets = () => {
