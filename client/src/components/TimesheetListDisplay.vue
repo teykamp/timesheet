@@ -90,16 +90,12 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
-
 import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDisplay } from 'vuetify'
 
-import { useGoogleUserData } from '../stores/useDataStore'
-import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 import type { TimesheetStateTypes } from '../stores/useDataStore'
 
@@ -107,9 +103,6 @@ import { formatDateToDDMMYY } from '../functions/dateUtils'
 import headerData from '../functions/headerData'
 import type { Timesheet } from '../stores/types'
 
-const { id, isUserLoggedIn } = useGoogleUserData()
-const { setCurrentTimesheet, setTimesheetDisplayStatus } = useHandleTimesheetDisplay()
-const { setLoadingState } = useLoadingScreen()
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
 
@@ -117,7 +110,9 @@ const { xs } = useDisplay()
 
 const props = defineProps<{
   updateState: (newState: TimesheetStateTypes) => void,
-  timesheetListDisplayActions: { [key: string]: (item: Timesheet) => void };
+  timesheetListDisplayActions: { [key: string]: (item: Timesheet) => void },
+  fetchData: () => void,
+  userTimesheets: Timesheet[],
 }>()
 
 
@@ -131,39 +126,8 @@ const getStatusChipColor = (status: Timesheet['status']) => {
       return 'success'
   }
 }
-const userTimesheets = ref<Timesheet[]>([])
 
-const deleteTimesheet = async (item: Timesheet) => {
-  try {
-    const response = await axios.delete(`/api/timesheets/${item.timesheetid}`)
-
-    if (response.status === 200) {
-      const updatedTimesheets = userTimesheets.value.filter(timesheet => timesheet.timesheetid !== item.timesheetid)
-      userTimesheets.value = updatedTimesheets
-    } else {
-      console.error('Failed to delete timesheet:', response.data.error)
-    }
-  } catch (error) {
-    console.error('Error deleting timesheet:', error)
-  }
-}
-
-const getUserTimesheets = () => {
-  if (!isUserLoggedIn()) return
-  
-  setLoadingState('isTimesheetListLoading', true)
-  axios.get(`/api/timesheets/user/${id}`)
-    .then(response => {
-      const { data } = response
-      userTimesheets.value = data.reverse()
-      setLoadingState('isTimesheetListLoading', false)
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error.message)
-    })
-}
-
-getUserTimesheets()
+props.fetchData()
 
 const search = ref('')
-</script>@/stores/types
+</script>
