@@ -7,44 +7,33 @@ import { url } from "inspector";
 */
 
 // Check if user first time login and POST if does not exist
-///userFirstTimeLogin/:userId/:email -> /users/FirstTimeLogin/:userId/:email (current)
-// /userFirstTimeLogin/:userId/:email -> /user/:userID/:email?FirstTimeLogin=True (thoughts)
-router.get('/:userId/:email', async (req, res) => {
-    const { userId, email } = req.params;
-    /* this query parameter will be determined by whether these is a
-    bearer-token/cookie in the request. 
-    can be checked using some form of middleware in express
-    !yet to implement!
-    */
-    const firstTime = req.query 
-    try {
-        if(firstTime){
-            const userResponse = await handleDatabaseTransaction(async (client) => {
-            const result = await client.query('SELECT * FROM "timesheetuser" WHERE userId = $1', [userId]);
-    
-            if (!result || !result.rows || result.rows.length === 0) {
-            const createUserResult = await client.query(
-                'INSERT INTO "timesheetuser" (userId, email) VALUES ($1, $2) RETURNING *',
-                [userId, email]
-            );
-    
-            return createUserResult.rows[0];
-            }
-    
-            return result.rows[0];
-            res.json(userResponse);
-        });
-    }else{
-        // redirect if already logged in
-        res.status(301).json({message: "redirecting to main page"})
-    }
-  
-     
-    } catch (error) {
-      res.status(500).json({ error: 'Error checking or creating user' });
-    }
-  });
-  
+router.get('/firstTimeLogin/:userId/:email', async (req, res) => {
+  const { userId, email } = req.params;
+
+  try {
+    const userResponse = await handleDatabaseTransaction(async (client) => {
+      const result = await client.query('SELECT * FROM "timesheetuser" WHERE userId = $1', [userId]);
+
+      if (!result || !result.rows || result.rows.length === 0) {
+        const createUserResult = await client.query(
+          'INSERT INTO "timesheetuser" (userId, email) VALUES ($1, $2) RETURNING *',
+          [userId, email]
+        );
+
+        return createUserResult.rows[0];
+      }
+
+      return result.rows[0];
+    });
+
+    res.json(userResponse);
+  } catch (error) {
+    res.status(500).json({ error: 'Error checking or creating user' });
+  }
+});
+
+
+
   // POST a user
   router.post('/', async (req, res) => {
     const { username, email, managerId, isManager } = req.body;

@@ -73,7 +73,7 @@ export const useGoogleUserData = defineStore('googleUserData',{
       this.picture = googleProfile.picture
       this.locale = googleProfile.locale
 
-      axios.get(`api/userFirstTimeLogin/${this.id}/${encodeURIComponent(this.email)}`)
+      axios.get(`api/users/firstTimeLogin/${this.id}/${encodeURIComponent(this.email)}`)
       .then((response) => {
         console.log('Response: User Logged Back In Successfully');
       })
