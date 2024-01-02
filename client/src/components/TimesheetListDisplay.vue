@@ -40,7 +40,6 @@
               </div>
             </template>
             <template #item.status="{ item }">
-              <div>
                 <v-chip
                   :color="getStatusChipColor(item.status)"
                   :text="item.status"
@@ -48,9 +47,7 @@
                   label
                   size="small"
                 ></v-chip>
-              </div>
             </template>
-          
             <template #item.view="{ item }">
               <v-btn
                 @click="viewTimesheet(item)"
@@ -63,21 +60,15 @@
             <template #item.actions="{ item }">
               <div class="d-flex justify-end">
                 <v-btn
-                  @click="editTimesheet(item)"
-                  icon="mdi-pencil"
+                  v-for="button in timesheetListDisplayActions"
+                  :key="button.icon"
+                  @click="button.callback(item)"
+                  :color="button.color"
+                  :disabled="button.disabled(item)"
+                  :icon="button.icon"
+                  size="small"
+                  variant="tonal"
                   class="mr-1"
-                  variant="tonal"
-                  size="small"
-                  :disabled="item.status === 'approved'"
-                ></v-btn>
-                <v-btn
-                  @click="deleteTimesheet(item)"
-                  icon="mdi-delete"
-                  class="ml-1"
-                  variant="tonal"
-                  size="small"
-                  color="red"
-                  :disabled="item.status === 'approved'"
                 ></v-btn>
               </div>
             </template>
@@ -90,26 +81,20 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
-
 import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDisplay } from 'vuetify'
 
-import { useGoogleUserData } from '../stores/useDataStore'
-import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 import type { TimesheetStateTypes } from '../stores/useDataStore'
-
-import { formatDateToDDMMYY } from '../functions/dateUtils'
-import headerData from '../functions/headerData'
 import type { Timesheet } from '../stores/types'
 
-const { id, isUserLoggedIn } = useGoogleUserData()
-const { setCurrentTimesheet, setTimesheetDisplayStatus } = useHandleTimesheetDisplay()
-const { setLoadingState } = useLoadingScreen()
+import { formatDateToDDMMYY } from '../functions/dateUtils'
+import type { HeaderItem } from '../functions/headerData'
+
+
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
 
@@ -117,64 +102,29 @@ const { xs } = useDisplay()
 
 const props = defineProps<{
   updateState: (newState: TimesheetStateTypes) => void,
+  viewTimesheet: (timesheet: Timesheet) => void
+  timesheetListDisplayActions: {
+    [key: string]: { callback: (timesheet: Timesheet) => void, icon: string, color: string, disabled: (timesheet: Timesheet) => boolean }
+  },
+  fetchData: () => void,
+  userTimesheets: Timesheet[],
+  headerData: HeaderItem[],
 }>()
-
 
 const getStatusChipColor = (status: Timesheet['status']) => {
   switch (status) {
     case 'working':
       return 'primary'
     case 'submitted':
-      return 'orange'
+      return 'warning'
     case 'approved':
       return 'success'
-  }
-}
-const userTimesheets = ref<Timesheet[]>([])
-
-const deleteTimesheet = async (item: Timesheet) => {
-  try {
-    const response = await axios.delete(`/api/timesheets/${item.timesheetid}`)
-
-    if (response.status === 200) {
-      const updatedTimesheets = userTimesheets.value.filter(timesheet => timesheet.timesheetid !== item.timesheetid)
-      userTimesheets.value = updatedTimesheets
-    } else {
-      console.error('Failed to delete timesheet:', response.data.error)
-    }
-  } catch (error) {
-    console.error('Error deleting timesheet:', error)
+    case 'revise':
+      return 'error'
   }
 }
 
-const editTimesheet = (item: Timesheet) => {
-  setTimesheetDisplayStatus('edit')
-  setCurrentTimesheet(item.timesheetid)
-  props.updateState('editTimesheet')
-}
-
-const viewTimesheet = (item: Timesheet) => {
-  setTimesheetDisplayStatus('view')
-  setCurrentTimesheet(item.timesheetid)
-  props.updateState('editTimesheet')
-}
-
-const getUserTimesheets = () => {
-  if (!isUserLoggedIn()) return
-  
-  setLoadingState('isTimesheetListLoading', true)
-  axios.get(`/api/timesheets/user/${id}`)
-    .then(response => {
-      const { data } = response
-      userTimesheets.value = data.reverse()
-      setLoadingState('isTimesheetListLoading', false)
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error.message)
-    })
-}
-
-getUserTimesheets()
+props.fetchData()
 
 const search = ref('')
-</script>@/stores/types
+</script>
