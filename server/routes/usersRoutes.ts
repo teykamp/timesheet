@@ -7,18 +7,18 @@ import { url } from "inspector";
 */
 
 // Check if user first time login and POST if does not exist
-///userFirstTimeLogin/:userId/:email -> /users/FirstTimeLogin/:userId/:email (current)
-// /userFirstTimeLogin/:userId/:email -> /user/:userID/:email?FirstTimeLogin=True (thoughts)
-router.get('/:userId/:email', async (req, res) => {
+///userFirstTimeLogin/:userId/:email -> /users/FirstTimeLogin/:userId/:email 
+// /userFirstTimeLogin/:userId/:email -> /user/:userID/:email?FirstTimeLogin=True (current)
+router.get('/firsttime/:userId/:email', async (req, res) => {
     const { userId, email } = req.params;
     /* this query parameter will be determined by whether these is a
     bearer-token/cookie in the request. 
     can be checked using some form of middleware in express
     !yet to implement!
     */
-    const firstTime = req.query 
+    const firstTime = req.query // remove this
     try {
-        if(firstTime){
+        if(firstTime){ // remove
             const userResponse = await handleDatabaseTransaction(async (client) => {
             const result = await client.query('SELECT * FROM "timesheetuser" WHERE userId = $1', [userId]);
     
