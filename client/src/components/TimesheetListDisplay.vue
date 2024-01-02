@@ -50,7 +50,7 @@
             </template>
             <template #item.view="{ item }">
               <v-btn
-                @click="timesheetListDisplayActions.viewTimesheet(item)"
+                @click="viewTimesheet(item)"
                 flat
                 size="small"
                 prepend-icon="mdi-eye"
@@ -60,21 +60,15 @@
             <template #item.actions="{ item }">
               <div class="d-flex justify-end">
                 <v-btn
-                  @click="timesheetListDisplayActions.editTimesheet(item)"
-                  icon="mdi-pencil"
+                  v-for="button in timesheetListDisplayActions"
+                  :key="button.icon"
+                  @click="button.callback(item)"
+                  :color="button.color"
+                  :disabled="button.disabled(item)"
+                  :icon="button.icon"
+                  size="small"
+                  variant="tonal"
                   class="mr-1"
-                  variant="tonal"
-                  size="small"
-                  :disabled="item.status === 'approved'"
-                ></v-btn>
-                <v-btn
-                  @click="timesheetListDisplayActions.deleteTimesheet(item)"
-                  icon="mdi-delete"
-                  class="ml-1"
-                  variant="tonal"
-                  size="small"
-                  color="red"
-                  :disabled="item.status === 'approved'"
                 ></v-btn>
               </div>
             </template>
@@ -108,7 +102,10 @@ const { xs } = useDisplay()
 
 const props = defineProps<{
   updateState: (newState: TimesheetStateTypes) => void,
-  timesheetListDisplayActions: { [key: string]: (item: Timesheet) => void },
+  viewTimesheet: (timesheet: Timesheet) => void
+  timesheetListDisplayActions: {
+    [key: string]: { callback: (timesheet: Timesheet) => void, icon: string, color: string, disabled: (timesheet: Timesheet) => boolean }
+  },
   fetchData: () => void,
   userTimesheets: Timesheet[],
   headerData: HeaderItem[],

@@ -5,6 +5,7 @@
         <div v-if="state === 'allTimesheets'">
           <TimesheetListDisplay
             :updateState="updateState"
+            :viewTimesheet="viewTimesheet"
             :timesheetListDisplayActions="timesheetListDisplayActions"
             :fetchData="getUserTimesheets"
             :userTimesheets="userTimesheets"
@@ -77,31 +78,43 @@ const handleAddNewTimesheet = () => {
 const userTimesheets = ref<Timesheet[]>([])
 
 const timesheetListDisplayActions = ref({
-  editTimesheet: (item: Timesheet) => {
-    setTimesheetDisplayStatus('edit')
-    setCurrentTimesheet(item.timesheetid)
-    updateState('editTimesheet')
+  editTimesheet: {
+    callback: (timesheet: Timesheet) => {
+      setTimesheetDisplayStatus('edit')
+      setCurrentTimesheet(timesheet.timesheetid)
+      updateState('editTimesheet')
+    },
+    icon: 'mdi-pencil',
+    color: '',
+    disabled: (timesheet: Timesheet) => timesheet.status === 'approved'
   },
-  viewTimesheet: (item: Timesheet) => {
-    setTimesheetDisplayStatus('view')
-    setCurrentTimesheet(item.timesheetid)
-    updateState('editTimesheet')
-  },
-  deleteTimesheet: async (item: Timesheet) => {
-    try {
-      const response = await axios.delete(`/api/timesheets/${item.timesheetid}`)
+  
+  deleteTimesheet: {
+    callback: async (timesheetToDelete: Timesheet) => {
+      try {
+        const response = await axios.delete(`/api/timesheets/${timesheetToDelete.timesheetid}`)
 
-      if (response.status === 200) {
-        const updatedTimesheets = userTimesheets.value.filter(timesheet => timesheet.timesheetid !== item.timesheetid)
-        userTimesheets.value = updatedTimesheets
-      } else {
-        console.error('Failed to delete timesheet:', response.data.error)
+        if (response.status === 200) {
+          const updatedTimesheets = userTimesheets.value.filter(timesheet => timesheet.timesheetid !== timesheetToDelete.timesheetid)
+          userTimesheets.value = updatedTimesheets
+        } else {
+          console.error('Failed to delete timesheet:', response.data.error)
+        }
+      } catch (error) {
+        console.error('Error deleting timesheet:', error)
       }
-    } catch (error) {
-      console.error('Error deleting timesheet:', error)
-    }
-  }
+    },
+    icon: 'mdi-delete',
+    color: 'red',
+    disabled: (timesheet: Timesheet) => timesheet.status === 'approved'
+  },
 })
+
+const viewTimesheet = (timesheet: Timesheet) => {
+  setTimesheetDisplayStatus('view')
+  setCurrentTimesheet(timesheet.timesheetid)
+  updateState('editTimesheet')
+}
 
 const getUserTimesheets = () => {
   if (!isUserLoggedIn()) return
