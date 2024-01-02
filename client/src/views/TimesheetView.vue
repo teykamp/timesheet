@@ -8,6 +8,7 @@
             :timesheetListDisplayActions="timesheetListDisplayActions"
             :fetchData="getUserTimesheets"
             :userTimesheets="userTimesheets"
+            :headerData="timesheetHeaderData"
           />
           <v-container 
             v-if="!isTimesheetListLoading"
@@ -47,6 +48,8 @@ import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 import type { Timesheet } from '../stores/types'
 import { useGoogleUserData } from '../stores/useDataStore'
+import { timesheetHeaderData } from '../functions/headerData'
+
 
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'

@@ -1,4 +1,11 @@
-const headerData = [
+export type HeaderItem = {
+    title: string
+    key: string
+    align?: 'start' | 'center' | 'end'
+    sortable?: boolean
+}
+
+export const timesheetHeaderData: HeaderItem[] = [
     {
         title: 'End Date',
         key: 'enddate',
@@ -25,4 +32,10 @@ const headerData = [
     },
 ]
 
-export default headerData
+export const managerHeaderData: HeaderItem[] = [
+    ...timesheetHeaderData,
+    {
+        title: 'email',
+        key: 'email'
+    }
+]

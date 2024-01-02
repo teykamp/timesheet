@@ -40,7 +40,6 @@
               </div>
             </template>
             <template #item.status="{ item }">
-              <div>
                 <v-chip
                   :color="getStatusChipColor(item.status)"
                   :text="item.status"
@@ -48,9 +47,7 @@
                   label
                   size="small"
                 ></v-chip>
-              </div>
             </template>
-          
             <template #item.view="{ item }">
               <v-btn
                 @click="timesheetListDisplayActions.viewTimesheet(item)"
@@ -98,10 +95,11 @@ import { useDisplay } from 'vuetify'
 
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 import type { TimesheetStateTypes } from '../stores/useDataStore'
+import type { Timesheet } from '../stores/types'
 
 import { formatDateToDDMMYY } from '../functions/dateUtils'
-import headerData from '../functions/headerData'
-import type { Timesheet } from '../stores/types'
+import type { HeaderItem } from '../functions/headerData'
+
 
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
@@ -113,17 +111,19 @@ const props = defineProps<{
   timesheetListDisplayActions: { [key: string]: (item: Timesheet) => void },
   fetchData: () => void,
   userTimesheets: Timesheet[],
+  headerData: HeaderItem[],
 }>()
-
 
 const getStatusChipColor = (status: Timesheet['status']) => {
   switch (status) {
     case 'working':
       return 'primary'
     case 'submitted':
-      return 'orange'
+      return 'warning'
     case 'approved':
       return 'success'
+    case 'revise':
+      return 'error'
   }
 }
 
