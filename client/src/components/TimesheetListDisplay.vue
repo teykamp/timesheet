@@ -71,7 +71,7 @@
                   :disabled="item.status === 'approved'"
                 ></v-btn>
                 <v-btn
-                  @click="deleteTimesheet(item)"
+                  @click="timesheetListDisplayActions.deleteTimesheet(item)"
                   icon="mdi-delete"
                   class="ml-1"
                   variant="tonal"
