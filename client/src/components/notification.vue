@@ -6,19 +6,17 @@
     </v-expansion-panels>
 </template>
 
-# testing
-
 <script setup lang="ts"> 
 import { useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 import {computed} from "vue";
 
-type notification = {
+type Notification = {
     date: string,
     from: string,
     message: string,
     projectID: string // when clicked will redirect to project
 }
-const notifArray :notification[] = [
+const notifArray :Notification[] = [
     {
         date: "31-12-2023",
         from: "John",

@@ -33,6 +33,15 @@ Aliases
 |-- userId (FK)
 |-- projectId (FK)
 |-- alias
+
+Notification
+|-- notificationId
+|-- timesheetId (FK)
+|-- title
+|-- content
+|-- date
+|-- fromUserId
+|-- notificationType
 ```
 
 ## Description:
@@ -81,13 +90,26 @@ Aliases
 - **Relationships:**
     - One project can be associated with multiple entries in different timesheets.  
     
-### Alias
+### Alias:
 - **Properties**
     - userId (foreign key)
     - projectId (foreign key)
     - alias (string) 
 - **Relationships**
     - one alias is associated with one project for one user
+ 
+
+### Notification:
+- **Properties**
+   - timesheetId (foreign key)
+   - fromId (foreignKey)
+   - title
+   - content
+   - date
+   - notificationType
+- **Relationships**
+   - a notificatin is shared between two users (manager (fromUserId) and employee (found in timesheet))
+   - a notification can have a type or none
 
  ## Database Setup Queries
 - Setting up projects table
@@ -127,5 +149,17 @@ CREATE TABLE TimesheetUser (
     managerId VARCHAR(255),
     isManager BOOLEAN,
     FOREIGN KEY (managerId) REFERENCES TimesheetUser(userId)
+);
+```
+- Setting up the notifications table
+```SQL
+CREATE TABLE TimesheetNotification (
+    notificationId SERIAL PRIMARY KEY,
+    timesheetId INTEGER REFERENCES Timesheet(timesheetId),
+    title VARCHAR(255),
+    content VARCHAR(255),
+    date DATE,
+    fromUserId VARCHAR(255) REFERENCES TimesheetUser(userId),
+    notificationType VARCHAR(10) CHECK (notificationType IN ('timesheet', 'expense', ''))
 );
 ```
