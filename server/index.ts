@@ -6,6 +6,7 @@ import {router as projectRouter} from "./routes/projectRoutes";
 import {router as timesheetRouter} from "./routes/timesheetsRoutes";
 import {router as timesheetEntriesRouter} from './routes/timesheetEntriesRoutes';
 import {router as usersRouter} from './routes/usersRoutes';
+import {router as timesheetnotifRouter} from "./routes/timesheetNotifcationRoutes"
 import { timeStamp } from 'console';
 
 const cors = require('cors');
@@ -20,7 +21,7 @@ dotenv.config();
 const { OAuth2 } = google.auth;
 const { GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET } = process.env;
 // const redirectUri = process.env.NODE_ENV ? 'produrl' : 'http://localhost:5174';
-const redirectUri = 'http://localhost:5174'
+const redirectUri = 'http://localhost:5173'
 module.exports.redirectUri = redirectUri;
 
 const scope = [
@@ -63,6 +64,7 @@ app.use('/api/projects',projectRouter);
 app.use('/api/timesheets', timesheetRouter)
 app.use('/api/timesheetEntries', timesheetEntriesRouter);
 app.use('/api/users',usersRouter);
+app.use('/api/notification/',timesheetnotifRouter)
 // app.use('/api', queriesRoute);
 
 app.get('/api/auth/url', (req, res) => {
