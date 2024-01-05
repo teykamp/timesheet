@@ -2,9 +2,9 @@
   <div>
     <IsUserLoggedInWrapper>
       <template #contentIfLoggedIn>
-        <div v-if="state === 'allTimesheets'">
+        <div v-if="timesheetViewState === 'allTimesheets'">
           <TimesheetListDisplay
-            :updateState="updateState"
+            :updateState="updateTimesheetViewState"
             :viewTimesheet="viewTimesheet"
             :timesheetListDisplayActions="timesheetListDisplayActions"
             :fetchData="getUserTimesheets"
@@ -24,15 +24,15 @@
           </v-container>
         </div>
         <v-btn
-          v-if="state === 'editTimesheet'"
-          @click="updateState('allTimesheets')"
+          v-if="timesheetViewState === 'singleTimesheet'"
+          @click="updateTimesheetViewState('allTimesheets')"
           icon="mdi-chevron-left"
           flat
           class="position-absolute ml-4 mt-2"
         ></v-btn>
         <EditTimesheet
-          v-if="state === 'editTimesheet'"
-          :updateState="updateState"
+          v-if="timesheetViewState === 'singleTimesheet'"
+          :updateState="updateTimesheetViewState"
         />
       </template>
     </IsUserLoggedInWrapper>
@@ -44,7 +44,6 @@ import axios from 'axios'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
-import type { TimesheetStateTypes } from '../stores/useDataStore'
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 import type { Timesheet } from '../stores/types'
@@ -58,21 +57,16 @@ import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
 
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
-const { resetTimesheetDisplay, setTimesheetDisplayStatus, setCurrentTimesheet } = useHandleTimesheetDisplay()
+const { resetTimesheetDisplay, setTimesheetDisplayStatus, setCurrentTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
+const useTimesheetStateStore = useHandleTimesheetDisplay()
+const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
 const { id, isUserLoggedIn } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
-
-const state = ref<TimesheetStateTypes>('allTimesheets')
-
-const updateState = (newState: TimesheetStateTypes) => {
-  state.value = newState
-}
 
 const handleAddNewTimesheet = () => {
   resetTimesheetDisplay()
   setTimesheetDisplayStatus('new')
-  updateState('editTimesheet')
-  return
+  updateTimesheetViewState('singleTimesheet')
 }
 
 const userTimesheets = ref<Timesheet[]>([])
@@ -82,7 +76,7 @@ const timesheetListDisplayActions = ref({
     callback: (timesheet: Timesheet) => {
       setTimesheetDisplayStatus('edit')
       setCurrentTimesheet(timesheet.timesheetid)
-      updateState('editTimesheet')
+      updateTimesheetViewState('singleTimesheet')
     },
     icon: 'mdi-pencil',
     color: '',
@@ -113,7 +107,7 @@ const timesheetListDisplayActions = ref({
 const viewTimesheet = (timesheet: Timesheet) => {
   setTimesheetDisplayStatus('view')
   setCurrentTimesheet(timesheet.timesheetid)
-  updateState('editTimesheet')
+  updateTimesheetViewState('singleTimesheet')
 }
 
 const getUserTimesheets = () => {

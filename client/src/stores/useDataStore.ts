@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { ref } from 'vue'
 import axios from 'axios'
 
 export type GoogleProfile = {
@@ -13,7 +14,7 @@ export type GoogleProfile = {
   locale: string
 }
 
-export type TimesheetStateTypes = 'allTimesheets' | 'editTimesheet'
+export type TimesheetStateTypes = 'allTimesheets' | 'singleTimesheet'
 
 export type Project = {
   projectid: Number,
@@ -29,22 +30,48 @@ export type TimesheetEntry = {
 
 type TimesheetDisplayStatus = 'view' | 'edit' | 'new'
 
-export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', {
-  state: () => ({
-    timesheetDisplayStatus: '',
-    currentEditTimesheet: -1
-  }),
-  actions: {
-    resetTimesheetDisplay() {
-      this.timesheetDisplayStatus = ''
-      this.currentEditTimesheet = -1
-    },
-    setTimesheetDisplayStatus(newStatus: TimesheetDisplayStatus) {
-      this.timesheetDisplayStatus = newStatus
-    },
-    setCurrentTimesheet(newTimesheetId: number) {
-      this.currentEditTimesheet = newTimesheetId
-    }
+export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', () => {
+  const router = useRouter()
+  
+  const timesheetDisplayStatus = ref('')
+  const currentEditTimesheet = ref(-1)
+  const timesheetViewState = ref<TimesheetStateTypes>('allTimesheets')
+
+  function resetTimesheetDisplay() {
+    timesheetDisplayStatus.value = ''
+    currentEditTimesheet.value = -1
+  }
+
+  function setTimesheetDisplayStatus(status: TimesheetDisplayStatus) {
+    timesheetDisplayStatus.value = status
+  }
+
+  function setCurrentTimesheet(timesheetId: number) {
+    currentEditTimesheet.value = timesheetId
+  }
+
+  function openTimesheetFromExternal(timesheetId: number, status: TimesheetDisplayStatus) {
+    router.push({ name: 'timesheets' })
+    resetTimesheetDisplay()
+    setTimesheetDisplayStatus(status)
+    setCurrentTimesheet(timesheetId)
+    updateTimesheetViewState('singleTimesheet')
+  }
+
+  function updateTimesheetViewState(newState: TimesheetStateTypes) {
+    timesheetViewState.value = newState
+  }
+
+  return {
+    timesheetDisplayStatus,
+    currentEditTimesheet,
+    timesheetViewState,
+
+    resetTimesheetDisplay,
+    setTimesheetDisplayStatus, 
+    setCurrentTimesheet,
+    openTimesheetFromExternal,
+    updateTimesheetViewState,
   }
 })
 
