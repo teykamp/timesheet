@@ -165,7 +165,8 @@ import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { useDisplay } from 'vuetify'
-import type { Project, TimesheetStateTypes } from '../stores/useDataStore'
+import type { Project } from '../types/types'
+
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { useLoadingScreen, useSnackbar, useColorPalette } from '../stores/useUserInterfaceStore'
@@ -177,7 +178,7 @@ const { setLoadingState } = useLoadingScreen()
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetContentLoading } = storeToRefs(useLoadingScreenStore)
 
-const { currentEditTimesheet } = useHandleTimesheetDisplay()
+const { currentEditTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
 const useHandleTimesheetDisplayStore = useHandleTimesheetDisplay()
 const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplayStore)
 const { showSnackbar } = useSnackbar()
@@ -185,10 +186,6 @@ const { showSnackbar } = useSnackbar()
 const { blueShadow, white } = useColorPalette()
 
 const { lgAndUp } = useDisplay()
-
-const props = defineProps<{
-  updateState: (newState: TimesheetStateTypes) => void,
-}>()
 
 // display default
 const rows = 3
@@ -299,7 +296,7 @@ const handleSubmitTimesheet = async (status: 'submitted' | 'working') => {
     await axios.post('/api/timesheets', buildTimesheetData(status))
 
     showSnackbar(`Timesheet ${status === 'submitted' ? 'submitted' : 'saved'}!`)
-    props.updateState('allTimesheets')
+    updateTimesheetViewState('allTimesheets')
   } catch (error) {
     console.error('Error posting timesheet:', error)
   }
@@ -310,7 +307,7 @@ const handleUpdateTimesheet = async (status: 'submitted' | 'working') => {
     await axios.put(`/api/timesheets/${currentEditTimesheet}`, buildTimesheetData(status))
 
     showSnackbar(`Timesheet ${status === 'submitted' ? 're-submitted' : 'updated'}!`)
-    props.updateState('allTimesheets')
+    updateTimesheetViewState('allTimesheets')
 
   } catch (error) {
     console.error('Error updating timesheet:', error)

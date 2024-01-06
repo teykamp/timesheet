@@ -4,7 +4,6 @@
       <template #contentIfLoggedIn>
         <div v-if="timesheetViewState === 'allTimesheets'">
           <TimesheetListDisplay
-            :updateState="updateTimesheetViewState"
             :viewTimesheet="viewTimesheet"
             :timesheetListDisplayActions="timesheetListDisplayActions"
             :fetchData="getUserTimesheets"
@@ -46,7 +45,7 @@ import { storeToRefs } from 'pinia'
 
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
-import type { Timesheet } from '../stores/types'
+import type { Timesheet } from '../types/types'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { timesheetHeaderData } from '../functions/headerData'
 
@@ -124,4 +123,4 @@ const getUserTimesheets = () => {
       console.error('Error fetching data:', error.message)
     })
 }
-</script>
+</script>../types/types

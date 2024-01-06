@@ -88,20 +88,19 @@ import { storeToRefs } from 'pinia'
 import { useDisplay } from 'vuetify'
 
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
-import type { TimesheetStateTypes } from '../stores/useDataStore'
-import type { Timesheet } from '../stores/types'
+
+import type { Timesheet, HeaderItem } from '../types/types'
 
 import { formatDateToDDMMYY } from '../functions/dateUtils'
-import type { HeaderItem } from '../functions/headerData'
 
 
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
 
+
 const { xs } = useDisplay()
 
 const props = defineProps<{
-  updateState: (newState: TimesheetStateTypes) => void,
   viewTimesheet: (timesheet: Timesheet) => void
   timesheetListDisplayActions: {
     [key: string]: { callback: (timesheet: Timesheet) => void, icon: string, color: string, disabled: (timesheet: Timesheet) => boolean }

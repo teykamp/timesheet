@@ -3,32 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ref } from 'vue'
 import axios from 'axios'
 
-export type GoogleProfile = {
-  id: string,
-  email: string,
-  verified_email: boolean,
-  name: string,
-  given_name: string,
-  family_name: string,
-  picture: string,
-  locale: string
-}
-
-export type TimesheetStateTypes = 'allTimesheets' | 'singleTimesheet'
-
-export type Project = {
-  projectid: Number,
-  projectname: String
-}
-
-export type TimesheetEntry = {
-  id: Number,
-  hours: Number,
-  timesheetId: Number,
-  date: String
-}
-
-type TimesheetDisplayStatus = 'view' | 'edit' | 'new'
+import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile } from '../types/types'
 
 export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', () => {
   const router = useRouter()

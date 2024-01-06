@@ -1,9 +1,4 @@
-export type HeaderItem = {
-    title: string
-    key: string
-    align?: 'start' | 'center' | 'end'
-    sortable?: boolean
-}
+import type { HeaderItem } from '../types/types'
 
 export const timesheetHeaderData: HeaderItem[] = [
     {
