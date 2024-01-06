@@ -79,8 +79,8 @@ router.put('/:timesheetId', async (req, res) => {
           const timesheetsQueryResult = await client.query(
             'SELECT t.timesheetId, t.userId, t.endDate, t.status ' +
             'FROM Timesheet t ' +
-            'WHERE t.status = $1 AND t.userId = $2',
-            ['submitted', userId]
+            'WHERE t.status != $1 AND t.userId = $2',
+            ['working', userId]
           );
   
           const timesheetsWithEmails = await Promise.all(timesheetsQueryResult.rows.map(async (timesheet) => {
@@ -307,7 +307,7 @@ router.put('/:timesheetId', async (req, res) => {
     const { timesheetId } = req.params;
     const { status } = req.body;
   
-    if (!status || !['approved', 'working', 'submitted'].includes(status)) {
+    if (!status || !['approved', 'working', 'submitted', 'revise'].includes(status)) {
       return res.status(400).json({ error: 'Valid status (approved, working, submitted) is required' });
     }
   

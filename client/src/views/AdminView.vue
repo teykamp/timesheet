@@ -1,140 +1,130 @@
 <template>
-  <v-data-table
-    v-if="managerTimesheets.length > 0"
-    :items="managerTimesheets"
-    :items-per-page="-1"
-    :headers="headerData"
-    :search="search"
-    >
-    <template #item.email="{ item }">
-      <div>
-        {{ item.email }}
-      </div>
-    </template>
-    <template #item.enddate="{ item }">
-      <div>
-        {{ formatDateToDDMMYY(new Date(item.enddate)) }}
-      </div>
-    </template>
-    <template #item.status="{ item }">
-      <div>
-        <v-chip
-          :color="getStatusChipColor(item.status)"
-          :text="item.status"
-          class="text-uppercase"
-          label
-          size="small"
-        ></v-chip>
-      </div>
-    </template>
-  
-    <template #item.view="{ item }">
-      <v-btn
-        @click="viewTimesheet(item)"
-        flat
-        size="small"
-        prepend-icon="mdi-eye"
-      >View</v-btn>
-    </template>
-  
-    <template #item.actions="{ item }">
-      <div class="d-flex justify-end">
-        <v-btn
-          @click="deleteTimesheet(item)"
-          icon="mdi-delete"
-          class="mx-1"
-          size="small"
-          variant="tonal"
-          color="red"
-          :disabled="item.status === 'approved'"
+  <div>
+    <IsUserLoggedInWrapper>
+      <template #contentIfLoggedIn>
+        <div v-if="timesheetViewState === 'allTimesheets'">
+          <TimesheetListDisplay 
+            :viewTimesheet="viewTimesheet" 
+            :timesheetListDisplayActions="timesheetListDisplayActions"
+            :fetchData="getManagerTimesheets" 
+            :userTimesheets="managerTimesheets" 
+            :headerData="managerHeaderData" 
+          />
+        </div>
+        <v-btn 
+          v-if="timesheetViewState === 'singleTimesheet'" 
+          @click="updateTimesheetViewState('allTimesheets')"
+          icon="mdi-chevron-left" 
+          flat 
+          class="position-absolute ml-4 mt-2"
         ></v-btn>
-        <v-btn
-          @click="deleteTimesheet(item)"
-          icon="mdi-comment"
-          class="mx-1"
-          size="small"
-          variant="tonal"
-          :disabled="item.status === 'approved'"
-        ></v-btn>
-        <v-btn
-          @click="deleteTimesheet(item)"
-          icon="mdi-file-check-outline"
-          class="mx-1"
-          size="small"
-          variant="tonal"
-          color="green"
-          :disabled="item.status === 'approved'"
-        ></v-btn>
-      </div>
-    </template>
-    <template #bottom></template>
-  </v-data-table>
+        <EditTimesheet 
+          v-if="timesheetViewState === 'singleTimesheet'" 
+          :updateState="updateTimesheetViewState" 
+        />
+      </template>
+    </IsUserLoggedInWrapper>
+  </div>
 </template>
 
 <script setup lang="ts">
 import axios from 'axios'
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 
-import { formatDateToDDMMYY } from '../functions/dateUtils'
-// import headerData from '../functions/headerData'
+import { useHandleTimesheetDisplay } from '../stores/useDataStore'
+import { useLoadingScreen } from '../stores/useUserInterfaceStore'
+import type { Timesheet } from '../types/types'
+import { useGoogleUserData } from '../stores/useDataStore'
+import { managerHeaderData } from '../functions/headerData'
 
-const headerData = [
-  {
-    title: 'Email',
-    key: 'email',
-  },
-  {
-    title: 'End Date',
-    key: 'enddate',
-  },
-  {
-    title: 'Hours',
-    key: 'totalHours',
-  },
-  {
-    title: 'Status',
-    key: 'status',
-  },
-  {
-    title: '',
-    key: 'view',
-    align: 'center',
-    sortable: false,
-  },
-  {
-    title: 'Actions',
-    key: 'actions',
-    align: 'end',
-    sortable: false,
-  },
-]
 
-const search = ref('')
-const managerTimesheets = ref([])
+import EditTimesheet from '../components/EditTimesheet.vue'
+import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
+import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
 
-const getStatusChipColor = (status: any) => {
-  switch (status) {
-    case 'working':
-      return 'primary'
-    case 'submitted':
-      return 'orange'
-    case 'approved':
-      return 'success'
-  }
+const { setTimesheetDisplayStatus, setCurrentTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
+const useTimesheetStateStore = useHandleTimesheetDisplay()
+const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
+const { isUserLoggedIn } = useGoogleUserData()
+const { setLoadingState } = useLoadingScreen()
+
+const managerTimesheets = ref<Timesheet[]>([])
+
+const timesheetListDisplayActions = ref({
+  commentOnTimesheet: {
+    callback: (timesheet: Timesheet) => {
+      return // implement
+    },
+    icon: 'mdi-comment-outline',
+    color: '',
+    disabled: (timesheet: Timesheet) => timesheet.status === 'approved'
+  },
+
+  approveTimesheet: { // changes to withdraw
+    callback: async (timesheet: Timesheet) => {
+      try {
+        const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, {status: 'approved' })
+
+        if (response.status === 200) {
+          const responseData = response.data
+          const indexToUpdate = managerTimesheets.value.findIndex(managerTimesheet => managerTimesheet.timesheetid === responseData.timesheetid)
+          if (indexToUpdate !== -1) {
+            responseData.totalHours = managerTimesheets.value[indexToUpdate].totalHours
+            managerTimesheets.value[indexToUpdate] = responseData
+          }
+        } else {
+          console.error('Unexpected status:', response.status)
+        }
+      } catch (error) {
+        console.error('Error updating timesheet status:', error)
+      }
+  },
+    icon: 'mdi-file-check-outline',
+    color: 'green',
+    disabled: () => false
+  },
+
+  deleteTimesheet: {
+    callback: async (timesheetToDelete: Timesheet) => {
+      try {
+        const response = await axios.delete(`/api/timesheets/${timesheetToDelete.timesheetid}`)
+
+        if (response.status === 200) {
+          const updatedTimesheets = managerTimesheets.value.filter(timesheet => timesheet.timesheetid !== timesheetToDelete.timesheetid)
+          managerTimesheets.value = updatedTimesheets
+        } else {
+          console.error('Failed to delete timesheet:', response.data.error)
+        }
+      } catch (error) {
+        console.error('Error deleting timesheet:', error)
+      }
+    },
+    icon: 'mdi-delete',
+    color: 'red',
+    disabled: (timesheet: Timesheet) => timesheet.status === 'approved'
+  },
+})
+
+const viewTimesheet = (timesheet: Timesheet) => {
+  setTimesheetDisplayStatus('view')
+  setCurrentTimesheet(timesheet.timesheetid)
+  updateTimesheetViewState('singleTimesheet')
 }
-
 const managerId = '115112513480272962705'
 
-const getStuff = () => {
+const getManagerTimesheets = () => {
+  if (!isUserLoggedIn()) return
+
+  setLoadingState('isTimesheetListLoading', true)
   axios.get(`/api/timesheets/manager/${managerId}`)
     .then(response => {
       const { data } = response
       managerTimesheets.value = data.reverse()
+      setLoadingState('isTimesheetListLoading', false)
     })
     .catch(error => {
       console.error('Error fetching data:', error.message)
     })
 }
-
-getStuff()
 </script>

@@ -28,9 +28,9 @@ export const timesheetHeaderData: HeaderItem[] = [
 ]
 
 export const managerHeaderData: HeaderItem[] = [
-    ...timesheetHeaderData,
     {
-        title: 'email',
+        title: 'Email',
         key: 'email'
-    }
+    },
+    ...timesheetHeaderData,
 ]
