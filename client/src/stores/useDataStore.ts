@@ -65,6 +65,7 @@ export const useGoogleUserData = defineStore('googleUserData',{
     isUserLoggedIn() {
       return this.id !== ''
     },
+
     logUserIn(googleProfile: GoogleProfile) {
       this.id = googleProfile.id
       this.email = googleProfile.email
@@ -83,6 +84,7 @@ export const useGoogleUserData = defineStore('googleUserData',{
         console.error('Error:', error.response.data);
       });
     },
+
     logUserOut() {
       this.id = ''
       this.email = ''
@@ -93,6 +95,7 @@ export const useGoogleUserData = defineStore('googleUserData',{
       this.picture = ''
       this.locale = ''
     },
+
     getGoogleUserData() {
       return {
         id: this.id,
@@ -105,6 +108,7 @@ export const useGoogleUserData = defineStore('googleUserData',{
         locale: this.locale
       }
     },
+    
     async redirectToGoogleAuth() {
       try {
         const response = await axios.get('api/auth/url')
