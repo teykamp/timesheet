@@ -59,17 +59,25 @@
           
             <template #item.actions="{ item }">
               <div class="d-flex justify-end">
-                <v-btn
+                <v-tooltip
                   v-for="button in timesheetListDisplayActions"
-                  :key="button.icon"
-                  @click="button.callback(item)"
-                  :color="typeof button.color === 'string' ? button.color : button.color(item)"
-                  :disabled="button.disabled(item)"
-                  :icon="typeof button.icon === 'string' ? button.icon : button.icon(item)"
-                  size="small"
-                  variant="tonal"
-                  class="mr-1"
-                ></v-btn>
+                  :key="button.key"
+                  :text="typeof button.tooltip === 'string' ? button.tooltip : button.tooltip(item)"
+                  location="top"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      @click="button.callback(item)"
+                      v-bind="props"
+                      :color="typeof button.color === 'string' ? button.color : button.color(item)"
+                      :disabled="button.disabled(item)"
+                      :icon="typeof button.icon === 'string' ? button.icon : button.icon(item)"
+                      size="small"
+                      variant="tonal"
+                      class="mr-1"
+                    ></v-btn>
+                  </template>
+                </v-tooltip>
               </div>
             </template>
             <template #bottom></template>
@@ -104,6 +112,8 @@ const props = defineProps<{
   viewTimesheet: (timesheet: Timesheet) => void
   timesheetListDisplayActions: {
     [key: string]: {
+      key: string,
+      tooltip: string | ((timesheet: Timesheet) => string),
       callback: (timesheet: Timesheet) => void,
       icon: string | ((timesheet: Timesheet) => string),
       color: string | ((timesheet: Timesheet) => string),
