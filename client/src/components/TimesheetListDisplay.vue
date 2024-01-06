@@ -63,9 +63,9 @@
                   v-for="button in timesheetListDisplayActions"
                   :key="button.icon"
                   @click="button.callback(item)"
-                  :color="button.color"
+                  :color="typeof button.color === 'string' ? button.color : button.color(item)"
                   :disabled="button.disabled(item)"
-                  :icon="button.icon"
+                  :icon="typeof button.icon === 'string' ? button.icon : button.icon(item)"
                   size="small"
                   variant="tonal"
                   class="mr-1"
@@ -103,7 +103,12 @@ const { xs } = useDisplay()
 const props = defineProps<{
   viewTimesheet: (timesheet: Timesheet) => void
   timesheetListDisplayActions: {
-    [key: string]: { callback: (timesheet: Timesheet) => void, icon: string, color: string, disabled: (timesheet: Timesheet) => boolean }
+    [key: string]: {
+      callback: (timesheet: Timesheet) => void,
+      icon: string | ((timesheet: Timesheet) => string),
+      color: string | ((timesheet: Timesheet) => string),
+      disabled: (timesheet: Timesheet) => boolean
+    }
   },
   fetchData: () => void,
   userTimesheets: Timesheet[],

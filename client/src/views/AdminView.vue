@@ -81,8 +81,8 @@ const timesheetListDisplayActions = ref({
         console.error('Error updating timesheet status:', error)
       }
   },
-    icon: 'mdi-file-check-outline',
-    color: 'green',
+    icon: (timesheet: Timesheet) => timesheet.status === 'approved' ? 'mdi-file-cancel-outline' : 'mdi-file-check-outline',
+    color: (timesheet: Timesheet) => timesheet.status === 'approved' ? 'red' : 'green',
     disabled: () => false
   },
 
