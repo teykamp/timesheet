@@ -20,7 +20,6 @@
         ></v-btn>
         <EditTimesheet 
           v-if="timesheetViewState === 'singleTimesheet'" 
-          :updateState="updateTimesheetViewState" 
         />
       </template>
     </IsUserLoggedInWrapper>
@@ -46,7 +45,7 @@ import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
 const { setTimesheetDisplayStatus, setCurrentTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
 const useTimesheetStateStore = useHandleTimesheetDisplay()
 const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
-const { isUserLoggedIn } = useGoogleUserData()
+const { isUserLoggedIn, id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
 
 const managerTimesheets = ref<Timesheet[]>([])
@@ -111,13 +110,12 @@ const viewTimesheet = (timesheet: Timesheet) => {
   setCurrentTimesheet(timesheet.timesheetid)
   updateTimesheetViewState('singleTimesheet')
 }
-const managerId = '115112513480272962705'
 
 const getManagerTimesheets = () => {
   if (!isUserLoggedIn()) return
 
   setLoadingState('isTimesheetListLoading', true)
-  axios.get(`/api/timesheets/manager/${managerId}`)
+  axios.get(`/api/timesheets/manager/${id}`)
     .then(response => {
       const { data } = response
       managerTimesheets.value = data.reverse()

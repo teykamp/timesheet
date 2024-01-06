@@ -31,7 +31,6 @@
         ></v-btn>
         <EditTimesheet
           v-if="timesheetViewState === 'singleTimesheet'"
-          :updateState="updateTimesheetViewState"
         />
       </template>
     </IsUserLoggedInWrapper>
