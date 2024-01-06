@@ -52,6 +52,8 @@ const managerTimesheets = ref<ManagerTimesheet[]>([])
 
 const timesheetListDisplayActions = ref({
   commentOnTimesheet: {
+    key: 'review',
+    tooltip: 'Review',
     callback: (timesheet: Timesheet) => {
       return // implement
     },
@@ -61,6 +63,8 @@ const timesheetListDisplayActions = ref({
   },
 
   approveTimesheet: {
+    key: 'approve',
+    tooltip: (timesheet: Timesheet) => timesheet.status === 'approved' ? 'Retract' : 'Approve',
     callback: async (timesheet: Timesheet) => {
       const status = timesheet.status === 'approved' ? 'submitted' : 'approved'
       try {
@@ -87,6 +91,8 @@ const timesheetListDisplayActions = ref({
   },
 
   deleteTimesheet: {
+    key: 'delete',
+    tooltip: 'Delete',
     callback: async (timesheetToDelete: Timesheet) => {
       try {
         const response = await axios.delete(`/api/timesheets/${timesheetToDelete.timesheetid}`)

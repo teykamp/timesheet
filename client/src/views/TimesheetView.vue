@@ -71,6 +71,8 @@ const userTimesheets = ref<Timesheet[]>([])
 
 const timesheetListDisplayActions = ref({
   editTimesheet: {
+    key: 'edit',
+    tooltip: 'Edit',
     callback: (timesheet: Timesheet) => {
       setTimesheetDisplayStatus('edit')
       setCurrentTimesheet(timesheet.timesheetid)
@@ -82,6 +84,8 @@ const timesheetListDisplayActions = ref({
   },
   
   deleteTimesheet: {
+    key: 'delete',
+    tooltip: 'Delete',
     callback: async (timesheetToDelete: Timesheet) => {
       try {
         const response = await axios.delete(`/api/timesheets/${timesheetToDelete.timesheetid}`)
