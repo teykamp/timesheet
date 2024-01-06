@@ -51,7 +51,7 @@
             'min-width': '600px',
         }">
             <v-card
-              class="d-flex justify-center rounded-0 pr-8 pl-1 mb-4"
+              class="d-flex justify-center rounded-0 pl-1 mb-4"
               elevation="2"
             >
               <v-col
@@ -61,6 +61,7 @@
                   'min-width': index === 0 ? '200px' : '50px',
                   'max-width': index === 0 ? '500px' : '150px'
                 }"
+                :class="`d-flex ${index === 0 ? '' : 'justify-center'}`"
               >
                   <div 
                     v-if="lgAndUp"
