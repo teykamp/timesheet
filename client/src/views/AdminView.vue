@@ -33,7 +33,7 @@ import { storeToRefs } from 'pinia'
 
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
-import type { Timesheet } from '../types/types'
+import type { ManagerTimesheet, Timesheet } from '../types/types'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { managerHeaderData } from '../functions/headerData'
 
@@ -48,7 +48,7 @@ const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
 const { isUserLoggedIn, id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
 
-const managerTimesheets = ref<Timesheet[]>([])
+const managerTimesheets = ref<ManagerTimesheet[]>([])
 
 const timesheetListDisplayActions = ref({
   commentOnTimesheet: {
@@ -60,16 +60,18 @@ const timesheetListDisplayActions = ref({
     disabled: (timesheet: Timesheet) => timesheet.status === 'approved'
   },
 
-  approveTimesheet: { // changes to withdraw
+  approveTimesheet: {
     callback: async (timesheet: Timesheet) => {
+      const status = timesheet.status === 'approved' ? 'submitted' : 'approved'
       try {
-        const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, {status: 'approved' })
+        const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, { status })
 
         if (response.status === 200) {
           const responseData = response.data
           const indexToUpdate = managerTimesheets.value.findIndex(managerTimesheet => managerTimesheet.timesheetid === responseData.timesheetid)
           if (indexToUpdate !== -1) {
             responseData.totalHours = managerTimesheets.value[indexToUpdate].totalHours
+            responseData.email = managerTimesheets.value[indexToUpdate].email
             managerTimesheets.value[indexToUpdate] = responseData
           }
         } else {

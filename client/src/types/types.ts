@@ -16,6 +16,8 @@ export type Timesheet = {
   status: 'working' | 'submitted' | 'approved' | 'revise'
 }
 
+export type ManagerTimesheet = Timesheet & { email: string }
+
 export type TimesheetStateTypes = 'allTimesheets' | 'singleTimesheet'
 
 export type Project = {
@@ -30,7 +32,7 @@ export type TimesheetEntry = {
   date: string
 }
 
-export type TimesheetDisplayStatus = 'view' | 'edit' | 'new'
+export type TimesheetDisplayStatus = 'view' | 'edit' | 'new' | 'review'
 
 export type HeaderItem = {
   title: string
