@@ -10,7 +10,7 @@
     >{{ snackbar.text }}</v-snackbar>
     <v-dialog
       v-model="dialog.show"
-      width="auto"
+      style="max-width: 1000px;"
     >
       <Dialog />
     </v-dialog>

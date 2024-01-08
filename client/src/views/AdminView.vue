@@ -31,13 +31,13 @@ import axios from 'axios'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
-import { useHandleTimesheetDisplay } from '../stores/useDataStore'
+import { useHandleTimesheetDisplay, useGoogleUserData } from '../stores/useDataStore'
+import { useDialog } from '../stores/useUserInterfaceStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 import type { ManagerTimesheet, Timesheet } from '../types/types'
-import { useGoogleUserData } from '../stores/useDataStore'
 import { managerHeaderData } from '../functions/headerData'
 
-
+import CreateTimesheetNote from '../components/CreateTimesheetNote.vue'
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
 import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
@@ -47,6 +47,7 @@ const useTimesheetStateStore = useHandleTimesheetDisplay()
 const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
 const { isUserLoggedIn, id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
+const { showDialog } = useDialog()
 
 const managerTimesheets = ref<ManagerTimesheet[]>([])
 
@@ -55,7 +56,7 @@ const timesheetListDisplayActions = ref({
     key: 'review',
     tooltip: 'Review',
     callback: (timesheet: Timesheet) => {
-      return // implement
+      showDialog(true, CreateTimesheetNote)
     },
     icon: 'mdi-comment-outline',
     color: '',

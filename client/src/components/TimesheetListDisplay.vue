@@ -105,7 +105,6 @@ import { formatDateToDDMMYY } from '../functions/dateUtils'
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
 
-
 const { xs } = useDisplay()
 
 const props = defineProps<{
