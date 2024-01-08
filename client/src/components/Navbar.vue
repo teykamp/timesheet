@@ -240,8 +240,6 @@ import { useDisplay } from 'vuetify'
 import { useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 
-import TestComponent from './TestComponent.vue'
-
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
 const { getGoogleUserData, redirectToGoogleAuth, logUserOut, logUserIn } = useGoogleUserData()
