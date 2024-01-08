@@ -307,7 +307,7 @@ router.put('/:timesheetId', async (req, res) => {
     const { timesheetId } = req.params;
     const { status } = req.body;
   
-    if (!status || !['approved', 'working', 'submitted', 'revise'].includes(status)) {
+    if (!status || !['approved', 'working', 'submitted', 'revised'].includes(status)) {
       return res.status(400).json({ error: 'Valid status (approved, working, submitted) is required' });
     }
   

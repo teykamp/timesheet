@@ -13,7 +13,7 @@ export type Timesheet = {
   timesheetid: number,
   enddate: string,
   totalHours: number,
-  status: 'working' | 'submitted' | 'approved' | 'revise'
+  status: 'working' | 'submitted' | 'approved' | 'revised'
 }
 
 export type ManagerTimesheet = Timesheet & { email: string }

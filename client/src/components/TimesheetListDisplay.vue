@@ -132,8 +132,8 @@ const getStatusChipColor = (status: Timesheet['status']) => {
       return 'warning'
     case 'approved':
       return 'success'
-    case 'revise':
-      return 'error'
+    case 'revised':
+      return 'red'
   }
 }
 

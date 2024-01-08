@@ -20,7 +20,7 @@
     <v-switch
       label="Require Resubmit"
       class="ml-4"
-      color="orange"
+      color="warning"
     ></v-switch>
     <v-card-actions class="d-flex justify-center">
       <v-btn
