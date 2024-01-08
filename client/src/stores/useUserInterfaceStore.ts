@@ -63,6 +63,7 @@ export const useSnackbar = defineStore('snackbar', {
 })
 
 export type Button = {
+  // need to update to accept icons also
   text: string;
   onClick: () => void;
   color?: string;
@@ -92,14 +93,16 @@ export const useDialog = defineStore('dialog', {
       this.show = false
     },
 
-    showDialog(persistent: boolean, component: any, componentProps: object, body: DialogBody ) {
+    showDialog(persistent: boolean, component: any, componentProps?: any, body?: DialogBody ) {
 
-      this.component = markRaw(component)
-      this.componentProps = componentProps
-      this.body.title = body.title || ''
-      this.body.description = body.description || ''
-      this.body.buttons = body.buttons || []
       this.persistent = persistent
+      this.component = markRaw(component)
+      this.componentProps = componentProps ?? {}
+      if (body !== undefined) {
+        this.body.title = body.title ?? ''
+        this.body.description = body.description ?? ''
+        this.body.buttons = body.buttons ?? []
+      }
       this.show = true
     },
   }
