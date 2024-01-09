@@ -37,7 +37,7 @@ import { useLoadingScreen } from '../stores/useUserInterfaceStore'
 import type { ManagerTimesheet, Timesheet } from '../types/types'
 import { managerHeaderData } from '../functions/headerData'
 
-import CreateTimesheetNote from '../components/CreateTimesheetNote.vue'
+import ViewTimesheetNote from '../components/ViewTimesheetNote.vue'
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
 import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
@@ -52,11 +52,11 @@ const { showDialog } = useDialog()
 const managerTimesheets = ref<ManagerTimesheet[]>([])
 
 const timesheetListDisplayActions = ref({
-  commentOnTimesheet: {
-    key: 'review',
-    tooltip: 'Review',
+  viewCommentsOnTimesheet: {
+    key: 'comments',
+    tooltip: 'View Comments',
     callback: (timesheet: Timesheet) => {
-      showDialog(true, CreateTimesheetNote)
+      showDialog(true, ViewTimesheetNote)
     },
     icon: 'mdi-comment-outline',
     color: '',
@@ -66,7 +66,7 @@ const timesheetListDisplayActions = ref({
   approveTimesheet: {
     key: 'approve',
     tooltip: (timesheet: Timesheet) => timesheet.status === 'approved' ? 'Retract' : 'Approve',
-    callback: async (timesheet: Timesheet) => {
+    callback: async (timesheet: Timesheet) => { // needs to be imported so can use elsewhere. needed inside createTimesheetNote and EditTimesheet
       const status = timesheet.status === 'approved' ? 'submitted' : 'approved'
       try {
         const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, { status })

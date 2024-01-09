@@ -51,8 +51,9 @@ import type { TimesheetNote } from '../types/types'
 const { closeDialog } = useDialog()
 
 const handleSubmitClick = () => {
+  // needs timesheetId as prop
   // stuff
-  // if require resubmit then set timesheet status to reviewed
+  // if require resubmit then set timesheet status to revised
   closeDialog()
 }
 

@@ -151,6 +151,17 @@
             color="success"
             append-icon="mdi-forward"
           >{{ timesheetDisplayStatus === 'edit' ? 'Resubmit' : 'Submit' }}</v-btn>
+          <v-btn
+            v-if="currentRouteName === 'admin' && timesheetDisplayStatus === 'view'"
+            @click="showDialog(true, CreateTimesheetNote)"
+            prepend-icon="mdi-pencil"
+            class="ml-6"
+          >Request Edits</v-btn>
+          <v-btn
+            v-if="currentRouteName === 'admin' && timesheetDisplayStatus === 'view'"
+            class="mr-6"
+            prepend-icon="mdi-file-check-outline"
+          >Approve</v-btn>
         </div>
       </template>
     </IsContentLoadingWrapper>
@@ -161,16 +172,18 @@
 import axios from 'axios'
 
 import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
+import CreateTimesheetNote from './CreateTimesheetNote.vue'
 
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRoute } from 'vue-router'
 
 import { useDisplay } from 'vuetify'
 import type { Project } from '../types/types'
 
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
-import { useLoadingScreen, useSnackbar, useColorPalette } from '../stores/useUserInterfaceStore'
+import { useLoadingScreen, useSnackbar, useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 
 import { getMonthRange, formatDateToDDMMYY, getMondayAndFriday } from '../functions/dateUtils'
 
@@ -178,6 +191,7 @@ const { id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetContentLoading } = storeToRefs(useLoadingScreenStore)
+const { showDialog } = useDialog()
 
 const { currentEditTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
 const useHandleTimesheetDisplayStore = useHandleTimesheetDisplay()
@@ -187,6 +201,9 @@ const { showSnackbar } = useSnackbar()
 const { blueShadow, white } = useColorPalette()
 
 const { lgAndUp } = useDisplay()
+
+const route = useRoute()
+const currentRouteName = computed(() => route.name)
 
 // display default
 const rows = 3
