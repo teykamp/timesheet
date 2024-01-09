@@ -35,8 +35,16 @@ export type TimesheetEntry = {
 export type TimesheetDisplayStatus = 'view' | 'edit' | 'new' | 'review'
 
 export type HeaderItem = {
-  title: string
-  key: string
-  align?: 'start' | 'center' | 'end'
-  sortable?: boolean
+  title: string,
+  key: string,
+  align?: 'start' | 'center' | 'end',
+  sortable?: boolean,
+}
+
+export type TimesheetNote = {
+  incorrectHours: boolean,
+  incorrectProject: boolean,
+  incorrectTime: boolean,
+  commentBody: string,
+  requireResubmit: boolean
 }
