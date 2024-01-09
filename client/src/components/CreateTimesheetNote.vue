@@ -6,7 +6,7 @@
     <div class="d-flex justfy-center">
       <v-checkbox label="Incorrect Hours" v-model="data.incorrectHours"></v-checkbox>
       <v-checkbox label="Incorrect Project" v-model="data.incorrectProject"></v-checkbox>
-      <v-checkbox label="Incorrect Time" v-mode="data.incorrectTime"></v-checkbox>
+      <v-checkbox label="Incorrect Time" v-model="data.incorrectTime"></v-checkbox>
     </div>
 
     <v-card-subtitle>Additional Feedback</v-card-subtitle>
@@ -35,6 +35,7 @@
       <v-btn
         @click="handleSubmitClick()"
         variant="tonal"
+        :disabled="computeCanSubmit"
       >
         Submit
       </v-btn>
@@ -43,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useDialog } from '../stores/useUserInterfaceStore'
 import type { TimesheetNote } from '../types/types'
 
@@ -61,5 +62,9 @@ const data = ref<TimesheetNote>({
   incorrectTime: false,
   commentBody: '',
   requireResubmit: false,
+})
+
+const computeCanSubmit = computed(() => {
+  return !(data.value.incorrectHours || data.value.incorrectProject || data.value.incorrectTime || data.value.commentBody !== '')
 })
 </script>
