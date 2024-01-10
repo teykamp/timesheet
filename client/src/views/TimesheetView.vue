@@ -43,7 +43,7 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
-import { useLoadingScreen } from '../stores/useUserInterfaceStore'
+import { useLoadingScreen, useDialog } from '../stores/useUserInterfaceStore'
 import type { Timesheet } from '../types/types'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { timesheetHeaderData } from '../functions/headerData'
@@ -52,6 +52,7 @@ import { timesheetHeaderData } from '../functions/headerData'
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
 import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
+import ViewTimesheetNote from '../components/ViewTimesheetNote.vue'
 
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
@@ -60,6 +61,7 @@ const useTimesheetStateStore = useHandleTimesheetDisplay()
 const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
 const { id, isUserLoggedIn } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
+const { showDialog } = useDialog()
 
 const handleAddNewTimesheet = () => {
   resetTimesheetDisplay()
@@ -70,6 +72,17 @@ const handleAddNewTimesheet = () => {
 const userTimesheets = ref<Timesheet[]>([])
 
 const timesheetListDisplayActions = ref({
+  viewCommentsOnTimesheet: {
+    key: 'comments',
+    tooltip: 'View Comments',
+    callback: (timesheet: Timesheet) => {
+      showDialog(true, ViewTimesheetNote, { timesheetId: timesheet.timesheetid })
+    },
+    icon: 'mdi-comment-outline',
+    color: (timesheet: Timesheet) => (timesheet.timesheetNotesCount > 0 && timesheet.status === 'revised') ? 'warning' : '',
+    disabled: (timesheet: Timesheet) => timesheet.timesheetNotesCount === 0 // todo: get timesheetnotecount on backend
+  },
+
   editTimesheet: {
     key: 'edit',
     tooltip: 'Edit',

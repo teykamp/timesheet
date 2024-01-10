@@ -60,7 +60,7 @@ const timesheetListDisplayActions = ref({
     },
     icon: 'mdi-comment-outline',
     color: '',
-    disabled: (timesheet: Timesheet) => timesheet.status === 'approved'
+    disabled: (timesheet: Timesheet) => timesheet.timesheetNotesCount === 0
   },
 
   approveTimesheet: {

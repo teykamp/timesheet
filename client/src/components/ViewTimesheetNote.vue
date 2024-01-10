@@ -1,6 +1,7 @@
 <template>
   <div style="min-height: 500px;">
     <IsContentLoadingWrapper :displayCondition="!(areTimesheetNotesLoading)"/>
+    <!-- list of items with pop-down with more details. can have tags with the three options: hours, project, time and a warning icon if resubmit required -->
     <div v-if="!areTimesheetNotesLoading && timesheetNotes.length === 0">
       No Timesheet Notes
     </div>
