@@ -56,7 +56,7 @@ const timesheetListDisplayActions = ref({
     key: 'comments',
     tooltip: 'View Comments',
     callback: (timesheet: Timesheet) => {
-      showDialog(true, ViewTimesheetNote)
+      showDialog(true, ViewTimesheetNote, { timesheetId: timesheet.timesheetid })
     },
     icon: 'mdi-comment-outline',
     color: '',
