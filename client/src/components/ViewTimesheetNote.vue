@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div style="min-height: 500px;">
+    <IsContentLoadingWrapper :displayCondition="!(areTimesheetNotesLoading)"/>
     <v-btn
       @click="showDialog(true, CreateTimesheetNote, componentProps)"
       prepend-icon="mdi-comment-plus-outline"
@@ -14,6 +15,7 @@
 
 <script setup lang="ts">
 import CreateTimesheetNote from './CreateTimesheetNote.vue'
+import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 
 import axios from 'axios'
 import { ref } from 'vue'
@@ -28,23 +30,23 @@ const props = defineProps<{
 }>()
 
 const timesheetNotes = ref<TimesheetNote[]>([])
+const areTimesheetNotesLoading = ref(false)
 
-
-const fetchTimesheetNotes = () => {
-  axios.get(`/api/timesheetNotes/${props.componentProps.timesheetId}`)
-    .then(response => {
-      const { data } = response
-      timesheetNotes.value = data
-    })
-    .catch(error => {
-      if (error.response.status === 404) {
-        console.log('TimesheetNote not found');
-      } else {
-        console.error('Error retrieving TimesheetNote:', error.response.data.error);
-      }
-    });
+const fetchTimesheetNotes = async () => {
+  areTimesheetNotesLoading.value = true
+  try {
+    const response = await axios.get(`/api/timesheetNotes/${props.componentProps.timesheetId}`);
+    const { data } = response;
+    timesheetNotes.value = data;
+    areTimesheetNotesLoading.value = false;
+  } catch (error) {
+    if (error.response.status === 404) {
+      console.log('TimesheetNote not found');
+    } else {
+      console.error('Error retrieving TimesheetNote:', error);
+    }
+  }
 }
 
 fetchTimesheetNotes()
-// showdialog with create new comment
 </script>

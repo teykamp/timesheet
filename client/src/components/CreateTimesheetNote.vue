@@ -51,17 +51,15 @@ import type { TimesheetNote } from '../types/types'
 
 const { closeDialog } = useDialog()
 
-const handleSubmitClick = () => {
+const handleSubmitClick = async () => {
 
-  axios.post('/api/timesheetNotes', data.value)
-    .then(response => {
-      console.log('Notification created:', response.data);
-    })
-    .catch(error => {
-      console.error('Error creating timesheetNote:', error.response.data.error);
-    });
+  try {
+    const response = await axios.post('/api/timesheetNotes', data.value);
+    console.log('Notification created:', response.data);
+  } catch (error) {
+    console.error('Error creating timesheetNote:', error);
+  }
 
-  // if require resubmit then set timesheet status to revised
   closeDialog()
 }
 
