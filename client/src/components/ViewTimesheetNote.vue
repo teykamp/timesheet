@@ -1,6 +1,9 @@
 <template>
   <div style="min-height: 500px;">
     <IsContentLoadingWrapper :displayCondition="!(areTimesheetNotesLoading)"/>
+    <div v-if="!areTimesheetNotesLoading && timesheetNotes.length === 0">
+      No Timesheet Notes
+    </div>
     <v-btn
       @click="showDialog(true, CreateTimesheetNote, componentProps)"
       prepend-icon="mdi-comment-plus-outline"
@@ -42,6 +45,7 @@ const fetchTimesheetNotes = async () => {
   } catch (error) {
     if (error.response.status === 404) {
       console.log('TimesheetNote not found');
+      areTimesheetNotesLoading.value = false
     } else {
       console.error('Error retrieving TimesheetNote:', error);
     }
