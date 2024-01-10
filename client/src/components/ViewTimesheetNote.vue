@@ -8,6 +8,7 @@
       @click="closeDialog()"
       color="red"
   >Close</v-btn>
+  {{ timesheetNotes }}
   </div>
 </template>
 
@@ -30,7 +31,20 @@ const timesheetNotes = ref<TimesheetNote[]>([])
 
 
 const fetchTimesheetNotes = () => {
-  // load all comments
+  axios.get(`/api/timesheetNotes/${props.componentProps.timesheetId}`)
+    .then(response => {
+      const { data } = response
+      timesheetNotes.value = data
+    })
+    .catch(error => {
+      if (error.response.status === 404) {
+        console.log('TimesheetNote not found');
+      } else {
+        console.error('Error retrieving TimesheetNote:', error.response.data.error);
+      }
+    });
 }
+
+fetchTimesheetNotes()
 // showdialog with create new comment
 </script>

@@ -44,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios'
 import { ref, computed } from 'vue'
 import { useDialog } from '../stores/useUserInterfaceStore'
 import type { TimesheetNote } from '../types/types'
@@ -51,8 +52,15 @@ import type { TimesheetNote } from '../types/types'
 const { closeDialog } = useDialog()
 
 const handleSubmitClick = () => {
-  // needs timesheetId as prop
-  // stuff
+
+  axios.post('/api/timesheetNotes', data.value)
+    .then(response => {
+      console.log('Notification created:', response.data);
+    })
+    .catch(error => {
+      console.error('Error creating timesheetNote:', error.response.data.error);
+    });
+
   // if require resubmit then set timesheet status to revised
   closeDialog()
 }
