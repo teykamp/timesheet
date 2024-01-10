@@ -42,6 +42,7 @@ export type HeaderItem = {
 }
 
 export type TimesheetNote = {
+  timesheetId: number
   incorrectHours: boolean,
   incorrectProject: boolean,
   incorrectTime: boolean,

@@ -57,7 +57,12 @@ const handleSubmitClick = () => {
   closeDialog()
 }
 
+const props = defineProps<{
+  componentProps: { timesheetId: number }
+}>()
+
 const data = ref<TimesheetNote>({
+  timesheetId: props.componentProps.timesheetId,
   incorrectHours: false,
   incorrectProject: false,
   incorrectTime: false,

@@ -7,7 +7,7 @@
     <v-btn
       @click="closeDialog()"
       color="red"
-    >Close</v-btn>
+  >Close</v-btn>
   </div>
 </template>
 
