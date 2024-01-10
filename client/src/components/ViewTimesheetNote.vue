@@ -6,6 +6,7 @@
       No Timesheet Notes
     </div>
     <v-btn
+    v-if="timesheetDisplayStatus !== 'review'"
       @click="showDialog(true, CreateTimesheetNote, componentProps)"
       prepend-icon="mdi-comment-plus-outline"
     >New Comment</v-btn>
@@ -13,7 +14,6 @@
       @click="closeDialog()"
       color="red"
   >Close</v-btn>
-  {{ timesheetNotes }}
   </div>
 </template>
 
@@ -23,11 +23,15 @@ import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 
 import axios from 'axios'
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 
 import { useDialog } from '../stores/useUserInterfaceStore'
+import { useHandleTimesheetDisplay } from '../stores/useDataStore'
 import type { TimesheetNote } from '../types/types'
 
 const { showDialog, closeDialog } = useDialog()
+const timesheetDisplayStatusStore = useHandleTimesheetDisplay()
+const { timesheetDisplayStatus } = storeToRefs(timesheetDisplayStatusStore)
 
 const props = defineProps<{
   componentProps: { timesheetId: number }

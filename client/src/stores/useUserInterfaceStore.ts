@@ -94,6 +94,7 @@ export const useDialog = defineStore('dialog', {
     },
 
     showDialog(persistent: boolean, component: any, componentProps?: any, body?: DialogBody ) {
+      const isDialogShowing = this.show
       if (this.show) this.closeDialog()
 
       setTimeout(() => {
@@ -106,7 +107,7 @@ export const useDialog = defineStore('dialog', {
           this.body.buttons = body.buttons ?? []
         }
         this.show = true
-      }, 200)
+      }, isDialogShowing ? 400 : 0)
     },
   }
 })

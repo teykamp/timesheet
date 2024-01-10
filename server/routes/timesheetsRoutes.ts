@@ -60,89 +60,104 @@ router.put('/:timesheetId', async (req, res) => {
   
   
   // GET all submitted timesheets and entries for a manager
-  router.get('/manager/:managerId', async (req, res) => {
-    const { managerId } = req.params;
-    try {
-      const result = await handleDatabaseTransaction(async (client) => {
-        const userIdsQueryResult = await client.query(
-          'SELECT userId, email FROM timesheetuser WHERE managerId = $1',
-          [managerId]
+router.get('/manager/:managerId', async (req, res) => {
+  const { managerId } = req.params;
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      const userIdsQueryResult = await client.query(
+        'SELECT userId, email FROM timesheetuser WHERE managerId = $1',
+        [managerId]
+      );
+      const userData = userIdsQueryResult.rows.map((row) => row.userid);
+      const userEmailsMap = new Map(userIdsQueryResult.rows.map((user) => [user.userId, user.email]))
+
+      if (userData.length === 0) {
+        return [];
+      }
+      const timesheets = []
+      for (const userId of userData) {
+        const timesheetsQueryResult = await client.query(
+          'SELECT t.timesheetId, t.userId, t.endDate, t.status ' +
+          'FROM Timesheet t ' +
+          'WHERE t.status != $1 AND t.userId = $2',
+          ['working', userId]
         );
-        const userData = userIdsQueryResult.rows.map((row) => row.userid);
-        const userEmailsMap = new Map(userIdsQueryResult.rows.map((user) => [user.userId, user.email]))
-  
-        if (userData.length === 0) {
-          return [];
-        }
-        const timesheets = []
-        for (const userId of userData) {
-          const timesheetsQueryResult = await client.query(
-            'SELECT t.timesheetId, t.userId, t.endDate, t.status ' +
-            'FROM Timesheet t ' +
-            'WHERE t.status != $1 AND t.userId = $2',
-            ['working', userId]
+
+        const timesheetsWithEmails = await Promise.all(timesheetsQueryResult.rows.map(async (timesheet) => {
+          const totalHoursResult = await client.query(
+            'SELECT COALESCE(SUM(hoursWorked), 0) AS totalHours FROM TimesheetEntry WHERE timesheetId = $1',
+            [timesheet.timesheetid]
           );
-  
-          const timesheetsWithEmails = await Promise.all(timesheetsQueryResult.rows.map(async (timesheet) => {
-            const totalHoursResult = await client.query(
-              'SELECT COALESCE(SUM(hoursWorked), 0) AS totalHours FROM TimesheetEntry WHERE timesheetId = $1',
-              [timesheet.timesheetid]
-            );
-  
-            const totalHours = totalHoursResult.rows[0].totalhours;
-  
-            return {
-              ...timesheet,
-              email: userEmailsMap.get(timesheet.userId),
-              totalHours,
-            };
-          }));
-  
-          timesheets.push(...timesheetsWithEmails);
-        }
-  
-        return timesheets;
-      });
-  
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ error: 'Error retrieving timesheets and entries for the manager' + error });
-    }
-  });
+
+          const totalHours = totalHoursResult.rows[0].totalhours;
+
+          const timesheetNotesCountResult = await client.query(
+            'SELECT COUNT(*) AS timesheetNotesCount FROM TimesheetNote WHERE timesheetId = $1',
+            [timesheet.timesheetid]
+          );
+          const timesheetNotesCount = +(timesheetNotesCountResult.rows[0].timesheetnotescount);
+
+          return {
+            ...timesheet,
+            email: userEmailsMap.get(timesheet.userId),
+            totalHours,
+            timesheetNotesCount,
+          };
+        }));
+
+        timesheets.push(...timesheetsWithEmails);
+      }
+
+      return timesheets;
+    });
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving timesheets and entries for the manager' + error });
+  }
+});
+
   
   
   // GET timesheets and total hours for a user by userId
-  router.get('/user/:userId', async (req, res) => {
-    const { userId } = req.params;
-  
-    try {
-      const result = await handleDatabaseTransaction(async (client) => {
-        // Fetch timesheets for the given userId
-        const timesheetsResult = await client.query(
-          'SELECT * FROM Timesheet WHERE userId = $1',
-          [userId]
-        );
-        const timesheets = timesheetsResult.rows || [];
-  
-        const timesheetsWithTotalHours = await Promise.all(
-          timesheets.map(async (timesheet) => {
-            const totalHoursResult = await client.query(
-              'SELECT COALESCE(SUM(hoursWorked), 0) AS totalHours FROM TimesheetEntry WHERE timesheetId = $1',
-              [timesheet.timesheetid]
-            );
-  
-            const totalHours = totalHoursResult.rows[0].totalhours
-            return { ...timesheet, totalHours };
-          })
-        );
-        return timesheetsWithTotalHours || [];
-      });
-  
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(500).json({ error: 'Error retrieving timesheets and total hours from the database' });
-    }
-  });
+router.get('/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await handleDatabaseTransaction(async (client) => {
+      // Fetch timesheets for the given userId
+      const timesheetsResult = await client.query(
+        'SELECT * FROM Timesheet WHERE userId = $1',
+        [userId]
+      );
+      const timesheets = timesheetsResult.rows || [];
+
+      const timesheetsWithTotalHours = await Promise.all(
+        timesheets.map(async (timesheet) => {
+          const totalHoursResult = await client.query(
+            'SELECT COALESCE(SUM(hoursWorked), 0) AS totalHours FROM TimesheetEntry WHERE timesheetId = $1',
+            [timesheet.timesheetid]
+          );
+
+          const totalHours = totalHoursResult.rows[0].totalhours;
+
+          const timesheetNotesCountResult = await client.query(
+            'SELECT COUNT(*) AS timesheetNotesCount FROM TimesheetNote WHERE timesheetId = $1',
+            [timesheet.timesheetid]
+          );
+          const timesheetNotesCount = +(timesheetNotesCountResult.rows[0].timesheetnotescount);
+
+          return { ...timesheet, totalHours, timesheetNotesCount };
+        })
+      );
+      return timesheetsWithTotalHours || [];
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: 'Error retrieving timesheets and total hours from the database' });
+  }
+});
   
   
   // POST a timesheet with entries
