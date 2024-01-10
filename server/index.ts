@@ -1,12 +1,13 @@
 import dotenv from 'dotenv';
 import express from 'express';
 
-import {router as queriesRoute}from './queries';
-import {router as projectRouter} from "./routes/projectRoutes";
-import {router as timesheetRouter} from "./routes/timesheetsRoutes";
-import {router as timesheetEntriesRouter} from './routes/timesheetEntriesRoutes';
-import {router as usersRouter} from './routes/usersRoutes';
-import {router as timesheetnotifRouter} from "./routes/timesheetNotifcationRoutes"
+// import { router as queriesRoute }from './queries';
+import { router as projectRouter } from "./routes/projectRoutes";
+import { router as timesheetRouter } from "./routes/timesheetsRoutes";
+import { router as timesheetEntriesRouter } from './routes/timesheetEntriesRoutes';
+import { router as usersRouter } from './routes/usersRoutes';
+import { router as timesheetnotifRouter } from "./routes/timesheetNotifcationRoutes"
+import { router as timesheetNoteRouter } from "./routes/timesheetNoteRouter"
 import { timeStamp } from 'console';
 
 const cors = require('cors');
@@ -65,6 +66,7 @@ app.use('/api/timesheets', timesheetRouter)
 app.use('/api/timesheetEntries', timesheetEntriesRouter);
 app.use('/api/users',usersRouter);
 app.use('/api/notification/',timesheetnotifRouter)
+app.use('/api/timesheetNotes/', timesheetNoteRouter)
 // app.use('/api', queriesRoute);
 
 app.get('/api/auth/url', (req, res) => {

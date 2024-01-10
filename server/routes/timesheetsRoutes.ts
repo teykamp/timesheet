@@ -328,5 +328,3 @@ router.put('/:timesheetId', async (req, res) => {
       res.status(500).json({ error: 'Error updating timesheet status in the database' });
     }
   });
-  
-  
