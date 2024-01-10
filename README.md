@@ -42,6 +42,15 @@ Notification
 |-- date
 |-- fromUserId
 |-- notificationType
+
+TimesheetNote
+|-- noteId
+|-- timesheetId (FK)
+|-- incorrectHours
+|-- incorrectProject
+|-- incorrectTime
+|-- commentBody
+|-- requireResubmit
 ```
 
 ## Description:
@@ -97,12 +106,11 @@ Notification
     - alias (string) 
 - **Relationships**
     - one alias is associated with one project for one user
- 
 
 ### Notification:
 - **Properties**
    - timesheetId (foreign key)
-   - fromId (foreignKey)
+   - fromId (foreign key)
    - title
    - content
    - date
@@ -110,6 +118,18 @@ Notification
 - **Relationships**
    - a notificatin is shared between two users (manager (fromUserId) and employee (found in timesheet))
    - a notification can have a type or none
+ 
+### Timesheet Note:
+- **Properties**
+  - noteId
+  - timesheetId: (foreign key)
+  - incorrectHours
+  - incorrectProject
+  - incorrectTime
+  - commentBody
+  - requireResubmit
+- **Relationships**:
+  - A timesheet note is associated with a timesheet (foreign key relationship).
 
  ## Database Setup Queries
 - Setting up projects table
@@ -161,5 +181,17 @@ CREATE TABLE TimesheetNotification (
     date DATE,
     fromUserId VARCHAR(255) REFERENCES TimesheetUser(userId),
     notificationType VARCHAR(10) CHECK (notificationType IN ('timesheet', 'expense', ''))
+);
+```
+- Setting up the timesheet note table
+```SQL
+CREATE TABLE TimesheetNote (
+  noteId SERIAL PRIMARY KEY,
+  timesheetId INT REFERENCES Timesheet(timesheetId) ON DELETE CASCADE,
+  incorrectHours BOOLEAN NOT NULL,
+  incorrectProject BOOLEAN NOT NULL,
+  incorrectTime BOOLEAN NOT NULL,
+  commentBody TEXT,
+  requireResubmit BOOLEAN NOT NULL
 );
 ```
