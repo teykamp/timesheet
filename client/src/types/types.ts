@@ -48,5 +48,5 @@ export type TimesheetNote = {
   incorrectProject: boolean,
   incorrectTime: boolean,
   commentBody: string,
-  requireResubmit: boolean
+  requireresubmit: boolean
 }

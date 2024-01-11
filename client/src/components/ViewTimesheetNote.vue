@@ -1,19 +1,45 @@
 <template>
   <div style="min-height: 500px;">
     <IsContentLoadingWrapper :displayCondition="!(areTimesheetNotesLoading)"/>
+      <v-expansion-panels variant="accordion">
+        <v-expansion-panel
+          v-for="note in timesheetNotes"
+          :key="note.timesheetId"
+        >
+          <v-expansion-panel-title>
+              Item
+              <template v-slot:actions="{ expanded }">
+                <v-icon 
+                  v-if="note.requireresubmit"
+                  color="warning" 
+                  icon="mdi-alert"
+                ></v-icon>
+                <v-icon :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
+              </template>
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <v-card flat>
+                {{ note }}
+              </v-card>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+      </v-expansion-panels>
     <!-- list of items with pop-down with more details. can have tags with the three options: hours, project, time and a warning icon if resubmit required -->
     <div v-if="!areTimesheetNotesLoading && timesheetNotes.length === 0">
       No Timesheet Notes
     </div>
-    <v-btn
-    v-if="timesheetDisplayStatus !== 'review'"
-      @click="showDialog(true, CreateTimesheetNote, componentProps)"
-      prepend-icon="mdi-comment-plus-outline"
-    >New Comment</v-btn>
-    <v-btn
-      @click="closeDialog()"
-      color="red"
-  >Close</v-btn>
+    <div class="position-absolute bottom-8" style="left: 30%;">
+      <v-btn
+        v-if="timesheetDisplayStatus !== 'review'"
+        @click="showDialog(true, CreateTimesheetNote, componentProps)"
+        prepend-icon="mdi-comment-plus-outline"
+        class="mr-6"
+      >New Comment</v-btn>
+      <v-btn
+        @click="closeDialog()"
+        color="red"
+      >Close</v-btn>
+    </div>
   </div>
 </template>
 

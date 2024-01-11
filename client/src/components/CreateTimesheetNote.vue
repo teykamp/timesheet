@@ -21,7 +21,7 @@
       label="Require Resubmit"
       class="ml-4"
       color="warning"
-      v-model="data.requireResubmit"
+      v-model="data.requireresubmit"
     ></v-switch>
     <v-card-actions class="d-flex justify-center">
       <v-btn
@@ -71,7 +71,7 @@ const data = ref<TimesheetNote>({
   incorrectProject: false,
   incorrectTime: false,
   commentBody: '',
-  requireResubmit: false,
+  requireresubmit: false,
 })
 
 const computeCanSubmit = computed(() => {
