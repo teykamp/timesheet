@@ -151,14 +151,22 @@
             color="success"
             append-icon="mdi-forward"
           >{{ timesheetDisplayStatus === 'edit' ? 'Resubmit' : 'Submit' }}</v-btn>
+          <!--  -->
+          <!--  -->
+          <!--  -->
+          <!-- the next buttons need to check timesheetStatus meaning it needs to be passed in!!! -->
+          <!--  -->
+          <!--  -->
+          <!--  -->
           <v-btn
             v-if="currentRouteName === 'admin' && timesheetDisplayStatus === 'view'"
-            @click="showDialog(true, CreateTimesheetNote)"
+            @click="showDialog(true, CreateTimesheetNote, { timesheetId: currentEditTimesheet })"
             prepend-icon="mdi-pencil"
             class="ml-6"
           >Request Edits</v-btn>
           <v-btn
             v-if="currentRouteName === 'admin' && timesheetDisplayStatus === 'view'"
+            @click="approveTimesheet()"
             class="mr-6"
             prepend-icon="mdi-file-check-outline"
           >Approve</v-btn>
@@ -363,5 +371,20 @@ const getViewTimesheetData = (timesheetId: number) => {
 
 if (timesheetDisplayStatus.value === 'view' || timesheetDisplayStatus.value === 'edit') {
   getViewTimesheetData(currentEditTimesheet)
+}
+
+const approveTimesheet = async () => {
+  try {
+    const response = await axios.put(`/api/timesheets/${currentEditTimesheet}/status`, { status: 'approved' })
+
+    if (response.status === 200) {
+      showSnackbar('Timesheet Approved')
+      updateTimesheetViewState('allTimesheets')
+    } else {
+    console.error('Unexpected status:', response.status)
+    }
+  } catch (error) {
+    console.error('Error updating timesheet status:', error)
+  }
 }
 </script>

@@ -8,7 +8,6 @@
       <v-checkbox label="Incorrect Project" v-model="data.incorrectProject"></v-checkbox>
       <v-checkbox label="Incorrect Time" v-model="data.incorrectTime"></v-checkbox>
     </div>
-
     <v-card-subtitle>Additional Feedback</v-card-subtitle>
     <v-textarea
       auto-grow
@@ -51,8 +50,11 @@ import type { TimesheetNote } from '../types/types'
 
 const { closeDialog } = useDialog()
 
-const handleSubmitClick = async () => {
+const props = defineProps<{
+  componentProps: { timesheetId: number }
+}>()
 
+const handleSubmitClick = async () => {
   try {
     const response = await axios.post('/api/timesheetNotes', data.value);
     console.log('Notification created:', response.data);
@@ -62,10 +64,6 @@ const handleSubmitClick = async () => {
 
   closeDialog()
 }
-
-const props = defineProps<{
-  componentProps: { timesheetId: number }
-}>()
 
 const data = ref<TimesheetNote>({
   timesheetId: props.componentProps.timesheetId,

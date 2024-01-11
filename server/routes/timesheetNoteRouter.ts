@@ -16,6 +16,8 @@ const validateInput = (data: any) => {
 };
 
 router.post('/', async (req, res) => {
+
+  console.log(req.body)
   const {
     timesheetId,
     incorrectHours,
