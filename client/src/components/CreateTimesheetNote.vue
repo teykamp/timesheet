@@ -4,9 +4,9 @@
 
     <v-card-subtitle>Quick Actions</v-card-subtitle>
     <div class="d-flex justfy-center">
-      <v-checkbox label="Incorrect Hours" v-model="data.incorrectHours"></v-checkbox>
-      <v-checkbox label="Incorrect Project" v-model="data.incorrectProject"></v-checkbox>
-      <v-checkbox label="Incorrect Time" v-model="data.incorrectTime"></v-checkbox>
+      <v-checkbox label="Incorrect Hours" v-model="data.incorrecthours"></v-checkbox>
+      <v-checkbox label="Incorrect Project" v-model="data.incorrectproject"></v-checkbox>
+      <v-checkbox label="Incorrect Time" v-model="data.incorrecttime"></v-checkbox>
     </div>
     <v-card-subtitle>Additional Feedback</v-card-subtitle>
     <v-textarea
@@ -15,7 +15,7 @@
       rows="4"
       label="Add Comment"
       class="mt-3"
-      v-model="data.commentBody"
+      v-model="data.commentbody"
     ></v-textarea>
     <v-switch
       label="Require Resubmit"
@@ -66,15 +66,15 @@ const handleSubmitClick = async () => {
 }
 
 const data = ref<TimesheetNote>({
-  timesheetId: props.componentProps.timesheetId,
-  incorrectHours: false,
-  incorrectProject: false,
-  incorrectTime: false,
-  commentBody: '',
+  timesheetid: props.componentProps.timesheetId,
+  incorrecthours: false,
+  incorrectproject: false,
+  incorrecttime: false,
+  commentbody: '',
   requireresubmit: false,
 })
 
 const computeCanSubmit = computed(() => {
-  return !(data.value.incorrectHours || data.value.incorrectProject || data.value.incorrectTime || data.value.commentBody !== '')
+  return !(data.value.incorrecthours || data.value.incorrectproject || data.value.incorrecttime || data.value.commentbody !== '')
 })
 </script>

@@ -43,10 +43,10 @@ export type HeaderItem = {
 }
 
 export type TimesheetNote = {
-  timesheetId: number
-  incorrectHours: boolean,
-  incorrectProject: boolean,
-  incorrectTime: boolean,
-  commentBody: string,
+  timesheetid: number
+  incorrecthours: boolean,
+  incorrectproject: boolean,
+  incorrecttime: boolean,
+  commentbody: string,
   requireresubmit: boolean
 }
