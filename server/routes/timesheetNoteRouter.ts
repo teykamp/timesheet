@@ -85,7 +85,7 @@ router.get('/', async (req, res) => {
     if (result.rows.length === 0) {
       res.status(404).json({ error: 'TimesheetNotes Table is Empty' });
     } else {
-      res.json(result.rows[0]);
+      res.json(result.rows);
     }
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving timesheet notes from the database' });
