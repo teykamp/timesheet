@@ -4,14 +4,14 @@ import { handleDatabaseTransaction } from "../queries";
 
 // POST a timesheetNote
 const validateInput = (data: any) => {
-  const { timesheetId, incorrectHours, incorrectProject, incorrectTime, commentBody, requireResubmit } = data;
+  const { timesheetid, incorrecthours, incorrectproject, incorrecttime, commentbody, requireresubmit } = data;
   return (
-    timesheetId !== undefined &&
-    incorrectHours !== undefined &&
-    incorrectProject !== undefined &&
-    incorrectTime !== undefined &&
-    commentBody !== undefined &&
-    requireResubmit !== undefined
+    timesheetid !== undefined &&
+    incorrecthours !== undefined &&
+    incorrectproject !== undefined &&
+    incorrecttime !== undefined &&
+    commentbody !== undefined &&
+    requireresubmit !== undefined
   );
 };
 
@@ -19,12 +19,12 @@ router.post('/', async (req, res) => {
 
   console.log(req.body)
   const {
-    timesheetId,
-    incorrectHours,
-    incorrectProject,
-    incorrectTime,
-    commentBody,
-    requireResubmit,
+    timesheetid,
+    incorrecthours,
+    incorrectproject,
+    incorrecttime,
+    commentbody,
+    requireresubmit,
   } = req.body;
 
   if (!validateInput(req.body)) {
@@ -33,10 +33,10 @@ router.post('/', async (req, res) => {
 
   try {
     const result = await handleDatabaseTransaction(async (client) => {
-      if (requireResubmit) {
+      if (requireresubmit) {
         const updateResult = await client.query(
           'UPDATE Timesheet SET status = $1 WHERE timesheetId = $2 RETURNING *',
-          ['revised', timesheetId]
+          ['revised', timesheetid]
         );
 
         if (updateResult.rows.length === 0) {
@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
       }
       return await client.query(
         'INSERT INTO TimesheetNote (timesheetId, incorrectHours, incorrectProject, incorrectTime, commentBody, requireResubmit) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [timesheetId, incorrectHours, incorrectProject, incorrectTime, commentBody, requireResubmit]
+        [timesheetid, incorrecthours, incorrectproject, incorrecttime, commentbody, requireresubmit]
       );
     });
 

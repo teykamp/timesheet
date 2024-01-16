@@ -3,6 +3,15 @@
     <IsUserLoggedInWrapper>
       <template #contentIfLoggedIn>
         <div v-if="timesheetViewState === 'allTimesheets'">
+          <!-- <div 
+            v-if="true"
+            class="d-flex justify-center mt-15 pt-15"
+            style="width: 100%;"
+          >
+            <h1>
+              You are not a Manager
+            </h1>
+          </div> -->
           <TimesheetListDisplay 
             :viewTimesheet="viewTimesheet" 
             :timesheetListDisplayActions="timesheetListDisplayActions"
