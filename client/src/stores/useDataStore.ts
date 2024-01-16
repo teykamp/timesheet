@@ -59,7 +59,9 @@ export const useGoogleUserData = defineStore('googleUserData',{
     given_name: '',
     family_name: '',
     picture: '',
-    locale: ''
+    locale: '',
+    isManager: false,
+    managerId: -1,
   }), 
   actions: {
     isUserLoggedIn() {
@@ -78,6 +80,9 @@ export const useGoogleUserData = defineStore('googleUserData',{
 
       axios.get(`api/users/firstTimeLogin/${this.id}/${encodeURIComponent(this.email)}`)
       .then((response) => {
+        const { data } = response
+        this.isManager = data.ismanager
+        this.managerId = data.managerid
         console.log('Response: User Logged Back In Successfully');
       })
       .catch((error) => {
@@ -94,6 +99,8 @@ export const useGoogleUserData = defineStore('googleUserData',{
       this.family_name = ''
       this.picture = ''
       this.locale = ''
+      this.isManager = false
+      this.managerId = -1
     },
 
     getGoogleUserData() {
@@ -106,6 +113,15 @@ export const useGoogleUserData = defineStore('googleUserData',{
         family_name: this.family_name,
         picture: this.picture,
         locale: this.locale
+      }
+    },
+
+    getUserData() {
+      return {
+        id: this.id,
+        email: this.email,
+        isManager: this.isManager,
+        managerId: this.managerId
       }
     },
     

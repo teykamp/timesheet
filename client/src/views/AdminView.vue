@@ -3,16 +3,24 @@
     <IsUserLoggedInWrapper>
       <template #contentIfLoggedIn>
         <div v-if="timesheetViewState === 'allTimesheets'">
-          <!-- <div 
-            v-if="true"
+          <div 
+            v-if="!isManager && loadDelay"
             class="d-flex justify-center mt-15 pt-15"
             style="width: 100%;"
           >
-            <h1>
-              You are not a Manager
-            </h1>
-          </div> -->
+            <div>
+              <h1>
+                You are not a Manager
+              </h1>
+              <v-btn
+                @click="router.push({ name: 'home' })"
+                class="mt-10"
+                prepend-icon="mdi-home"
+              >Return Home</v-btn>
+            </div>
+          </div>
           <TimesheetListDisplay 
+            v-show="isManager"
             :viewTimesheet="viewTimesheet" 
             :timesheetListDisplayActions="timesheetListDisplayActions"
             :fetchData="getManagerTimesheets" 
@@ -39,6 +47,7 @@
 import axios from 'axios'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 
 import { useHandleTimesheetDisplay, useGoogleUserData } from '../stores/useDataStore'
 import { useDialog } from '../stores/useUserInterfaceStore'
@@ -54,9 +63,12 @@ import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
 const { setTimesheetDisplayStatus, setCurrentTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
 const useTimesheetStateStore = useHandleTimesheetDisplay()
 const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
+const useGetUserDataStore = useGoogleUserData()
+const { isManager } = storeToRefs(useGetUserDataStore)
 const { isUserLoggedIn, id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
 const { showDialog } = useDialog()
+const router = useRouter()
 
 const managerTimesheets = ref<ManagerTimesheet[]>([])
 
@@ -131,6 +143,7 @@ const viewTimesheet = (timesheet: Timesheet) => {
 
 const getManagerTimesheets = () => {
   if (!isUserLoggedIn()) return
+  if (!isManager) return
 
   setLoadingState('isTimesheetListLoading', true)
   axios.get(`/api/timesheets/manager/${id}`)
@@ -143,4 +156,9 @@ const getManagerTimesheets = () => {
       console.error('Error fetching data:', error.message)
     })
 }
+
+const loadDelay = ref(false)
+setTimeout(() => {
+  loadDelay.value = true
+}, 200)
 </script>
