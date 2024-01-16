@@ -136,7 +136,7 @@ const getManagerTimesheets = () => {
   axios.get(`/api/timesheets/manager/${id}`)
     .then(response => {
       const { data } = response
-      managerTimesheets.value = data.reverse()
+      managerTimesheets.value = data.sort((a: Timesheet, b: Timesheet) => new Date(b.enddate).getTime() - new Date(a.enddate).getTime());
       setLoadingState('isTimesheetListLoading', false)
     })
     .catch(error => {

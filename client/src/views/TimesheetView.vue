@@ -132,7 +132,7 @@ const getUserTimesheets = () => {
   axios.get(`/api/timesheets/user/${id}`)
     .then(response => {
       const { data } = response
-      userTimesheets.value = data.reverse()
+      userTimesheets.value = data.sort((a: Timesheet, b: Timesheet) => new Date(b.enddate).getTime() - new Date(a.enddate).getTime());
       setLoadingState('isTimesheetListLoading', false)
     })
     .catch(error => {
