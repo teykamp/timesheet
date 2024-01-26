@@ -1,5 +1,5 @@
 # Timesheet
-Timesheet tracking for employees and managers
+Timesheet tracking for employees and managers. The system uses Vue, Vuetify, PostgreSQL (ElephantSQL), and Google authentication.
 
 ### Employee
 
