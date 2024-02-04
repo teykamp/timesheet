@@ -114,7 +114,7 @@
                   <!-- error handled thorugh v-if -->
                   <v-text-field
                     v-else
-                    v-model="cell.entry.hoursWorked"  
+                    v-model="cell.entry?.hoursWorked"  
                     :rules="[validateAllRules]"
                     :readonly="timesheetDisplayStatus === 'view'"
                     label="Hours" 
@@ -145,7 +145,7 @@
           >Add</v-btn>
           <v-btn
             v-if="timesheetDisplayStatus !== 'view'"
-            @click="timesheetDisplayStatus === 'edit' ? handleUpdateTimesheet('submitted') : handleSubmitTimesheet('submitted')"
+            @click="handleSubmitTimesheet('submitted')"
             :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null)"
             class="mr-10"
             color="success"
@@ -251,8 +251,7 @@ const validateAllRules = (value: any) => {
     const result = rule(value)
     if (result !== true) {
       allRulesPassed.value = false
-      console.log(allRulesPassed.value)
-      return result
+      return false
     }
   }
   allRulesPassed.value = true
@@ -290,7 +289,9 @@ const handleDeleteRow = (rowIndex: number) => {
   timesheetData.value.splice(rowIndex, 1);
 }
 
-const buildTimesheetData = (status: 'submitted' | 'working') => {
+type Status = 'submitted' | 'working'
+
+const buildTimesheetData = (status: Status) => {
   return {
     userId: id,
     endDate: weekEndingIn.value,
@@ -317,7 +318,7 @@ const buildTimesheetData = (status: 'submitted' | 'working') => {
   }
 }
 
-const handleSubmitTimesheet = async (status: 'submitted' | 'working') => {
+const handleSubmitTimesheet = async (status: Status) => {
   try {
     await axios.post('/api/timesheets', buildTimesheetData(status))
 
@@ -328,7 +329,7 @@ const handleSubmitTimesheet = async (status: 'submitted' | 'working') => {
   }
 }
 
-const handleUpdateTimesheet = async (status: 'submitted' | 'working') => {
+const handleUpdateTimesheet = async (status: Status) => {
   try {
     await axios.put(`/api/timesheets/${currentEditTimesheet}`, buildTimesheetData(status))
 
