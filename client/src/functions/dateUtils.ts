@@ -31,7 +31,6 @@ export function getMonthRange(monthsToRetrieve: number = 1): DatePair[] {
     let currentDate = new Date(firstMonday.monday)
     while (currentDate <= lastFriday.friday ) {
       const { monday, friday } = getMondayAndFriday(currentDate)
-      console.log(monday, monthPairs[monthPairs.length - 1]?.monday)
       if (monthPairs.length === 0) monthPairs.push({ monday, friday })
       if (formatDateToDDMMYY(monthPairs[monthPairs.length - 1].monday) !== formatDateToDDMMYY(monday)) monthPairs.push({ monday, friday })
       currentDate.setDate(currentDate.getDate() + 7)
