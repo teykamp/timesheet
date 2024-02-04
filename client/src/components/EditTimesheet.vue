@@ -25,10 +25,10 @@
                 :key="index"
                 @click="weekEndingIn = date.friday"
                 :style="{
-                  background: formatDateToDDMMYY(weekEndingIn) === formatDateToDDMMYY(date.friday) ? blueShadow : '',
-                  color: formatDateToDDMMYY(weekEndingIn) === formatDateToDDMMYY(date.friday) ? white : ''
+                  background: isCurrentWeek(date) ? blueShadow : '',
+                  color: isCurrentWeek(date) ? white : ''
                 }"
-                :appendIcon="formatDateToDDMMYY(date.friday) === formatDateToDDMMYY(getMondayAndFriday(new Date).friday) ? 'mdi-calendar-today' : ''"
+                :appendIcon="isCurrentWeekIcon(date)"
               >
                 <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
               </v-list-item>
@@ -36,8 +36,8 @@
           </v-menu>
           <v-btn
             v-if="timesheetDisplayStatus !== 'view'"
-            @click="timesheetDisplayStatus === 'edit' ? handleUpdateTimesheet('working') : handleSubmitTimesheet('working')"
-            :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null) || timesheetDisplayStatus === 'view'"
+            @click="handleSubmitTimesheet('working')"
+            :disabled="canSaveOrSubmitTimesheet"
             class="ma-4"
             color="primary"
           >{{ timesheetDisplayStatus === 'edit' ? 'Update' : 'Save' }}</v-btn>
@@ -57,10 +57,7 @@
               <v-col
                 v-for="(label, index) in colLabels"
                 :key="index"
-                :style="{
-                  'min-width': index === 0 ? '200px' : '50px',
-                  'max-width': index === 0 ? '500px' : '150px'
-                }"
+                :style="computeColumnStyles(index)"
                 :class="`d-flex ${index === 0 ? '' : 'justify-center'}`"
               >
                   <div 
@@ -88,10 +85,7 @@
                 <v-col 
                   v-for="(cell, colIndex) in row" 
                   :key="colIndex" 
-                  :style="{
-                    'min-width': colIndex === 0 ? '200px' : '50px',
-                    'max-width': colIndex === 0 ? '500px' : '150px'
-                  }"
+                  :style="computeColumnStyles(colIndex)"
                 >
                   <v-autocomplete
                     v-if="colIndex === 0"
@@ -139,14 +133,14 @@
           <v-btn
             v-if="timesheetDisplayStatus !== 'view'"
             @click="handleAddRow()"
-            :color="`${timesheetData.length === 0 ? 'red' : ''}`"
+            :color="timesheetData.length === 0 ? 'red' : ''"
             :class="`ml-10 ${timesheetData.length === 0 ? 'animate-bounce' : ''}`"
             prepend-icon="mdi-plus"
           >Add</v-btn>
           <v-btn
             v-if="timesheetDisplayStatus !== 'view'"
             @click="handleSubmitTimesheet('submitted')"
-            :disabled="timesheetData.length === 0 || !allRulesPassed || !timesheetData.every(row => row[0].projectid !== null)"
+            :disabled="canSaveOrSubmitTimesheet"
             class="mr-10"
             color="success"
             append-icon="mdi-forward"
@@ -159,15 +153,16 @@
           <!--  -->
           <!--  -->
           <v-btn
-            v-if="currentRouteName === 'admin' && timesheetDisplayStatus === 'view'"
+            v-if="managerIsViewing"
             @click="showDialog(true, CreateTimesheetNote, { timesheetId: currentEditTimesheet })"
             prepend-icon="mdi-pencil"
             class="ml-6"
           >Request Edits</v-btn>
           <v-btn
-            v-if="currentRouteName === 'admin' && timesheetDisplayStatus === 'view'"
+            v-if="managerIsViewing"
             @click="approveTimesheet()"
             class="mr-6"
+            color="success"
             prepend-icon="mdi-file-check-outline"
           >Approve</v-btn>
         </div>
@@ -194,6 +189,7 @@ import { useGoogleUserData } from '../stores/useDataStore'
 import { useLoadingScreen, useSnackbar, useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 
 import { getMonthRange, formatDateToDDMMYY, getMondayAndFriday } from '../functions/dateUtils'
+import type { DatePair } from '../functions/dateUtils'
 
 const { id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
@@ -237,6 +233,15 @@ colLabels.unshift({
   xs: 'PN'
 })
 
+const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length === 0 || !allRulesPassed || !timesheetData.value.every(row => row[0].projectid !== null) || timesheetDisplayStatus.value === 'view')
+
+const computeColumnStyles = (index: number) => {
+  return {
+    'min-width': index === 0 ? '200px' : '50px',
+    'max-width': index === 0 ? '500px' : '150px'
+  }
+}
+
 const allRulesPassed = ref(false)
 
 const positiveNumberRule = (value: any) => {
@@ -258,6 +263,7 @@ const validateAllRules = (value: any) => {
   return true
 }
 
+const managerIsViewing = computed(() => currentRouteName.value === 'admin' && timesheetDisplayStatus.value === 'view')
 
 const timesheetData = ref(
   Array.from({ length: rows }, () => {
@@ -356,6 +362,10 @@ getProjects()
 
 const dateRange = ref(getMonthRange())
 const weekEndingIn = ref(getMondayAndFriday(new Date()).friday)
+
+const isCurrentWeek = (date: DatePair) => formatDateToDDMMYY(weekEndingIn.value) === formatDateToDDMMYY(date.friday)
+const isCurrentWeekIcon = (date: DatePair) => formatDateToDDMMYY(date.friday) === formatDateToDDMMYY(getMondayAndFriday(new Date).friday) ? 'mdi-calendar-today' : ''
+
 
 const getViewTimesheetData = (timesheetId: number) => {
   setLoadingState('isTimesheetContentLoading', true)
