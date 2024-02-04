@@ -114,7 +114,7 @@
                   <!-- error handled thorugh v-if -->
                   <v-text-field
                     v-else
-                    v-model="cell.entry?.hoursWorked"  
+                    v-model="cell.entry.hoursWorked"  
                     :rules="[validateAllRules]"
                     :readonly="timesheetDisplayStatus === 'view'"
                     label="Hours" 
