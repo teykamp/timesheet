@@ -1,6 +1,22 @@
 # Timesheet
-Timesheet tracking for employees and managers
+Timesheet tracking for employees and managers. The system uses Vue, Vuetify, PostgreSQL (ElephantSQL), and Google authentication.
 
+### Employee
+
+![image](https://github.com/teykamp/timesheet/assets/46391052/75f8446b-0173-464e-b384-1ef4bf3d5d01)
+Employees can view all of their timesheets including hours, status, and date. They have the option to edit or withdraw them as well.
+
+![image](https://github.com/teykamp/timesheet/assets/46391052/0c226bb4-2482-4438-abeb-b71117ff2902)
+Creating or editing timesheets is as simple as filling in the grid layout.
+
+
+### Manager
+
+![image](https://github.com/teykamp/timesheet/assets/46391052/e1072987-15d0-4793-8025-4162ff569877)
+Managers can view timesheets of their designated employees as well as approve them, reject them, or request edits.
+
+![image](https://github.com/teykamp/timesheet/assets/46391052/6e98f96a-6944-4f71-bb37-f05fea185d1e)
+Requestig edits is simple and fast. Empoyees then get notified and can make the adjusted changes and resubmit. The status of the timesheets changes accordingly as well.
 
 ## Object Model:
 
