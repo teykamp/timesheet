@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
 
-import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile } from '../types/types'
+import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile, ArrowDirection } from '../types/types'
 
 export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', () => {
   const router = useRouter()
@@ -119,6 +119,39 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
     return true
   }
 
+  type SelectedCell = [number, number]
+
+  const currentSelectedCell = ref<SelectedCell | undefined>(undefined)
+
+  const handleMoveCellSelection = (direction: ArrowDirection) => {
+    if (!currentSelectedCell.value) return
+    switch (direction) {
+      case 'ArrowUp':
+        if (currentSelectedCell.value[0] === 0) return
+        currentSelectedCell.value[0]--
+        break
+      case 'ArrowDown':
+        if (currentSelectedCell.value[0] === timesheetData.value.length - 1) return
+        currentSelectedCell.value[0]++
+        break
+      case 'ArrowLeft':
+        if (currentSelectedCell.value[1] === 1) return
+        currentSelectedCell.value[1]--
+        break
+      case 'ArrowRight':
+        if (currentSelectedCell.value[1] === timesheetData.value[0].length - 1) return
+        currentSelectedCell.value[1]++
+        break
+    }
+  }
+
+  const handleTimesheetCellFocus = (position: SelectedCell) => {
+    currentSelectedCell.value = position
+  }
+  const handleTimesheetCellBlur = () => {
+    currentSelectedCell.value = undefined
+  }
+
   return {
     timesheetData,
     handleDeleteRow,
@@ -126,6 +159,10 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
     computeColumnStyles,
     allRulesPassed,
     validateAllRules,
+    handleMoveCellSelection,
+    handleTimesheetCellFocus, 
+    handleTimesheetCellBlur,
+    currentSelectedCell,
   }
 })
 

@@ -135,6 +135,8 @@ import { useLoadingScreen, useSnackbar, useColorPalette, useDialog } from '../st
 import { getMonthRange, formatDateToDDMMYY, getMondayAndFriday } from '../functions/dateUtils'
 import type { DatePair } from '../functions/dateUtils'
 
+import type { ArrowDirection } from '../types/types'
+
 const { id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
 const { isTimesheetContentLoading } = storeToRefs(useLoadingScreen())
@@ -149,7 +151,7 @@ const { blueShadow, white } = useColorPalette()
 const { lgAndUp } = useDisplay()
 
 const { timesheetData, allRulesPassed } = storeToRefs(useSingleTimesheetDisplay())
-const { handleAddRow, computeColumnStyles } = useSingleTimesheetDisplay()
+const { handleAddRow, computeColumnStyles, handleMoveCellSelection } = useSingleTimesheetDisplay()
 
 
 const route = useRoute()
@@ -275,4 +277,12 @@ const approveTimesheet = async () => {
     console.error('Error updating timesheet status:', error)
   }
 }
+
+document.addEventListener('keydown', (event: KeyboardEvent) => {
+  const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
+  if (arrowKeys.includes(event.key)) {
+    event.preventDefault() // Prevent scrolling when using arrow keys
+    handleMoveCellSelection(event.key as ArrowDirection)
+  }
+})
 </script>

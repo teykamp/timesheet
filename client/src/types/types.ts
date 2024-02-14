@@ -50,3 +50,5 @@ export type TimesheetNote = {
   commentbody: string,
   requireresubmit: boolean
 }
+
+export type ArrowDirection = 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
