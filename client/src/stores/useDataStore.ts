@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
 
 import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile } from '../types/types'
@@ -47,6 +47,85 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
     setCurrentTimesheet,
     openTimesheetFromExternal,
     updateTimesheetViewState,
+  }
+})
+
+export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', () => {
+
+  // what needs to happen:
+  // need to componentize the grid
+  // this means using store for the grid data, meaning all of the actions need to be in the store as well and called from edittimesheet.vue
+  // data needs to be storetorefs to make it reactive
+
+  //  ^^^ should all be done
+
+  // afterards, export data in here that has to do with timesheets and make special store
+  // maybe can use some stuff from above?? but I think they handle different stuff so lets see
+
+
+  const computeColumnStyles = (index: number) => {
+    return {
+      'min-width': index === 0 ? '200px' : '50px',
+      'max-width': index === 0 ? '500px' : '150px'
+    }
+  }
+
+  // display default
+  const rows = 3
+  const cols = 6
+
+  const timesheetData = ref(
+    Array.from({ length: rows }, () => {
+      const row = []
+      row.push({ projectid: null })
+      for (let i = 0; i < cols - 1; i++) {
+        row.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
+      }
+      return row
+    })
+  )
+
+  const handleDeleteRow = (rowIndex: number) => {
+    timesheetData.value.splice(rowIndex, 1);
+  }
+
+  const handleAddRow = () => {
+    const newRow = []
+    newRow.push({ projectid: null })
+    for (let i = 0; i < cols - 1; i++) {
+      newRow.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
+    }
+    timesheetData.value.push(newRow)
+  }
+
+  const allRulesPassed = ref(false)
+
+  const positiveNumberRule = (value: any) => {
+    return /^[+]?\d*\.?\d+$/.test(value) || 'Error NaN'
+  }
+  const multipleOfQuarterRule = (value: any) => {
+    return (parseFloat(value) % 0.25 === 0) || 'Error *.25'
+  }
+  const validateAllRules = (value: any) => {
+    const rules = [positiveNumberRule, multipleOfQuarterRule]
+    for (const rule of rules) {
+      const result = rule(value)
+      if (result !== true) {
+        allRulesPassed.value = false
+        return false
+      }
+    }
+    allRulesPassed.value = true
+    return true
+  }
+
+  return {
+    timesheetData,
+    handleDeleteRow,
+    handleAddRow,
+    computeColumnStyles,
+    allRulesPassed,
+    validateAllRules,
   }
 })
 

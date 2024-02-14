@@ -71,62 +71,7 @@
                   <!-- <div v-else>{{ label.xs || label.sm || label.lg }}</div> -->
               </v-col>
             </v-card>
-            <v-sheet 
-              :style="{
-                'max-height': 'calc(88vh - 200px)',
-                overflow: 'auto',
-              }"
-            >
-              <v-sheet 
-                v-for="(row, rowIndex) in timesheetData" 
-                :key="rowIndex"
-                class="d-flex justify-center"
-              >
-                <v-col 
-                  v-for="(cell, colIndex) in row" 
-                  :key="colIndex" 
-                  :style="computeColumnStyles(colIndex)"
-                >
-                  <v-autocomplete
-                    v-if="colIndex === 0"
-                    v-model="cell.projectid"
-                    :items="projects"
-                    label="Project Name"
-                    item-title="projectname"
-                    item-value="projectid"
-                    density="compact"
-                    variant="outlined"
-                    :readonly="timesheetDisplayStatus === 'view'"
-                  >
-                    <template #item="{ props, item }">
-                      <v-list-item
-                        v-bind="props"
-                        :disabled="selectedProjects.includes(item.value)"
-                      ></v-list-item>
-                    </template>
-                  </v-autocomplete>
-                  <!-- error handled thorugh v-if -->
-                  <v-text-field
-                    v-else
-                    v-model="cell.entry.hoursWorked"  
-                    :rules="[validateAllRules]"
-                    :readonly="timesheetDisplayStatus === 'view'"
-                    label="Hours" 
-                    variant="outlined" 
-                    density="compact" 
-                  />
-                </v-col>
-                <v-btn 
-                  v-if="timesheetDisplayStatus !== 'view'"
-                  @click="handleDeleteRow(rowIndex)"
-                  size="small"
-                  variant="tonal"
-                  color="red" 
-                  icon="mdi-delete"
-                  class="mt-3 mx-2"
-                ></v-btn>
-              </v-sheet>
-            </v-sheet>
+            <TimesheetCellGrid />
           </v-card>
         </div>
         <div class="d-flex justify-space-between mt-8">
@@ -149,6 +94,7 @@
           <!--  -->
           <!--  -->
           <!-- the next buttons need to check timesheetStatus meaning it needs to be passed in!!! -->
+          <!-- this is because the approve buttons will be there even if already approved and it needs to turn into unapprove -->
           <!--  -->
           <!--  -->
           <!--  -->
@@ -176,15 +122,15 @@ import axios from 'axios'
 
 import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 import CreateTimesheetNote from './CreateTimesheetNote.vue'
+import TimesheetCellGrid from './TimesheetCellGrid.vue'
 
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 
 import { useDisplay } from 'vuetify'
-import type { Project } from '../types/types'
 
-import { useHandleTimesheetDisplay } from '../stores/useDataStore'
+import { useHandleTimesheetDisplay, useSingleTimesheetDisplay } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { useLoadingScreen, useSnackbar, useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 
@@ -206,12 +152,12 @@ const { blueShadow, white } = useColorPalette()
 
 const { lgAndUp } = useDisplay()
 
+const { timesheetData, allRulesPassed } = storeToRefs(useSingleTimesheetDisplay()) // might have syntax error, can always revert to two-line syntax (see any other storetorefs)
+const { handleAddRow, computeColumnStyles } = useSingleTimesheetDisplay()
+
+
 const route = useRoute()
 const currentRouteName = computed(() => route.name)
-
-// display default
-const rows = 3
-const cols = 6
 
 const colLabelsBase = [
   'Monday',
@@ -233,67 +179,13 @@ colLabels.unshift({
   xs: 'PN'
 })
 
-const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length === 0 || !allRulesPassed || !timesheetData.value.every(row => row[0].projectid !== null) || timesheetDisplayStatus.value === 'view')
-
-const computeColumnStyles = (index: number) => {
-  return {
-    'min-width': index === 0 ? '200px' : '50px',
-    'max-width': index === 0 ? '500px' : '150px'
-  }
-}
-
-const allRulesPassed = ref(false)
-
-const positiveNumberRule = (value: any) => {
-  return /^[+]?\d*\.?\d+$/.test(value) || 'Error NaN'
-}
-const multipleOfQuarterRule = (value: any) => {
-  return (parseFloat(value) % 0.25 === 0) || 'Error *.25'
-}
-const validateAllRules = (value: any) => {
-  const rules = [positiveNumberRule, multipleOfQuarterRule]
-  for (const rule of rules) {
-    const result = rule(value)
-    if (result !== true) {
-      allRulesPassed.value = false
-      return false
-    }
-  }
-  allRulesPassed.value = true
-  return true
-}
+const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length === 0 
+                                             || !allRulesPassed 
+                                             || !timesheetData.value.every(row => row[0].projectid !== null)
+                                             || timesheetDisplayStatus.value === 'view'
+                                            )
 
 const managerIsViewing = computed(() => currentRouteName.value === 'admin' && timesheetDisplayStatus.value === 'view')
-
-const timesheetData = ref(
-  Array.from({ length: rows }, () => {
-    const row = [];
-    row.push({ projectid: null })
-    for (let i = 0; i < cols - 1; i++) {
-      row.push({ entry: {  projectid: null, hoursWorked: 0, date: null } })
-    }
-    return row
-  })
-)
-
-const projects = ref<Project[]>([])
-
-const selectedProjects = computed(() => {
-  return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
-})
-
-const handleAddRow = () => {
-  const newRow = []
-  newRow.push({ projectid: null })
-  for (let i = 0; i < cols - 1; i++) {
-    newRow.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
-  }
-  timesheetData.value.push(newRow)
-}
-
-const handleDeleteRow = (rowIndex: number) => {
-  timesheetData.value.splice(rowIndex, 1);
-}
 
 type Status = 'submitted' | 'working'
 
@@ -324,6 +216,7 @@ const buildTimesheetData = (status: Status) => {
   }
 }
 
+
 const handleSubmitTimesheet = async (status: Status) => {
   try {
     await axios.post('/api/timesheets', buildTimesheetData(status))
@@ -335,6 +228,7 @@ const handleSubmitTimesheet = async (status: Status) => {
   }
 }
 
+// DOES THIS NEED TO BE USED
 const handleUpdateTimesheet = async (status: Status) => {
   try {
     await axios.put(`/api/timesheets/${currentEditTimesheet}`, buildTimesheetData(status))
@@ -346,19 +240,6 @@ const handleUpdateTimesheet = async (status: Status) => {
     console.error('Error updating timesheet:', error)
   }
 }
-
-const getProjects = () => {
-  axios.get(`/api/projects`)
-    .then(response => {
-      const { data } = response
-      projects.value = data
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error.message)
-    })
-}
-
-getProjects()
 
 const dateRange = ref(getMonthRange())
 const weekEndingIn = ref(getMondayAndFriday(new Date()).friday)
