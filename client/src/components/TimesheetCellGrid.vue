@@ -65,8 +65,8 @@ import { useSingleTimesheetDisplay, useHandleTimesheetDisplay } from '../stores/
 
 import type { Project } from '../types/types'
 
-const { timesheetData } = storeToRefs(useSingleTimesheetDisplay()) // might have syntax error, can always revert to two-line syntax (see any other storetorefs)
-const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay()) // same
+const { timesheetData } = storeToRefs(useSingleTimesheetDisplay())
+const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
 
 const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTimesheetDisplay()
 

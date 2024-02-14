@@ -101,9 +101,7 @@ import type { Timesheet, HeaderItem } from '../types/types'
 
 import { formatDateToDDMMYY } from '../functions/dateUtils'
 
-
-const useLoadingScreenStore = useLoadingScreen()
-const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
+const { isTimesheetListLoading } = storeToRefs(useLoadingScreen())
 
 const { xs } = useDisplay()
 

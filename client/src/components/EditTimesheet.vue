@@ -137,20 +137,18 @@ import type { DatePair } from '../functions/dateUtils'
 
 const { id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
-const useLoadingScreenStore = useLoadingScreen()
-const { isTimesheetContentLoading } = storeToRefs(useLoadingScreenStore)
+const { isTimesheetContentLoading } = storeToRefs(useLoadingScreen())
 const { showDialog } = useDialog()
 
 const { currentEditTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
-const useHandleTimesheetDisplayStore = useHandleTimesheetDisplay()
-const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplayStore)
+const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
 const { showSnackbar } = useSnackbar()
 
 const { blueShadow, white } = useColorPalette()
 
 const { lgAndUp } = useDisplay()
 
-const { timesheetData, allRulesPassed } = storeToRefs(useSingleTimesheetDisplay()) // might have syntax error, can always revert to two-line syntax (see any other storetorefs)
+const { timesheetData, allRulesPassed } = storeToRefs(useSingleTimesheetDisplay())
 const { handleAddRow, computeColumnStyles } = useSingleTimesheetDisplay()
 
 

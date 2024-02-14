@@ -94,11 +94,9 @@ import type { TimesheetNote } from '../types/types'
 
 const { showDialog, closeDialog } = useDialog()
 const { openTimesheetFromExternal } = useHandleTimesheetDisplay()
-const timesheetDisplayStatusStore = useHandleTimesheetDisplay()
-const { timesheetDisplayStatus } = storeToRefs(timesheetDisplayStatusStore)
+const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
 const route = useRoute()
 const currentRouteName = computed(() => route.name)
-
 
 const props = defineProps<{
   componentProps: { timesheetId: number }
