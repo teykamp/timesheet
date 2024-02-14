@@ -1,50 +1,49 @@
 <template>
-  <div>
-    <IsContentLoadingWrapper :displayCondition="!(isTimesheetContentLoading && timesheetDisplayStatus !== 'new')">
-      <template #loadedContent>
-        <div class="w-100 d-flex justify-end">
-          <v-menu>
-            <template v-slot:activator="{ props }">
-              <div 
-                v-if="timesheetDisplayStatus === 'view'"
-                class="ma-4 mr-10"
-              >{{ 'Week Ending In:' + formatDateToDDMMYY(weekEndingIn) }}</div>
-              <v-btn
-                v-else
-                v-bind="props"
-                append-icon="mdi-menu-down"
-                class="ma-4"
-                flat
-              >
-                {{ 'Week Ending In:' +  formatDateToDDMMYY(weekEndingIn) }}
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item
-                v-for="(date, index) in dateRange"
-                :key="index"
-                @click="weekEndingIn = date.friday"
-                :style="{
-                  background: isCurrentWeek(date) ? blueShadow : '',
-                  color: isCurrentWeek(date) ? white : ''
-                }"
-                :appendIcon="isCurrentWeekIcon(date)"
-              >
-                <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-          <v-btn
-            v-if="timesheetDisplayStatus !== 'view'"
-            @click="handleSubmitTimesheet('working')"
-            :disabled="canSaveOrSubmitTimesheet"
-            class="ma-4"
-            color="primary"
-          >{{ timesheetDisplayStatus === 'edit' ? 'Update' : 'Save' }}</v-btn>
-        </div>
-        <div :style="{
-          'overflow-x': 'auto',
-        }">
+  <IsContentLoadingWrapper :displayCondition="!(isTimesheetContentLoading && timesheetDisplayStatus !== 'new')">
+    <template #loadedContent>
+      <div class="w-100 d-flex justify-end">
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <div 
+              v-if="timesheetDisplayStatus === 'view'"
+              class="ma-4 mr-10"
+            >{{ 'Week Ending In:' + formatDateToDDMMYY(weekEndingIn) }}</div>
+            <v-btn
+              v-else
+              v-bind="props"
+              append-icon="mdi-menu-down"
+              class="ma-4"
+              flat
+            >
+              {{ 'Week Ending In:' +  formatDateToDDMMYY(weekEndingIn) }}
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(date, index) in dateRange"
+              :key="index"
+              @click="weekEndingIn = date.friday"
+              :style="{
+                background: isCurrentWeek(date) ? blueShadow : '',
+                color: isCurrentWeek(date) ? white : ''
+              }"
+              :appendIcon="isCurrentWeekIcon(date)"
+            >
+              <v-list-item-title>{{ 'Mon,' + formatDateToDDMMYY(date.monday) }} to {{ 'Fri,' + formatDateToDDMMYY(date.friday) }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <v-btn
+          v-if="timesheetDisplayStatus !== 'view'"
+          @click="handleSubmitTimesheet('working')"
+          :disabled="canSaveOrSubmitTimesheet"
+          class="ma-4"
+          color="primary"
+        >{{ timesheetDisplayStatus === 'edit' ? 'Update' : 'Save' }}</v-btn>
+      </div>
+      <div :style="{
+        'overflow-x': 'auto',
+      }">
         <v-card 
           flat
           :style="{
@@ -60,61 +59,60 @@
                 :style="computeColumnStyles(index)"
                 :class="`d-flex ${index === 0 ? '' : 'justify-center'}`"
               >
-                  <div 
-                    v-if="lgAndUp"
-                    class="text-truncate"
-                    >{{ label.lg }}</div>
-                  <div
-                    v-else
-                    class="text-truncate"
-                  >{{ label.sm || label.lg }}</div>
-                  <!-- <div v-else>{{ label.xs || label.sm || label.lg }}</div> -->
-              </v-col>
-            </v-card>
-            <TimesheetCellGrid />
+                <div 
+                  v-if="lgAndUp"
+                  class="text-truncate"
+                  >{{ label.lg }}</div>
+                <div
+                  v-else
+                  class="text-truncate"
+                >{{ label.sm || label.lg }}</div>
+                <!-- <div v-else>{{ label.xs || label.sm || label.lg }}</div> -->
+            </v-col>
           </v-card>
-        </div>
-        <div class="d-flex justify-space-between mt-8">
-          <v-btn
-            v-if="timesheetDisplayStatus !== 'view'"
-            @click="handleAddRow()"
-            :color="timesheetData.length === 0 ? 'red' : ''"
-            :class="`ml-10 ${timesheetData.length === 0 ? 'animate-bounce' : ''}`"
-            prepend-icon="mdi-plus"
-          >Add</v-btn>
-          <v-btn
-            v-if="timesheetDisplayStatus !== 'view'"
-            @click="handleSubmitTimesheet('submitted')"
-            :disabled="canSaveOrSubmitTimesheet"
-            class="mr-10"
-            color="success"
-            append-icon="mdi-forward"
-          >{{ timesheetDisplayStatus === 'edit' ? 'Resubmit' : 'Submit' }}</v-btn>
-          <!--  -->
-          <!--  -->
-          <!--  -->
-          <!-- the next buttons need to check timesheetStatus meaning it needs to be passed in!!! -->
-          <!-- this is because the approve buttons will be there even if already approved and it needs to turn into unapprove -->
-          <!--  -->
-          <!--  -->
-          <!--  -->
-          <v-btn
-            v-if="managerIsViewing"
-            @click="showDialog(true, CreateTimesheetNote, { timesheetId: currentEditTimesheet })"
-            prepend-icon="mdi-pencil"
-            class="ml-6"
-          >Request Edits</v-btn>
-          <v-btn
-            v-if="managerIsViewing"
-            @click="approveTimesheet()"
-            class="mr-6"
-            color="success"
-            prepend-icon="mdi-file-check-outline"
-          >Approve</v-btn>
-        </div>
-      </template>
-    </IsContentLoadingWrapper>
-  </div>
+          <TimesheetCellGrid />
+        </v-card>
+      </div>
+      <div class="d-flex justify-space-between mt-8">
+        <v-btn
+          v-if="timesheetDisplayStatus !== 'view'"
+          @click="handleAddRow()"
+          :color="timesheetData.length === 0 ? 'red' : ''"
+          :class="`ml-10 ${timesheetData.length === 0 ? 'animate-bounce' : ''}`"
+          prepend-icon="mdi-plus"
+        >Add</v-btn>
+        <v-btn
+          v-if="timesheetDisplayStatus !== 'view'"
+          @click="handleSubmitTimesheet('submitted')"
+          :disabled="canSaveOrSubmitTimesheet"
+          class="mr-10"
+          color="success"
+          append-icon="mdi-forward"
+        >{{ timesheetDisplayStatus === 'edit' ? 'Resubmit' : 'Submit' }}</v-btn>
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <!-- the next buttons need to check timesheetStatus meaning it needs to be passed in!!! -->
+        <!-- this is because the approve buttons will be there even if already approved and it needs to turn into unapprove -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <v-btn
+          v-if="managerIsViewing"
+          @click="showDialog(true, CreateTimesheetNote, { timesheetId: currentEditTimesheet })"
+          prepend-icon="mdi-pencil"
+          class="ml-6"
+        >Request Edits</v-btn>
+        <v-btn
+          v-if="managerIsViewing"
+          @click="approveTimesheet()"
+          class="mr-6"
+          color="success"
+          prepend-icon="mdi-file-check-outline"
+        >Approve</v-btn>
+      </div>
+    </template>
+  </IsContentLoadingWrapper>
 </template>
 
 <script setup lang="ts">
