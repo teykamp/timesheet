@@ -66,7 +66,7 @@
         class="mx-3"
       >New Comment</v-btn>
       <v-btn
-        @click="openTimesheetFromExternal(props.componentProps.timesheetId, needResubmit ? 'edit' : 'view'), closeDialog()"
+        @click="openTimesheetFromExternal(props.componentProps.timesheet, needResubmit ? 'edit' : 'view'), closeDialog()"
         class="mx-3"
         prepend-icon="mdi-arrow-right"
       >Go To Timesheet</v-btn>
@@ -90,7 +90,7 @@ import { useRoute } from 'vue-router'
 
 import { useDialog } from '../stores/useUserInterfaceStore'
 import { useHandleTimesheetDisplay } from '../stores/useDataStore'
-import type { TimesheetNote } from '../types/types'
+import type { TimesheetNote, Timesheet } from '../types/types'
 
 const { showDialog, closeDialog } = useDialog()
 const { openTimesheetFromExternal } = useHandleTimesheetDisplay()
@@ -99,7 +99,7 @@ const route = useRoute()
 const currentRouteName = computed(() => route.name)
 
 const props = defineProps<{
-  componentProps: { timesheetId: number }
+  componentProps: { timesheet: Timesheet }
 }>()
 
 const timesheetNotes = ref<(TimesheetNote & { noteid: number })[]>([])

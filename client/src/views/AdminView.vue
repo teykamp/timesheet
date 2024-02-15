@@ -77,7 +77,7 @@ const timesheetListDisplayActions = ref({
     key: 'comments',
     tooltip: 'View Comments',
     callback: (timesheet: Timesheet) => {
-      showDialog(true, ViewTimesheetNote, { timesheetId: timesheet.timesheetid })
+      showDialog(true, ViewTimesheetNote, { timesheet: timesheet })
     },
     icon: 'mdi-comment-outline',
     color: '',
@@ -137,7 +137,7 @@ const timesheetListDisplayActions = ref({
 
 const viewTimesheet = (timesheet: Timesheet) => {
   setTimesheetDisplayStatus('view')
-  setCurrentTimesheet(timesheet.timesheetid)
+  setCurrentTimesheet(timesheet)
   updateTimesheetViewState('singleTimesheet')
 }
 
@@ -149,7 +149,7 @@ const getManagerTimesheets = () => {
   axios.get(`/api/timesheets/manager/${id}`)
     .then(response => {
       const { data } = response
-      managerTimesheets.value = data.sort((a: Timesheet, b: Timesheet) => new Date(b.enddate).getTime() - new Date(a.enddate).getTime());
+      managerTimesheets.value = data.sort((a: Timesheet, b: Timesheet) => new Date(b.enddate).getTime() - new Date(a.enddate).getTime())
       setLoadingState('isTimesheetListLoading', false)
     })
     .catch(error => {

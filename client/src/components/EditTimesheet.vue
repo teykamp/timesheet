@@ -43,7 +43,7 @@
       </div>
 
       <Timesheet />
-      
+
       <div class="d-flex justify-space-between mt-8">
         <v-btn
           v-if="timesheetDisplayStatus !== 'view'"
@@ -70,7 +70,7 @@
         <!--  -->
         <v-btn
           v-if="managerIsViewing"
-          @click="showDialog(true, CreateTimesheetNote, { timesheetId: currentEditTimesheet })"
+          @click="showDialog(true, CreateTimesheetNote, { timesheetId: currentEditTimesheetId })"
           prepend-icon="mdi-pencil"
           class="ml-6"
         >Request Edits</v-btn>
@@ -109,12 +109,11 @@ const { setLoadingState } = useLoadingScreen()
 const { isTimesheetContentLoading } = storeToRefs(useLoadingScreen())
 const { showDialog } = useDialog()
 
-const { currentEditTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
+const { currentEditTimesheetId, updateTimesheetViewState } = useHandleTimesheetDisplay()
 const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
 const { showSnackbar } = useSnackbar()
 
 const { blueShadow, white } = useColorPalette()
-
 
 const { timesheetData, allRulesPassed } = storeToRefs(useSingleTimesheetDisplay())
 const { handleAddRow } = useSingleTimesheetDisplay()
@@ -175,7 +174,7 @@ const handleSubmitTimesheet = async (status: Status) => {
 // DOES THIS NEED TO BE USED
 const handleUpdateTimesheet = async (status: Status) => {
   try {
-    await axios.put(`/api/timesheets/${currentEditTimesheet}`, buildTimesheetData(status))
+    await axios.put(`/api/timesheets/${currentEditTimesheetId}`, buildTimesheetData(status))
 
     showSnackbar(`Timesheet ${status === 'submitted' ? 're-submitted' : 'updated'}!`)
     updateTimesheetViewState('allTimesheets')
@@ -206,12 +205,12 @@ const getViewTimesheetData = (timesheetId: number) => {
 }
 
 if (timesheetDisplayStatus.value === 'view' || timesheetDisplayStatus.value === 'edit') {
-  getViewTimesheetData(currentEditTimesheet)
+  getViewTimesheetData(currentEditTimesheetId)
 }
 
 const approveTimesheet = async () => {
   try {
-    const response = await axios.put(`/api/timesheets/${currentEditTimesheet}/status`, { status: 'approved' })
+    const response = await axios.put(`/api/timesheets/${currentEditTimesheetId}/status`, { status: 'approved' })
 
     if (response.status === 200) {
       showSnackbar('Timesheet Approved')

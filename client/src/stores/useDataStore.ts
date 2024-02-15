@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
+import type { Timesheet } from '../types/types'
 import { ref } from 'vue'
 import axios from 'axios'
 
@@ -9,27 +10,27 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
   const router = useRouter()
   
   const timesheetDisplayStatus = ref('')
-  const currentEditTimesheet = ref(-1)
+  const currentEditTimesheetId = ref(-1)
   const timesheetViewState = ref<TimesheetStateTypes>('allTimesheets')
 
   function resetTimesheetDisplay() {
     timesheetDisplayStatus.value = ''
-    currentEditTimesheet.value = -1
+    currentEditTimesheetId.value = -1
   }
 
   function setTimesheetDisplayStatus(status: TimesheetDisplayStatus) {
     timesheetDisplayStatus.value = status
   }
 
-  function setCurrentTimesheet(timesheetId: number) {
-    currentEditTimesheet.value = timesheetId
+  function setCurrentTimesheet(timesheet: Timesheet) {
+    currentEditTimesheetId.value = timesheet.timesheetid
   }
 
-  function openTimesheetFromExternal(timesheetId: number, status: TimesheetDisplayStatus) {
+  function openTimesheetFromExternal(timesheet: Timesheet, status: TimesheetDisplayStatus) {
     router.push({ name: 'timesheets' })
     resetTimesheetDisplay()
     setTimesheetDisplayStatus(status)
-    setCurrentTimesheet(timesheetId)
+    setCurrentTimesheet(timesheet)
     updateTimesheetViewState('singleTimesheet')
   }
 
@@ -39,7 +40,7 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
 
   return {
     timesheetDisplayStatus,
-    currentEditTimesheet,
+    currentEditTimesheetId,
     timesheetViewState,
 
     resetTimesheetDisplay,

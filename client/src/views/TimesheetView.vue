@@ -76,7 +76,7 @@ const timesheetListDisplayActions = ref({
     key: 'comments',
     tooltip: 'View Comments',
     callback: (timesheet: Timesheet) => {
-      showDialog(true, ViewTimesheetNote, { timesheetId: timesheet.timesheetid })
+      showDialog(true, ViewTimesheetNote, { timesheet: timesheet })
     },
     icon: 'mdi-comment-outline',
     color: (timesheet: Timesheet) => (timesheet.timesheetNotesCount > 0 && timesheet.status === 'revised') ? 'warning' : '',
@@ -88,7 +88,7 @@ const timesheetListDisplayActions = ref({
     tooltip: 'Edit',
     callback: (timesheet: Timesheet) => {
       setTimesheetDisplayStatus('edit')
-      setCurrentTimesheet(timesheet.timesheetid)
+      setCurrentTimesheet(timesheet)
       updateTimesheetViewState('singleTimesheet')
     },
     icon: 'mdi-pencil',
@@ -121,7 +121,7 @@ const timesheetListDisplayActions = ref({
 
 const viewTimesheet = (timesheet: Timesheet) => {
   setTimesheetDisplayStatus('view')
-  setCurrentTimesheet(timesheet.timesheetid)
+  setCurrentTimesheet(timesheet)
   updateTimesheetViewState('singleTimesheet')
 }
 
