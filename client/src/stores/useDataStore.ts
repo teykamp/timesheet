@@ -3,7 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ref } from 'vue'
 import axios from 'axios'
 
-import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile, ArrowDirection } from '../types/types'
+import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile } from '../types/types'
 
 export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', () => {
   const router = useRouter()
@@ -126,6 +126,7 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
     computeColumnStyles,
     allRulesPassed,
     validateAllRules,
+  }
 })
 
 export const useGoogleUserData = defineStore('googleUserData',{

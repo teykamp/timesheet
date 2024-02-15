@@ -41,40 +41,9 @@
           color="primary"
         >{{ timesheetDisplayStatus === 'edit' ? 'Update' : 'Save' }}</v-btn>
       </div>
-      <div :style="{
-        'overflow-x': 'auto',
-      }">
-        <v-card 
-          flat
-          :style="{
-            'min-width': '600px',
-        }">
-            <v-card
-              class="d-flex justify-center rounded-0 pl-1 mb-4"
-              elevation="2"
-            >
-              <v-col
-                v-for="(label, index) in colLabels"
-                :key="index"
-                :style="computeColumnStyles(index)"
-                :class="`d-flex ${index === 0 ? '' : 'justify-center'}`"
-              >
-                <div 
-                  v-if="lgAndUp"
-                  class="text-truncate"
-                  >{{ label.lg }}</div>
-                <div
-                  v-else
-                  class="text-truncate"
-                >{{ label.sm || label.lg }}</div>
-                <!-- <div v-else>{{ label.xs || label.sm || label.lg }}</div> -->
-            </v-col>
-          </v-card>
 
-          <!-- wrapper with slot depending on state? -->
-          <TimesheetCellGrid />
-        </v-card>
-      </div>
+      <Timesheet />
+      
       <div class="d-flex justify-space-between mt-8">
         <v-btn
           v-if="timesheetDisplayStatus !== 'view'"
@@ -122,13 +91,11 @@ import axios from 'axios'
 
 import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 import CreateTimesheetNote from './CreateTimesheetNote.vue'
-import TimesheetCellGrid from './TimesheetCellGrid.vue'
+import Timesheet from './Timesheet.vue'
 
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
-
-import { useDisplay } from 'vuetify'
 
 import { useHandleTimesheetDisplay, useSingleTimesheetDisplay } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
@@ -148,34 +115,13 @@ const { showSnackbar } = useSnackbar()
 
 const { blueShadow, white } = useColorPalette()
 
-const { lgAndUp } = useDisplay()
 
 const { timesheetData, allRulesPassed } = storeToRefs(useSingleTimesheetDisplay())
-const { handleAddRow, computeColumnStyles } = useSingleTimesheetDisplay()
+const { handleAddRow } = useSingleTimesheetDisplay()
 
 
 const route = useRoute()
 const currentRouteName = computed(() => route.name)
-
-const colLabelsBase = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday'
-]
-
-const colLabels = colLabelsBase.map(label => ({
-  lg: label,
-  sm: label.slice(0, 3),
-  xs: label.slice(0, 1)
-}))
-
-colLabels.unshift({
-  lg: 'Project Name',
-  sm: 'Project Name',
-  xs: 'PN'
-})
 
 const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length === 0 
                                              || !allRulesPassed 
