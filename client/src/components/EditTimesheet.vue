@@ -60,27 +60,25 @@
           color="success"
           append-icon="mdi-forward"
         >{{ timesheetDisplayStatus === 'edit' ? 'Resubmit' : 'Submit' }}</v-btn>
-        <!--  -->
-        <!--  -->
-        <!--  -->
-        <!-- the next buttons need to check timesheetStatus meaning it needs to be passed in!!! -->
-        <!-- this is because the approve buttons will be there even if already approved and it needs to turn into unapprove -->
-        <!--  -->
-        <!--  -->
-        <!--  -->
         <v-btn
-          v-if="managerIsViewing"
+          v-if="managerIsViewing && computeApprovalButtonStyles"
           @click="showDialog(true, CreateTimesheetNote, { timesheetId: currentEditTimesheetId })"
           prepend-icon="mdi-pencil"
           class="ml-6"
         >Request Edits</v-btn>
+        <!-- this div is here to move the approve button to the end if the request edits button does not appear -->
+        <div v-else></div>
+        <!--  -->
+        <!--  -->
+        <!-- need to import the retract functionality here!!! -->
+        <!-- see adminview comment under approvetimesheet -->
         <v-btn
           v-if="managerIsViewing"
           @click="approveTimesheet()"
           class="mr-6"
-          color="success"
-          prepend-icon="mdi-file-check-outline"
-        >Approve</v-btn>
+          :color="computeApprovalButtonStyles ? 'green' : 'red'"
+          :prepend-icon="computeApprovalButtonStyles ? 'mdi-file-check-outline' : 'mdi-file-cancel-outline'"
+        >{{ computeApprovalButtonStyles ? 'Approve' : 'Retract' }}</v-btn>
       </div>
     </template>
   </IsContentLoadingWrapper>
@@ -109,7 +107,7 @@ const { setLoadingState } = useLoadingScreen()
 const { isTimesheetContentLoading } = storeToRefs(useLoadingScreen())
 const { showDialog } = useDialog()
 
-const { currentEditTimesheetId, updateTimesheetViewState } = useHandleTimesheetDisplay()
+const { currentEditTimesheetId, currentEditTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
 const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
 const { showSnackbar } = useSnackbar()
 
@@ -121,6 +119,8 @@ const { handleAddRow } = useSingleTimesheetDisplay()
 
 const route = useRoute()
 const currentRouteName = computed(() => route.name)
+
+const computeApprovalButtonStyles = computed(() => currentEditTimesheet && currentEditTimesheet.status !== 'approved')
 
 const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length === 0 
                                              || !allRulesPassed 

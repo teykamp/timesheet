@@ -112,7 +112,7 @@ const needResubmit = computed(() => {
 const fetchTimesheetNotes = async () => {
   areTimesheetNotesLoading.value = true
   try {
-    const response = await axios.get(`/api/timesheetNotes/${props.componentProps.timesheetId}`);
+    const response = await axios.get(`/api/timesheetNotes/${props.componentProps.timesheet.timesheetid}`);
     const { data } = response;
     timesheetNotes.value = data;
     areTimesheetNotesLoading.value = false;

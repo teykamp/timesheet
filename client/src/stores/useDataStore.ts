@@ -11,6 +11,7 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
   
   const timesheetDisplayStatus = ref('')
   const currentEditTimesheetId = ref(-1)
+  const currentEditTimesheet = ref<Timesheet | undefined>(undefined)
   const timesheetViewState = ref<TimesheetStateTypes>('allTimesheets')
 
   function resetTimesheetDisplay() {
@@ -24,6 +25,7 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
 
   function setCurrentTimesheet(timesheet: Timesheet) {
     currentEditTimesheetId.value = timesheet.timesheetid
+    currentEditTimesheet.value = timesheet
   }
 
   function openTimesheetFromExternal(timesheet: Timesheet, status: TimesheetDisplayStatus) {
@@ -42,6 +44,7 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
     timesheetDisplayStatus,
     currentEditTimesheetId,
     timesheetViewState,
+    currentEditTimesheet,
 
     resetTimesheetDisplay,
     setTimesheetDisplayStatus, 
@@ -52,17 +55,6 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
 })
 
 export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', () => {
-
-  // what needs to happen:
-  // need to componentize the grid
-  // this means using store for the grid data, meaning all of the actions need to be in the store as well and called from edittimesheet.vue
-  // data needs to be storetorefs to make it reactive
-
-  //  ^^^ should all be done
-
-  // afterards, export data in here that has to do with timesheets and make special store
-  // maybe can use some stuff from above?? but I think they handle different stuff so lets see
-
 
   const computeColumnStyles = (index: number) => {
     return {
@@ -122,10 +114,11 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
 
   return {
     timesheetData,
+    allRulesPassed,
+
     handleDeleteRow,
     handleAddRow,
     computeColumnStyles,
-    allRulesPassed,
     validateAllRules,
   }
 })
