@@ -40,9 +40,6 @@
         <v-text-field
           v-else
           v-model="cell.entry.hoursWorked"
-          @focus="handleTimesheetCellFocus([rowIndex, colIndex])"
-          @blur="handleTimesheetCellBlur()"
-          :focused="currentSelectedCell && currentSelectedCell.every((value, index) => value === [rowIndex, colIndex][index]) ? true : false"
           :rules="[validateAllRules]"
           :readonly="timesheetDisplayStatus === 'view'"
           label="Hours" 
@@ -73,9 +70,8 @@ import type { Project } from '../types/types'
 
 const { timesheetData } = storeToRefs(useSingleTimesheetDisplay())
 const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
-const { handleTimesheetCellFocus, handleTimesheetCellBlur } = useSingleTimesheetDisplay()
 
-const { handleDeleteRow, computeColumnStyles, validateAllRules, currentSelectedCell } = useSingleTimesheetDisplay()
+const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTimesheetDisplay()
 
 
 const projects = ref<Project[]>([])
