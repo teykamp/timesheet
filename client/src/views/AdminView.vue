@@ -49,10 +49,10 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 
-import { useHandleTimesheetDisplay, useGoogleUserData } from '../stores/useDataStore'
+import { useHandleTimesheetDisplay, useGoogleUserData, useHandleManagerTimesheets } from '../stores/useDataStore'
 import { useDialog } from '../stores/useUserInterfaceStore'
 import { useLoadingScreen } from '../stores/useUserInterfaceStore'
-import type { ManagerTimesheet, Timesheet } from '../types/types'
+import type { Timesheet } from '../types/types'
 import { managerHeaderData } from '../functions/headerData'
 
 import ViewTimesheetNote from '../components/ViewTimesheetNote.vue'
@@ -61,16 +61,14 @@ import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
 import IsUserLoggedInWrapper from '../components/IsUserLoggedInWrapper.vue'
 
 const { setTimesheetDisplayStatus, setCurrentTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
-const useTimesheetStateStore = useHandleTimesheetDisplay()
-const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
-const useGetUserDataStore = useGoogleUserData()
-const { isManager } = storeToRefs(useGetUserDataStore)
+const { timesheetViewState } = storeToRefs(useHandleTimesheetDisplay())
+const { updateTimesheetStatus } = useHandleManagerTimesheets()
+const { managerTimesheets } = storeToRefs(useHandleManagerTimesheets())
+const { isManager } = storeToRefs(useGoogleUserData())
 const { isUserLoggedIn, id } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
 const { showDialog } = useDialog()
 const router = useRouter()
-
-const managerTimesheets = ref<ManagerTimesheet[]>([])
 
 const timesheetListDisplayActions = ref({
   viewCommentsOnTimesheet: {
@@ -87,26 +85,7 @@ const timesheetListDisplayActions = ref({
   approveTimesheet: {
     key: 'approve',
     tooltip: (timesheet: Timesheet) => timesheet.status === 'approved' ? 'Retract' : 'Approve',
-    callback: async (timesheet: Timesheet) => { // needs to be imported so can use elsewhere. needed inside createTimesheetNote and EditTimesheet
-      const status = timesheet.status === 'approved' ? 'submitted' : 'approved'
-      try {
-        const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, { status })
-
-        if (response.status === 200) {
-          const responseData = response.data
-          const indexToUpdate = managerTimesheets.value.findIndex(managerTimesheet => managerTimesheet.timesheetid === responseData.timesheetid)
-          if (indexToUpdate !== -1) {
-            responseData.totalHours = managerTimesheets.value[indexToUpdate].totalHours
-            responseData.email = managerTimesheets.value[indexToUpdate].email
-            managerTimesheets.value[indexToUpdate] = responseData
-          }
-        } else {
-          console.error('Unexpected status:', response.status)
-        }
-      } catch (error) {
-        console.error('Error updating timesheet status:', error)
-      }
-  },
+    callback: updateTimesheetStatus,
     icon: (timesheet: Timesheet) => timesheet.status === 'approved' ? 'mdi-file-cancel-outline' : 'mdi-file-check-outline',
     color: (timesheet: Timesheet) => timesheet.status === 'approved' ? 'red' : 'green',
     disabled: () => false

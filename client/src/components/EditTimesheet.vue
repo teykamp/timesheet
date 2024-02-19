@@ -208,6 +208,8 @@ if (timesheetDisplayStatus.value === 'view' || timesheetDisplayStatus.value === 
   getViewTimesheetData(currentEditTimesheetId)
 }
 
+
+// check this compares to the one in the store!!! the one that updates the timesheet for approving/rejecting. can probably consolidate
 const approveTimesheet = async () => {
   try {
     const response = await axios.put(`/api/timesheets/${currentEditTimesheetId}/status`, { status: 'approved' })

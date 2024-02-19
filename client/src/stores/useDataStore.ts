@@ -1,10 +1,42 @@
 import { defineStore } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import type { Timesheet } from '../types/types'
+import type { Timesheet, ManagerTimesheet } from '../types/types'
 import { ref } from 'vue'
 import axios from 'axios'
 
 import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile } from '../types/types'
+
+export const useHandleManagerTimesheets = defineStore('handleManagerTimesheets', () => {
+
+  const managerTimesheets = ref<ManagerTimesheet[]>([])
+
+  // should probably be upated ot accept a status instead of checking internally...
+  const updateTimesheetStatus = async (timesheet: Timesheet) => { // needs to be imported so can use elsewhere. needed inside createTimesheetNote and EditTimesheet
+    const status = timesheet.status === 'approved' ? 'submitted' : 'approved'
+    try {
+      const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, { status })
+
+      if (response.status === 200) {
+        const responseData = response.data
+        const indexToUpdate = managerTimesheets.value.findIndex(managerTimesheet => managerTimesheet.timesheetid === responseData.timesheetid)
+        if (indexToUpdate !== -1) {
+          responseData.totalHours = managerTimesheets.value[indexToUpdate].totalHours
+          responseData.email = managerTimesheets.value[indexToUpdate].email
+          managerTimesheets.value[indexToUpdate] = responseData
+        }
+      } else {
+        console.error('Unexpected status:', response.status)
+      }
+    } catch (error) {
+      console.error('Error updating timesheet status:', error)
+    }
+  }
+
+  return {
+    updateTimesheetStatus,
+    managerTimesheets,
+  }
+})
 
 export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', () => {
   const router = useRouter()
