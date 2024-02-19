@@ -68,13 +68,15 @@
         >Request Edits</v-btn>
         <!-- this div is here to move the approve button to the end if the request edits button does not appear -->
         <div v-else></div>
-        <!--  -->
-        <!--  -->
-        <!-- need to import the retract functionality here!!! -->
-        <!-- see adminview comment under approvetimesheet -->
+        <!-- fix errors! -> move to computed property -->
         <v-btn
           v-if="managerIsViewing"
-          @click="approveTimesheet()"
+          @click="updateTimesheetStatus(currentEditTimesheet, currentEditTimesheet.status === 'approved' ? 'revised' : 'approved',
+            () => { 
+              showSnackbar(`Timesheet ${currentEditTimesheet.status === 'approved' ? 'Retracted' : 'Approved'}`)
+              updateTimesheetViewState('allTimesheets')
+            }
+          )"
           class="mr-6"
           :color="computeApprovalButtonStyles ? 'green' : 'red'"
           :prepend-icon="computeApprovalButtonStyles ? 'mdi-file-check-outline' : 'mdi-file-cancel-outline'"
@@ -95,7 +97,7 @@ import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 
-import { useHandleTimesheetDisplay, useSingleTimesheetDisplay } from '../stores/useDataStore'
+import { useHandleTimesheetDisplay, useSingleTimesheetDisplay, useHandleManagerTimesheets } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { useLoadingScreen, useSnackbar, useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
 
@@ -107,9 +109,11 @@ const { setLoadingState } = useLoadingScreen()
 const { isTimesheetContentLoading } = storeToRefs(useLoadingScreen())
 const { showDialog } = useDialog()
 
+// TODO: Replace all currentedittimesheetid with currentedittimeshet.timesheetid etc..
 const { currentEditTimesheetId, currentEditTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
-const  { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
+const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
 const { showSnackbar } = useSnackbar()
+const { updateTimesheetStatus } = useHandleManagerTimesheets()
 
 const { blueShadow, white } = useColorPalette()
 
@@ -206,22 +210,5 @@ const getViewTimesheetData = (timesheetId: number) => {
 
 if (timesheetDisplayStatus.value === 'view' || timesheetDisplayStatus.value === 'edit') {
   getViewTimesheetData(currentEditTimesheetId)
-}
-
-
-// check this compares to the one in the store!!! the one that updates the timesheet for approving/rejecting. can probably consolidate
-const approveTimesheet = async () => {
-  try {
-    const response = await axios.put(`/api/timesheets/${currentEditTimesheetId}/status`, { status: 'approved' })
-
-    if (response.status === 200) {
-      showSnackbar('Timesheet Approved')
-      updateTimesheetViewState('allTimesheets')
-    } else {
-    console.error('Unexpected status:', response.status)
-    }
-  } catch (error) {
-    console.error('Error updating timesheet status:', error)
-  }
 }
 </script>
