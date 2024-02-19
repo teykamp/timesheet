@@ -11,8 +11,8 @@ export const useHandleManagerTimesheets = defineStore('handleManagerTimesheets',
   const managerTimesheets = ref<ManagerTimesheet[]>([])
 
   // should probably be upated ot accept a status instead of checking internally...
-  const updateTimesheetStatus = async (timesheet: Timesheet) => { // needs to be imported so can use elsewhere. needed inside createTimesheetNote and EditTimesheet
-    const status = timesheet.status === 'approved' ? 'submitted' : 'approved'
+  // all I have done is tried to pass in the status... need to figure out way to handle this first line
+  const updateTimesheetStatus = async (timesheet: Timesheet, status: Timesheet['status']) => { // needs to be imported so can use elsewhere. needed inside createTimesheetNote and EditTimesheet
     try {
       const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, { status })
 

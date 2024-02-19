@@ -79,7 +79,7 @@ const timesheetListDisplayActions = ref({
     },
     icon: 'mdi-comment-outline',
     color: '',
-    disabled: (timesheet: Timesheet) => timesheet.timesheetNotesCount === 0
+    disabled: (timesheet: Timesheet) => !timesheet.timesheetNotesCount // < 1 and !undefined <- needs fix
   },
 
   approveTimesheet: {

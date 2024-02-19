@@ -54,6 +54,7 @@ const props = defineProps<{
   componentProps: { timesheetId: number }
 }>()
 
+// in here somewhere need to update the status. import from store
 const handleSubmitClick = async () => {
   try {
     const response = await axios.post('/api/timesheetNotes', data.value);

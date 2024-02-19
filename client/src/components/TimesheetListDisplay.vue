@@ -67,7 +67,7 @@
                 >
                   <template v-slot:activator="{ props }">
                     <v-btn
-                      @click="button.callback(item)"
+                      @click="button.callback(item, item.status === 'approved' ? 'submitted' : 'approved')"
                       v-bind="props"
                       :color="typeof button.color === 'string' ? button.color : button.color(item)"
                       :disabled="button.disabled(item)"
@@ -76,6 +76,7 @@
                       variant="tonal"
                       class="mr-1"
                     ></v-btn>
+                    <!-- {{ item.timesheetNotesCount + 'hi' }} -->
                   </template>
                 </v-tooltip>
               </div>
@@ -111,7 +112,7 @@ const props = defineProps<{
     [key: string]: {
       key: string,
       tooltip: string | ((timesheet: Timesheet) => string),
-      callback: (timesheet: Timesheet) => void,
+      callback: (timesheet: Timesheet, status? : Timesheet['status']) => void,
       icon: string | ((timesheet: Timesheet) => string),
       color: string | ((timesheet: Timesheet) => string),
       disabled: (timesheet: Timesheet) => boolean
