@@ -68,12 +68,11 @@
         >Request Edits</v-btn>
         <!-- this div is here to move the approve button to the end if the request edits button does not appear -->
         <div v-else></div>
-        <!-- fix errors! -> move to computed property -->
         <v-btn
           v-if="managerIsViewing"
-          @click="updateTimesheetStatus(currentEditTimesheet, currentEditTimesheet.status === 'approved' ? 'revised' : 'approved',
+          @click="updateTimesheetStatus(currentEditTimesheet, computeUpdateTimesheetStatusName,
             () => { 
-              showSnackbar(`Timesheet ${currentEditTimesheet.status === 'approved' ? 'Retracted' : 'Approved'}`)
+              showSnackbar(`Timesheet ${computeUpdateTimesheetStatusSnackbarText}`)
               updateTimesheetViewState('allTimesheets')
             }
           )"
@@ -133,6 +132,17 @@ const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length === 0
                                             )
 
 const managerIsViewing = computed(() => currentRouteName.value === 'admin' && timesheetDisplayStatus.value === 'view')
+
+const computeUpdateTimesheetStatusName = computed(() => {
+  if (!currentEditTimesheet) return 'approved'
+  return currentEditTimesheet.status === 'approved' ? 'revised' : 'approved'
+})
+
+// should probably make a global type for these words as well
+const computeUpdateTimesheetStatusSnackbarText = computed(() => {
+  if (!currentEditTimesheet) return 'Approved'
+  return currentEditTimesheet.status === 'approved' ? 'Retracted' : 'Approved'
+})
 
 type Status = 'submitted' | 'working'
 

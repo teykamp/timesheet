@@ -10,9 +10,7 @@ export const useHandleManagerTimesheets = defineStore('handleManagerTimesheets',
 
   const managerTimesheets = ref<ManagerTimesheet[]>([])
 
-  // should probably be upated ot accept a status instead of checking internally...
-  // all I have done is tried to pass in the status... need to figure out way to handle this first line
-  const updateTimesheetStatus = async (timesheet: Timesheet | undefined, status: Timesheet['status'], updateUICallback?: () => void) => { // needs to be imported so can use elsewhere. needed inside createTimesheetNote and EditTimesheet
+  const updateTimesheetStatus = async (timesheet: Timesheet | undefined, status: Timesheet['status'], updateUICallback?: () => void) => { // needed inside createTimesheetNote
     if (timesheet === undefined) return
     try {
       const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, { status })
