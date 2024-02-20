@@ -184,18 +184,18 @@ const handleSubmitTimesheet = async (status: Status) => {
   }
 }
 
-// DOES THIS NEED TO BE USED
-const handleUpdateTimesheet = async (status: Status) => {
-  try {
-    await axios.put(`/api/timesheets/${currentEditTimesheet?.timesheetid}`, buildTimesheetData(status))
+// DOES THIS NEED TO BE USED??
+// const handleUpdateTimesheet = async (status: Status) => {
+//   try {
+//     await axios.put(`/api/timesheets/${currentEditTimesheet?.timesheetid}`, buildTimesheetData(status))
 
-    showSnackbar(`Timesheet ${status === 'submitted' ? 're-submitted' : 'updated'}!`)
-    updateTimesheetViewState('allTimesheets')
+//     showSnackbar(`Timesheet ${status === 'submitted' ? 're-submitted' : 'updated'}!`)
+//     updateTimesheetViewState('allTimesheets')
 
-  } catch (error) {
-    console.error('Error updating timesheet:', error)
-  }
-}
+//   } catch (error) {
+//     console.error('Error updating timesheet:', error)
+//   }
+// }
 
 const dateRange = ref(getMonthRange())
 const weekEndingIn = ref(getMondayAndFriday(new Date()).friday)
@@ -204,12 +204,7 @@ const isCurrentWeek = (date: DatePair) => formatDateToDDMMYY(weekEndingIn.value)
 const isCurrentWeekIcon = (date: DatePair) => formatDateToDDMMYY(date.friday) === formatDateToDDMMYY(getMondayAndFriday(new Date).friday) ? 'mdi-calendar-today' : ''
 
 // need to find better way to handle this whole system... undefined shouldnt trickle into functions
-const getViewTimesheetData = (timesheetId: number | undefined) => {
-  if (!timesheetId) {
-    showSnackbar('Oops! Something went wrong...', 'red')
-    console.error('timesheetId is undefined!')
-    return
-  }
+const getViewTimesheetData = (timesheetId: number) => {
   setLoadingState('isTimesheetContentLoading', true)
   axios.get(`/api/timesheetEntries/FormattedBy/${timesheetId}`)
     .then(response => {
@@ -223,6 +218,10 @@ const getViewTimesheetData = (timesheetId: number | undefined) => {
 }
 
 if (timesheetDisplayStatus.value === 'view' || timesheetDisplayStatus.value === 'edit') {
-  getViewTimesheetData(currentEditTimesheet?.timesheetid)
+  if (!currentEditTimesheet) {
+    showSnackbar('Oops! Something went wrong...', 'red')
+    console.error('timesheetId is undefined!')
+  } 
+  else getViewTimesheetData(currentEditTimesheet.timesheetid)
 }
 </script>
