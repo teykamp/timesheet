@@ -6,25 +6,31 @@ import axios from 'axios'
 
 import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile } from '../types/types'
 
+// this needs a rename
 export const useHandleManagerTimesheets = defineStore('handleManagerTimesheets', () => {
+
+  const route = useRoute()
 
   const managerTimesheets = ref<ManagerTimesheet[]>([])
 
-  const updateTimesheetStatus = async (timesheet: Timesheet | undefined, status: Timesheet['status'], updateUICallback?: () => void) => { // needed inside createTimesheetNote
-    if (timesheet === undefined) return
+  const updateTimesheetStatus = async (timesheetOrId: Timesheet | number | undefined, status: Timesheet['status'], updateUICallback?: () => void) => {
+    if (timesheetOrId === undefined) return
+    const timesheetId = typeof(timesheetOrId) === 'number' ? timesheetOrId : timesheetOrId.timesheetid
     try {
-      const response = await axios.put(`/api/timesheets/${timesheet.timesheetid}/status`, { status })
+      const response = await axios.put(`/api/timesheets/${timesheetId}/status`, { status })
 
-      if (response.status === 200) {
-        const responseData = response.data
-        const indexToUpdate = managerTimesheets.value.findIndex(managerTimesheet => managerTimesheet.timesheetid === responseData.timesheetid)
-        if (indexToUpdate !== -1) {
-          responseData.totalHours = managerTimesheets.value[indexToUpdate].totalHours
-          responseData.email = managerTimesheets.value[indexToUpdate].email
-          managerTimesheets.value[indexToUpdate] = responseData
+      if (route.name === 'admin') { // this is currently only for createtimesheetnote... need better way to determine this since doesnt actually check anything for current usecase
+        if (response.status === 200) { // return responsData sometime maybe?
+          const responseData = response.data
+          const indexToUpdate = managerTimesheets.value.findIndex(managerTimesheet => managerTimesheet.timesheetid === responseData.timesheetid)
+          if (indexToUpdate !== -1) {
+            responseData.totalHours = managerTimesheets.value[indexToUpdate].totalHours
+            responseData.email = managerTimesheets.value[indexToUpdate].email
+            managerTimesheets.value[indexToUpdate] = responseData
+          }
+        } else {
+          console.error('Unexpected status:', response.status)
         }
-      } else {
-        console.error('Unexpected status:', response.status)
       }
       if (updateUICallback) updateUICallback()
     } catch (error) {

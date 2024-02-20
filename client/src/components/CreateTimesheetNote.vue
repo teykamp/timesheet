@@ -46,25 +46,15 @@
 import axios from 'axios'
 import { ref, computed } from 'vue'
 import { useDialog } from '../stores/useUserInterfaceStore'
+import { useHandleManagerTimesheets } from '../stores/useDataStore'
 import type { TimesheetNote } from '../types/types'
 
 const { closeDialog } = useDialog()
+const { updateTimesheetStatus } = useHandleManagerTimesheets()
 
 const props = defineProps<{
   componentProps: { timesheetId: number }
 }>()
-
-// in here somewhere need to update the status. import from store
-const handleSubmitClick = async () => {
-  try {
-    const response = await axios.post('/api/timesheetNotes', data.value);
-    console.log('Notification created:', response.data);
-  } catch (error) {
-    console.error('Error creating timesheetNote:', error);
-  }
-
-  closeDialog()
-}
 
 const data = ref<TimesheetNote>({
   timesheetid: props.componentProps.timesheetId,
@@ -74,6 +64,18 @@ const data = ref<TimesheetNote>({
   commentbody: '',
   requireresubmit: false,
 })
+
+const handleSubmitClick = async () => {
+  try {
+    const response = await axios.post('/api/timesheetNotes', data.value)
+    if (data.value.requireresubmit) updateTimesheetStatus(props.componentProps.timesheetId, 'revised')
+
+  } catch (error) {
+    console.error('Error creating timesheetNote:', error)
+  }
+
+  closeDialog()
+}
 
 const computeCanSubmit = computed(() => {
   return !(data.value.incorrecthours || data.value.incorrectproject || data.value.incorrecttime || data.value.commentbody !== '')
