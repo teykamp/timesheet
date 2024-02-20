@@ -42,13 +42,12 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
   const router = useRouter()
   
   const timesheetDisplayStatus = ref('')
-  const currentEditTimesheetId = ref(-1)
   const currentEditTimesheet = ref<Timesheet | undefined>(undefined)
   const timesheetViewState = ref<TimesheetStateTypes>('allTimesheets')
 
   function resetTimesheetDisplay() {
     timesheetDisplayStatus.value = ''
-    currentEditTimesheetId.value = -1
+    currentEditTimesheet.value = undefined
   }
 
   function setTimesheetDisplayStatus(status: TimesheetDisplayStatus) {
@@ -56,7 +55,6 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
   }
 
   function setCurrentTimesheet(timesheet: Timesheet) {
-    currentEditTimesheetId.value = timesheet.timesheetid
     currentEditTimesheet.value = timesheet
   }
 
@@ -74,7 +72,6 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
 
   return {
     timesheetDisplayStatus,
-    currentEditTimesheetId,
     timesheetViewState,
     currentEditTimesheet,
 
