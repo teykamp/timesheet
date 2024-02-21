@@ -65,10 +65,13 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
     currentEditTimesheet.value = timesheet
   }
 
-  function openTimesheetFromExternal(timesheet: Timesheet, status: TimesheetDisplayStatus) {
-    router.push({ name: 'timesheets' })
-    resetTimesheetDisplay()
-    setTimesheetDisplayStatus(status)
+  function openTimesheetFromExternal(timesheet: Timesheet, status: TimesheetDisplayStatus, accessLevel: 'manager' | 'employee' = 'employee') {
+    if (accessLevel === 'employee') {
+      router.push({ name: 'timesheets' })
+      resetTimesheetDisplay()
+      setTimesheetDisplayStatus(status)
+    } else setTimesheetDisplayStatus('view')
+
     setCurrentTimesheet(timesheet)
     updateTimesheetViewState('singleTimesheet')
   }

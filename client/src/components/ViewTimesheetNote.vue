@@ -70,7 +70,7 @@
         class="mx-3"
       >New Comment</v-btn>
       <v-btn
-        @click="openTimesheetFromExternal(props.componentProps.timesheet, needResubmit ? 'edit' : 'view'), closeDialog()"
+        @click="openTimesheetFromExternal(props.componentProps.timesheet, computeEmployeeResubmitStatus ? 'edit' : 'view', computeViewerStatus), closeDialog()"
         class="mx-3"
         prepend-icon="mdi-arrow-right"
       >Go To Timesheet</v-btn>
@@ -109,8 +109,15 @@ const props = defineProps<{
 const timesheetNotes = ref<(TimesheetNote & { noteid: number })[]>([])
 const areTimesheetNotesLoading = ref(false)
 
-const needResubmit = computed(() => {
-  return timesheetNotes.value.some(note => note.requireresubmit)
+const computeEmployeeResubmitStatus = computed(() => timesheetNotes.value.some(note => note.requireresubmit) && currentRouteName.value !== 'admin')
+
+const computeViewerStatus = computed(() => {
+  switch (currentRouteName.value) {
+    case 'admin':
+      return 'manager'
+    case 'timesheets': return 'employee'
+    default: return undefined
+  }
 })
 
 const computeNoteTitle = (timesheetNote: TimesheetNote) => {
