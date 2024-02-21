@@ -55,6 +55,7 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
   function resetTimesheetDisplay() {
     timesheetDisplayStatus.value = ''
     currentEditTimesheet.value = undefined
+    updateTimesheetViewState('allTimesheets')
   }
 
   function setTimesheetDisplayStatus(status: TimesheetDisplayStatus) {
