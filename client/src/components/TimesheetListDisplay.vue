@@ -76,7 +76,6 @@
                       variant="tonal"
                       class="mr-1"
                     ></v-btn>
-                    <!-- {{ item.timesheetNotesCount + 'hi' }} -->
                   </template>
                 </v-tooltip>
               </div>

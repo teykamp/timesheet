@@ -137,7 +137,6 @@ const computeUpdateTimesheetStatusName = computed(() => {
   return currentEditTimesheet.status === 'approved' ? 'revised' : 'approved'
 })
 
-// should probably make a global type for these words as well
 const computeUpdateTimesheetStatusSnackbarText = computed(() => {
   if (!currentEditTimesheet) return 'Approved'
   return currentEditTimesheet.status === 'approved' ? 'Retracted' : 'Approved'
@@ -203,7 +202,6 @@ const weekEndingIn = ref(getMondayAndFriday(new Date()).friday)
 const isCurrentWeek = (date: DatePair) => formatDateToDDMMYY(weekEndingIn.value) === formatDateToDDMMYY(date.friday)
 const isCurrentWeekIcon = (date: DatePair) => formatDateToDDMMYY(date.friday) === formatDateToDDMMYY(getMondayAndFriday(new Date).friday) ? 'mdi-calendar-today' : ''
 
-// need to find better way to handle this whole system... undefined shouldnt trickle into functions
 const getViewTimesheetData = (timesheetId: number) => {
   setLoadingState('isTimesheetContentLoading', true)
   axios.get(`/api/timesheetEntries/FormattedBy/${timesheetId}`)

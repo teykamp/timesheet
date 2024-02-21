@@ -33,6 +33,7 @@ export const useHandleManagerTimesheets = defineStore('handleManagerTimesheets',
         }
       }
       if (updateUICallback) updateUICallback()
+      return response
     } catch (error) {
       console.error('Error updating timesheet status:', error)
     }

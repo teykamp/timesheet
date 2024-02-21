@@ -8,11 +8,12 @@
         >
           <v-expansion-panel-title>
             <v-icon icon="mdi-comment-outline"></v-icon>
+              <p class="ml-3">{{ computeNoteTitle(note) }}</p>
             <template v-slot:actions="{ expanded }">
               <v-icon 
                 v-if="note.requireresubmit"
                 color="warning" 
-                icon="mdi-alert"
+                icon="mdi-alert-circle"
               ></v-icon>
               <v-icon :icon="expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
             </template>
@@ -34,20 +35,23 @@
                   {{ note.commentbody || "No Comments Provided" }}
                 </v-card-text>
                 <v-chip v-if="note.incorrecthours" 
+                  prepend-icon="mdi-alert-circle-outline"
                   size="small" 
-                  color="primary" 
+                  color="error" 
                   variant="tonal" 
                   label
                 >Hours</v-chip>
-                <v-chip v-if="note.incorrectproject" 
+                <v-chip v-if="note.incorrectproject"
+                  prepend-icon="mdi-alert-circle-outline" 
                   size="small" 
-                  color="primary" 
+                  color="error" 
                   variant="tonal" 
                   label
                 >Project</v-chip>
                 <v-chip v-if="note.incorrecttime" 
+                  prepend-icon="mdi-alert-circle-outline"
                   size="small" 
-                  color="primary" 
+                  color="error" 
                   variant="tonal" 
                   label
                 >Time</v-chip>
@@ -108,6 +112,12 @@ const areTimesheetNotesLoading = ref(false)
 const needResubmit = computed(() => {
   return timesheetNotes.value.some(note => note.requireresubmit)
 })
+
+const computeNoteTitle = (timesheetNote: TimesheetNote) => {
+  const { incorrecthours, incorrectproject, incorrecttime, requireresubmit } = timesheetNote
+  const appendUrgent = requireresubmit ? ' (Urgent)' : ''
+  return incorrecthours || incorrectproject || incorrecttime ? 'Timesheet Update Request' + appendUrgent : 'Timesheet Comment' + appendUrgent
+}
 
 const fetchTimesheetNotes = async () => {
   areTimesheetNotesLoading.value = true
