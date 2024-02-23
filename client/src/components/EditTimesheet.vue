@@ -36,7 +36,7 @@
         <v-btn
           v-if="timesheetDisplayStatus !== 'view'"
           @click="handleSubmitTimesheet('working')"
-          :disabled="canSaveOrSubmitTimesheet"
+          :disabled="!canSaveOrSubmitTimesheet"
           class="ma-4"
           color="primary"
         >{{ timesheetDisplayStatus === 'edit' ? 'Update' : 'Save' }}</v-btn>
@@ -55,7 +55,7 @@
         <v-btn
           v-if="timesheetDisplayStatus !== 'view'"
           @click="handleSubmitTimesheet('submitted')"
-          :disabled="canSaveOrSubmitTimesheet"
+          :disabled="!canSaveOrSubmitTimesheet"
           class="mr-10"
           color="success"
           append-icon="mdi-forward"
@@ -122,11 +122,11 @@ const currentRouteName = computed(() => route.name)
 
 const computeApprovalButtonStyles = computed(() => currentEditTimesheet && currentEditTimesheet.status !== 'approved')
 
-const canSaveOrSubmitTimesheet = computed(() => !(timesheetData.value.length > 0 
-                                             && allRulesPassed.value 
-                                             && timesheetData.value.every(row => row[0].projectid !== null)
-                                             && timesheetDisplayStatus.value !== 'view')
-                                            )
+const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length > 0
+                                            && allRulesPassed.value
+                                            && timesheetData.value.every(row => row[0].projectid !== null)
+                                            && timesheetDisplayStatus.value !== 'view'
+                                          )
 
 const managerIsViewing = computed(() => currentRouteName.value === 'admin' && timesheetDisplayStatus.value === 'view')
 
