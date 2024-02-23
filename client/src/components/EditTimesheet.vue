@@ -66,8 +66,6 @@
           prepend-icon="mdi-pencil"
           class="ml-6"
         >Request Edits</v-btn>
-        <!-- this div is here to move the approve button to the end if the request edits button does not appear -->
-        <div v-else></div>
         <v-btn
           v-if="managerIsViewing"
           @click="updateTimesheetStatus(currentEditTimesheet, computeUpdateTimesheetStatusName,

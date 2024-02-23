@@ -34,19 +34,34 @@
           </template>
         </v-autocomplete>
         <!-- error handled thorugh v-if -->
-        <!-- 
-          this needs to not do the focus on click; also needs to allow for editing when arrowkeys move focus
-         -->
         <v-text-field
           v-else
           v-model="cell.entry.hoursWorked"
           :rules="[validateAllRules]"
           :readonly="timesheetDisplayStatus === 'view'"
-          label="Hours" 
+          label="Hours"
           variant="outlined" 
           density="compact" 
         />
+        <div 
+          v-if="rowIndex === timesheetData.length - 1" 
+        >
+          <p v-if="colIndex === 0"
+          >Total</p>
+          <p 
+            class="text-center"
+           style="text-overflow: ellipsis; text-wrap: nowrap; overflow: hidden;"
+          >
+            {{ computeColumnTotals[colIndex-1] }}
+          </p>
+        </div>
       </v-col>
+      <p
+        v-if="true"
+        class="mt-5 text-center"
+        style="text-overflow: ellipsis; width: 25px; text-wrap: nowrap; overflow: hidden;"
+      >{{ computeRowTotals[rowIndex] }}</p>
+      
       <v-btn 
         v-if="timesheetDisplayStatus !== 'view'"
         @click="handleDeleteRow(rowIndex)"
@@ -78,6 +93,33 @@ const projects = ref<Project[]>([])
 
 const selectedProjects = computed(() => {
   return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
+})
+
+const computeRowTotals = computed(() => {
+  const rowTotals: number[] = []
+  timesheetData.value.forEach(row => {
+    let totalHours = 0
+    row.forEach(cell => {
+      if (cell.entry && typeof Number(cell.entry.hoursWorked) === 'number')
+        totalHours += Number(cell.entry.hoursWorked)
+    })
+    rowTotals.push(totalHours)
+  })
+  return rowTotals
+})
+
+const computeColumnTotals = computed(() => {
+  const colTotals: number[] = []
+
+  timesheetData.value.forEach(row => {
+    row.forEach((cell, index) => {
+      if (index > 0 && cell.entry && typeof Number(cell.entry.hoursWorked) === 'number') {
+        if (!colTotals[index - 1]) colTotals[index - 1] = 0
+        colTotals[index - 1] += Number(cell.entry.hoursWorked)
+      }
+    })
+  })
+  return colTotals
 })
 
 const getProjects = () => {

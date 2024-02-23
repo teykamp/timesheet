@@ -5,7 +5,7 @@
     <v-card 
       flat
       :style="{
-        'min-width': '600px',
+        'min-width': '700px',
       }">
         <v-card
           class="d-flex justify-center rounded-0 pl-1 mb-4"
