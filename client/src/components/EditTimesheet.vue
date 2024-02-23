@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
+import axios, { all } from 'axios'
 
 import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 import CreateTimesheetNote from './CreateTimesheetNote.vue'
@@ -122,10 +122,10 @@ const currentRouteName = computed(() => route.name)
 
 const computeApprovalButtonStyles = computed(() => currentEditTimesheet && currentEditTimesheet.status !== 'approved')
 
-const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length === 0 
-                                             || !allRulesPassed 
-                                             || !timesheetData.value.every(row => row[0].projectid !== null)
-                                             || timesheetDisplayStatus.value === 'view'
+const canSaveOrSubmitTimesheet = computed(() => !(timesheetData.value.length > 0 
+                                             && allRulesPassed.value 
+                                             && timesheetData.value.every(row => row[0].projectid !== null)
+                                             && timesheetDisplayStatus.value !== 'view')
                                             )
 
 const managerIsViewing = computed(() => currentRouteName.value === 'admin' && timesheetDisplayStatus.value === 'view')
