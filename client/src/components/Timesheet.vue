@@ -9,6 +9,7 @@
       }">
         <v-card
           class="d-flex justify-center rounded-0 pl-1 mb-4"
+          style="padding-right: 100px;"
           elevation="2"
         >
           <v-col
@@ -19,11 +20,11 @@
           >
             <div 
               v-if="lgAndUp"
-              class="text-truncate"
+              class="text-truncate text-center"
               >{{ label.lg }}</div>
             <div
               v-else
-              class="text-truncate"
+              class="text-truncate text-center"
             >{{ label.sm || label.lg }}</div>
             <!-- <div v-else>{{ label.xs || label.sm || label.lg }}</div> -->
         </v-col>
