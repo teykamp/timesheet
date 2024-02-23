@@ -50,7 +50,9 @@
           >Total</p>
           <p 
             class="text-center"
-           style="text-overflow: ellipsis; text-wrap: nowrap; overflow: hidden;"
+            :style="{
+              ...totalsStyles,
+              }"
           >
             {{ computeColumnTotals[colIndex-1] }}
           </p>
@@ -59,7 +61,10 @@
       <p
         v-if="true"
         class="mt-5 text-center"
-        style="text-overflow: ellipsis; width: 25px; text-wrap: nowrap; overflow: hidden;"
+        :style="{
+          ...totalsStyles,
+          width: '25px',
+        }"
       >{{ computeRowTotals[rowIndex] }}</p>
       
       <v-btn 
@@ -94,6 +99,12 @@ const projects = ref<Project[]>([])
 const selectedProjects = computed(() => {
   return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
 })
+
+const totalsStyles = {
+  'text-wrap': 'nowrap',
+  'text-overflow': 'ellipsis',
+  'overflow': 'hidden',
+}
 
 const computeRowTotals = computed(() => {
   const rowTotals: number[] = []
