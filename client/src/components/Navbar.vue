@@ -235,13 +235,12 @@ import { useRouter, useRoute } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 import { useDisplay } from 'vuetify'
-import { useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
+import { useColorPalette } from '../stores/useUserInterfaceStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 
 const { smAndDown, mdAndUp, smAndUp, xs } = useDisplay()
 const { gray, blue, white, textPrimary, textSelected } = useColorPalette()
 const { getGoogleUserData, redirectToGoogleAuth, logUserOut, logUserIn } = useGoogleUserData()
-const { showDialog } = useDialog()
 
 const checkIfKeepLoggedIn = () => {
   try {
