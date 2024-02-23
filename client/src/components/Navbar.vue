@@ -84,7 +84,6 @@
              
               <v-list-item 
                 v-if="xs"
-                @click="showDialog(true, TestComponent, {}, {})"
                 class="my-2"
                 prepend-icon="mdi-cog"
                 :style="{
@@ -194,7 +193,6 @@
               >
                 <template v-slot:append>
                     <v-btn
-                      @click="showDialog(true, TestComponent, {}, {})"
                       flat
                       icon="mdi-cog"
                     ></v-btn>
