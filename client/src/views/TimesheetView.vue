@@ -42,7 +42,7 @@ import axios from 'axios'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
-import { useHandleTimesheetDisplay } from '../stores/useDataStore'
+import { useHandleTimesheetDisplay, useSingleTimesheetDisplay } from '../stores/useDataStore'
 import { useLoadingScreen, useDialog } from '../stores/useUserInterfaceStore'
 import type { Timesheet } from '../types/types'
 import { useGoogleUserData } from '../stores/useDataStore'
@@ -62,9 +62,11 @@ const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
 const { id, isUserLoggedIn } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
 const { showDialog } = useDialog()
+const { resetTimesheetData } = useSingleTimesheetDisplay()
 
 const handleAddNewTimesheet = () => {
   resetTimesheetDisplay()
+  resetTimesheetData()
   setTimesheetDisplayStatus('new')
   updateTimesheetViewState('singleTimesheet')
 }

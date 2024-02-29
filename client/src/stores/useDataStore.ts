@@ -13,8 +13,8 @@ export const useHandleManagerTimesheets = defineStore('handleManagerTimesheets',
 
   const managerTimesheets = ref<ManagerTimesheet[]>([])
 
-  const updateTimesheetStatus = async (timesheetOrId: Timesheet | number | undefined, status: Timesheet['status'], updateUICallback?: () => void) => {
-    if (timesheetOrId === undefined) return
+  const updateTimesheetStatus = async (timesheetOrId: Timesheet | number | null, status: Timesheet['status'], updateUICallback?: () => void) => {
+    if (!timesheetOrId) return
     const timesheetId = typeof(timesheetOrId) === 'number' ? timesheetOrId : timesheetOrId.timesheetid
     try {
       const response = await axios.put(`/api/timesheets/${timesheetId}/status`, { status })
@@ -49,12 +49,12 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
   const router = useRouter()
   
   const timesheetDisplayStatus = ref('')
-  const currentEditTimesheet = ref<Timesheet | undefined>(undefined)
+  const currentEditTimesheet = ref<Timesheet | null>(null)
   const timesheetViewState = ref<TimesheetStateTypes>('allTimesheets')
 
   function resetTimesheetDisplay() {
     timesheetDisplayStatus.value = ''
-    currentEditTimesheet.value = undefined
+    currentEditTimesheet.value = null
     updateTimesheetViewState('allTimesheets')
   }
 
@@ -107,17 +107,20 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
   const rows = 3
   const cols = 6
 
-  const timesheetData = ref(
-    Array.from({ length: rows }, () => {
-      const row = []
-      row.push({ projectid: null })
-      for (let i = 0; i < cols - 1; i++) {
-        row.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
-      }
-      return row
-    })
-  )
+  const generateTimeTable = () => Array.from({ length: rows }, () => {
+                                    const row = []
+                                    row.push({ projectid: null })
+                                    for (let i = 0; i < cols - 1; i++) {
+                                      row.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
+                                    }
+                                    return row
+                                  })
 
+                                  
+  const timesheetData = ref(generateTimeTable())
+
+  const resetTimesheetData = () => timesheetData.value = generateTimeTable()
+                                  
   const handleDeleteRow = (rowIndex: number) => {
     timesheetData.value.splice(rowIndex, 1);
   }
@@ -160,6 +163,7 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
     handleAddRow,
     computeColumnStyles,
     validateAllRules,
+    resetTimesheetData,
   }
 })
 

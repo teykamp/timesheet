@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import axios, { all } from 'axios'
+import axios from 'axios'
 
 import IsContentLoadingWrapper from './IsContentLoadingWrapper.vue'
 import CreateTimesheetNote from './CreateTimesheetNote.vue'
