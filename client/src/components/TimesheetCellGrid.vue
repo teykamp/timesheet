@@ -27,17 +27,29 @@
           :readonly="timesheetDisplayStatus === 'view'"
         >
           <template #item="{ props, item: { raw: projectOrAlias }}">
-            <!-- update check for diabled to prevent curent selected item from being disabled -->
-            <v-list-item
+            <div 
               v-if="hasProperty(projectOrAlias, 'isAlias')"
+              style="position: relative;"
+            >
+              <v-list-item
+                v-bind="props"
+                :disabled="selectedProjects.includes(projectOrAlias.projectid)"
+              >
+              </v-list-item>
+               <v-btn
+                @click.stop="console.log('deleted' + projectOrAlias.projectid)"
+                style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
+                variant="tonal"
+                size="x-small"
+                color="red"
+                icon="mdi-delete"
+              ></v-btn>
+            </div>
+            <v-list-item
+              v-else-if="(typeof projectOrAlias === 'object' && 'projectid' in projectOrAlias)"
               v-bind="props"
               :disabled="selectedProjects.includes(projectOrAlias.projectid)"
             ></v-list-item>
-            <v-list-item
-              v-else-if="(typeof projectOrAlias === 'object')"
-              v-bind="props"
-              :disabled="selectedProjects.includes(projectOrAlias.projectid)"
-            > {{ projectOrAlias }}</v-list-item>
             <v-list-item
               v-else
               @click="console.log('worked')"
