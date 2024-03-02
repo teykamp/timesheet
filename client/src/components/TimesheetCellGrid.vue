@@ -18,20 +18,26 @@
         <v-autocomplete
           v-if="colIndex === 0"
           v-model="cell.projectid"
-          :items="['Add New Alias', ...projects, /*...projectAliases */]"
+          :items="['Add New Alias', ...projectAliases, ...projects]"
           label="Project Name"
-          :item-title="'projectname' || 'alias'"
-          :item-value="'projectid' || 'projectId'"
           density="compact"
           variant="outlined"
+          item-title="projectname"
+          item-value="projectid"
           :readonly="timesheetDisplayStatus === 'view'"
         >
-          <template #item="{ props, item }">
+          <template #item="{ props, item: { raw: projectOrAlias }}">
+            <!-- update check for diabled to prevent curent selected item from being disabled -->
             <v-list-item
-              v-if="isProjectOrAlias(item, 'number')"
+              v-if="hasProperty(projectOrAlias, 'isAlias')"
               v-bind="props"
-              :disabled="selectedProjects.includes(item.value)"
+              :disabled="selectedProjects.includes(projectOrAlias.projectid)"
             ></v-list-item>
+            <v-list-item
+              v-else-if="(typeof projectOrAlias === 'object')"
+              v-bind="props"
+              :disabled="selectedProjects.includes(projectOrAlias.projectid)"
+            > {{ projectOrAlias }}</v-list-item>
             <v-list-item
               v-else
               @click="console.log('worked')"
@@ -104,21 +110,21 @@ const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTime
 
 const projects = ref<Project[]>([])
 
-const isProjectOrAlias = (item: {title: number | string, value: number | string}, propertyType: string) => {
-  return typeof item.value === propertyType
+const hasProperty = (value: any, propertyName: string): boolean => {
+  return value && typeof value === 'object' && propertyName in value
 }
 
-
 type ProjectAlias = {
-  alias: string,
-  projectId: number
+  projectname: string,
+  projectid: number,
+  isAlias: true,
 }
 
 const projectAliases = ref<ProjectAlias[]>([
-  { alias: "alias1", projectId: 1 },
-  { alias: "alias7", projectId: 2 },
-  { alias: "alias8", projectId: 2 },
-  { alias: "alias9", projectId: 3 }
+  { projectname: "alias1", projectid: 1, isAlias: true },
+  { projectname: "alias7", projectid: 2, isAlias: true },
+  { projectname: "alias8", projectid: 2, isAlias: true },
+  { projectname: "alias9", projectid: 3, isAlias: true }
 ])
 
 const selectedProjects = computed(() => {
