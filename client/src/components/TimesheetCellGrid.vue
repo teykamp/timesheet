@@ -18,19 +18,27 @@
         <v-autocomplete
           v-if="colIndex === 0"
           v-model="cell.projectid"
-          :items="projects"
+          :items="['Add New Alias', ...projects, /*...projectAliases */]"
           label="Project Name"
-          item-title="projectname"
-          item-value="projectid"
+          :item-title="'projectname' || 'alias'"
+          :item-value="'projectid' || 'projectId'"
           density="compact"
           variant="outlined"
           :readonly="timesheetDisplayStatus === 'view'"
         >
           <template #item="{ props, item }">
             <v-list-item
+              v-if="isProjectOrAlias(item, 'number')"
               v-bind="props"
               :disabled="selectedProjects.includes(item.value)"
             ></v-list-item>
+            <v-list-item
+              v-else
+              @click="console.log('worked')"
+              variant="tonal"
+              append-icon="mdi-plus"
+            > Add New Alias
+            </v-list-item>
           </template>
         </v-autocomplete>
         <!-- error handled thorugh v-if -->
@@ -95,6 +103,23 @@ const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTime
 
 
 const projects = ref<Project[]>([])
+
+const isProjectOrAlias = (item: {title: number | string, value: number | string}, propertyType: string) => {
+  return typeof item.value === propertyType
+}
+
+
+type ProjectAlias = {
+  alias: string,
+  projectId: number
+}
+
+const projectAliases = ref<ProjectAlias[]>([
+  { alias: "alias1", projectId: 1 },
+  { alias: "alias7", projectId: 2 },
+  { alias: "alias8", projectId: 2 },
+  { alias: "alias9", projectId: 3 }
+])
 
 const selectedProjects = computed(() => {
   return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
