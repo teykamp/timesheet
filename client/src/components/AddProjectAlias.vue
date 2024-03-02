@@ -1,6 +1,7 @@
 <template>
     <div>
       <!-- prevent clicking from closing menu -->
+      
       <v-text-field
         v-model="alias.projectname"
         label="Alias Title"
@@ -11,10 +12,17 @@
         item-title="projectname"
         item-value="projectid"
       ></v-autocomplete>
-      <v-btn
-        @click="props.componentProps.onAddProjectAliasSubmit(alias), closeDialog()"
-        append-icon="mdi-plus"
-      >Add</v-btn>
+      <div class="d-flex justify-center gap-5">
+        <v-btn
+          @click="props.componentProps.onAddProjectAliasSubmit(alias), closeDialog()"
+          :disabled="!alias.projectname"
+          append-icon="mdi-plus"
+        >Add</v-btn>
+        <v-btn
+          @click="closeDialog()"
+          color="red"
+        >Close</v-btn>
+      </div>
     </div>
 </template>
 
