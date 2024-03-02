@@ -37,7 +37,7 @@
               >
               </v-list-item>
                <v-btn
-                @click.stop="console.log('deleted' + projectOrAlias.projectid)"
+                @click.stop="deleteProjectAliasFromList(projectOrAlias.projectid)"
                 style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
                 variant="tonal"
                 size="x-small"
@@ -55,8 +55,7 @@
               @click="showDialog(true, AddProjectAlias, { projects, onAddProjectAliasSubmit })"
               variant="tonal"
               append-icon="mdi-plus"
-            > Add New Alias
-            </v-list-item>
+            >Add New Alias</v-list-item>
           </template>
         </v-autocomplete>
         <!-- error handled thorugh v-if -->
@@ -186,5 +185,9 @@ getProjects()
 
 const onAddProjectAliasSubmit = (newAlias: ProjectAlias) => {
   projectAliases.value.push(newAlias)
+}
+
+const deleteProjectAliasFromList = (aliasId: number) => {
+  projectAliases.value = projectAliases.value.filter(alias => alias.projectid !== aliasId)
 }
 </script>
