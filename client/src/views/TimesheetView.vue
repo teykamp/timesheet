@@ -13,7 +13,7 @@
           <v-container 
             v-if="!isTimesheetListLoading"
             class="d-flex justify-end"
-            style="position: absolute; right: 0;"
+            style="position: absolute; right: 40px;"
           >
             <v-btn
               @click="handleAddNewTimesheet()"
