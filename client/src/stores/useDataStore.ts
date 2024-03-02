@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import type { Timesheet, ManagerTimesheet } from '../types/types'
 import { ref } from 'vue'
 import axios from 'axios'
 
-import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile } from '../types/types'
+import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile, Timesheet, ManagerTimesheet } from '../types/types'
 
 // this needs a rename
 export const useHandleManagerTimesheets = defineStore('handleManagerTimesheets', () => {

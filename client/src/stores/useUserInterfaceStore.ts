@@ -93,7 +93,7 @@ export const useDialog = defineStore('dialog', {
       this.show = false
     },
 
-    showDialog(persistent: boolean, component: any, componentProps?: any, body?: DialogBody ) {
+    showDialog(persistent: boolean, component: any, componentProps?: object, body?: DialogBody ) {
       const isDialogShowing = this.show
       if (this.show) this.closeDialog()
 

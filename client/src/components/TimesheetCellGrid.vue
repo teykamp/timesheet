@@ -18,19 +18,44 @@
         <v-autocomplete
           v-if="colIndex === 0"
           v-model="cell.projectid"
-          :items="projects"
+          :items="['Add New Alias', ...projectAliases, ...projects]"
           label="Project Name"
-          item-title="projectname"
-          item-value="projectid"
           density="compact"
           variant="outlined"
+          item-title="projectname"
+          item-value="projectid"
           :readonly="timesheetDisplayStatus === 'view'"
         >
-          <template #item="{ props, item }">
+          <template #item="{ props, item: { raw: projectOrAlias }}">
+            <div 
+              v-if="hasProperty(projectOrAlias, 'isAlias')"
+              style="position: relative;"
+            >
+              <v-list-item
+                v-bind="props"
+                :disabled="selectedProjects.includes(projectOrAlias.projectid)"
+              >
+              </v-list-item>
+               <v-btn
+                @click.stop="deleteProjectAliasFromList(projectOrAlias.projectid)"
+                style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
+                variant="tonal"
+                size="x-small"
+                color="red"
+                icon="mdi-delete"
+              ></v-btn>
+            </div>
             <v-list-item
+              v-else-if="(typeof projectOrAlias === 'object' && 'projectid' in projectOrAlias)"
               v-bind="props"
-              :disabled="selectedProjects.includes(item.value)"
+              :disabled="selectedProjects.includes(projectOrAlias.projectid)"
             ></v-list-item>
+            <v-list-item
+              v-else
+              @click="showDialog(true, AddProjectAlias, { projects, onAddProjectAliasSubmit })"
+              variant="tonal"
+              append-icon="mdi-plus"
+            >Add New Alias</v-list-item>
           </template>
         </v-autocomplete>
         <!-- error handled thorugh v-if -->
@@ -85,16 +110,28 @@ import axios from 'axios'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSingleTimesheetDisplay, useHandleTimesheetDisplay } from '../stores/useDataStore'
+import { useDialog } from '../stores/useUserInterfaceStore'
 
-import type { Project } from '../types/types'
+import AddProjectAlias from './AddProjectAlias.vue'
+
+import type { Project, ProjectAlias } from '../types/types'
 
 const { timesheetData } = storeToRefs(useSingleTimesheetDisplay())
 const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
+
+const { showDialog } = useDialog()
 
 const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTimesheetDisplay()
 
 
 const projects = ref<Project[]>([])
+
+const projectAliases = ref<ProjectAlias[]>([
+])
+
+const hasProperty = (value: any, propertyName: string): boolean => {
+  return value && typeof value === 'object' && propertyName in value
+}
 
 const selectedProjects = computed(() => {
   return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
@@ -145,4 +182,12 @@ const getProjects = () => {
 }
 
 getProjects()
+
+const onAddProjectAliasSubmit = (newAlias: ProjectAlias) => {
+  projectAliases.value.push(newAlias)
+}
+
+const deleteProjectAliasFromList = (aliasId: number) => {
+  projectAliases.value = projectAliases.value.filter(alias => alias.projectid !== aliasId)
+}
 </script>
