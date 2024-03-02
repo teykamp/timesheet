@@ -52,7 +52,7 @@
             ></v-list-item>
             <v-list-item
               v-else
-              @click="console.log('worked')"
+              @click="showDialog(true, AddProjectAlias, { projects, onAddProjectAliasSubmit })"
               variant="tonal"
               append-icon="mdi-plus"
             > Add New Alias
@@ -111,33 +111,28 @@ import axios from 'axios'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSingleTimesheetDisplay, useHandleTimesheetDisplay } from '../stores/useDataStore'
+import { useDialog } from '../stores/useUserInterfaceStore'
 
-import type { Project } from '../types/types'
+import AddProjectAlias from './AddProjectAlias.vue'
+
+import type { Project, ProjectAlias } from '../types/types'
 
 const { timesheetData } = storeToRefs(useSingleTimesheetDisplay())
 const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
+
+const { showDialog } = useDialog()
 
 const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTimesheetDisplay()
 
 
 const projects = ref<Project[]>([])
 
+const projectAliases = ref<ProjectAlias[]>([
+])
+
 const hasProperty = (value: any, propertyName: string): boolean => {
   return value && typeof value === 'object' && propertyName in value
 }
-
-type ProjectAlias = {
-  projectname: string,
-  projectid: number,
-  isAlias: true,
-}
-
-const projectAliases = ref<ProjectAlias[]>([
-  { projectname: "alias1", projectid: 1, isAlias: true },
-  { projectname: "alias7", projectid: 2, isAlias: true },
-  { projectname: "alias8", projectid: 2, isAlias: true },
-  { projectname: "alias9", projectid: 3, isAlias: true }
-])
 
 const selectedProjects = computed(() => {
   return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
@@ -188,4 +183,8 @@ const getProjects = () => {
 }
 
 getProjects()
+
+const onAddProjectAliasSubmit = (newAlias: ProjectAlias) => {
+  projectAliases.value.push(newAlias)
+}
 </script>
