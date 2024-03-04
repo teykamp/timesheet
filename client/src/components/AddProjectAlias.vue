@@ -14,7 +14,10 @@
       ></v-autocomplete>
       <div class="d-flex justify-center gap-5">
         <v-btn
-          @click="props.componentProps.onAddProjectAliasSubmit(alias), closeDialog()"
+          @click="() => {
+            props.componentProps.onAddProjectAliasSubmit(alias)
+            closeDialog()
+          }"
           :disabled="!alias.projectname"
           append-icon="mdi-plus"
         >Add</v-btn>

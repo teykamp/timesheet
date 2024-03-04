@@ -109,7 +109,7 @@
 import axios from 'axios'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useSingleTimesheetDisplay, useHandleTimesheetDisplay } from '../stores/useDataStore'
+import { useSingleTimesheetDisplay, useHandleTimesheetDisplay, useGoogleUserData, useHandleUserSettings } from '../stores/useDataStore'
 import { useDialog } from '../stores/useUserInterfaceStore'
 
 import AddProjectAlias from './AddProjectAlias.vue'
@@ -118,16 +118,14 @@ import type { Project, ProjectAlias } from '../types/types'
 
 const { timesheetData } = storeToRefs(useSingleTimesheetDisplay())
 const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
-
+const { id } = useGoogleUserData()
 const { showDialog } = useDialog()
-
+const { userAllowSaveCookies } = storeToRefs(useHandleUserSettings())
 const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTimesheetDisplay()
-
 
 const projects = ref<Project[]>([])
 
-const projectAliases = ref<ProjectAlias[]>([
-])
+const projectAliases = ref<ProjectAlias[]>([])
 
 const hasProperty = (value: any, propertyName: string): boolean => {
   return value && typeof value === 'object' && propertyName in value
@@ -183,11 +181,21 @@ const getProjects = () => {
 
 getProjects()
 
+const loadStoredProjectAliases = () => {
+  const existingAliasesJson = localStorage.getItem(`aliases-${id}`)
+  projectAliases.value = existingAliasesJson ? JSON.parse(existingAliasesJson) : []
+}
+
+if (userAllowSaveCookies.value) {
+  loadStoredProjectAliases()}
+
 const onAddProjectAliasSubmit = (newAlias: ProjectAlias) => {
   projectAliases.value.push(newAlias)
+  if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 
 const deleteProjectAliasFromList = (aliasId: number) => {
   projectAliases.value = projectAliases.value.filter(alias => alias.projectid !== aliasId)
+  if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 </script>
