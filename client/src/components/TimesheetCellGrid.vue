@@ -109,7 +109,7 @@
 import axios from 'axios'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useSingleTimesheetDisplay, useHandleTimesheetDisplay } from '../stores/useDataStore'
+import { useSingleTimesheetDisplay, useHandleTimesheetDisplay, useuseGoogleUserData } from '../stores/useDataStore'
 import { useDialog } from '../stores/useUserInterfaceStore'
 
 import AddProjectAlias from './AddProjectAlias.vue'
@@ -118,6 +118,7 @@ import type { Project, ProjectAlias } from '../types/types'
 
 const { timesheetData } = storeToRefs(useSingleTimesheetDisplay())
 const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
+const { id } = useGoogleUserData()
 
 const { showDialog } = useDialog()
 
@@ -126,8 +127,7 @@ const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTime
 
 const projects = ref<Project[]>([])
 
-const projectAliases = ref<ProjectAlias[]>([
-])
+const projectAliases = ref<ProjectAlias[]>([])
 
 const hasProperty = (value: any, propertyName: string): boolean => {
   return value && typeof value === 'object' && propertyName in value
@@ -183,11 +183,22 @@ const getProjects = () => {
 
 getProjects()
 
+const loadStoredProjectAliases = () => {
+  const existingAliasesJson = localStorage.getItem('aliases')
+  projectAliases.value = existingAliasesJson ? JSON.parse(existingAliasesJson) : []
+}
+
+loadStoredProjectAliases()
+
 const onAddProjectAliasSubmit = (newAlias: ProjectAlias) => {
   projectAliases.value.push(newAlias)
+  // IF USER SETTINGS ALLOWS
+  localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 
 const deleteProjectAliasFromList = (aliasId: number) => {
   projectAliases.value = projectAliases.value.filter(alias => alias.projectid !== aliasId)
+  // IF USER SETTINGS ALLOWS
+  localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 </script>
