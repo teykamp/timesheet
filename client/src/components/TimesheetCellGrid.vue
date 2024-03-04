@@ -109,7 +109,7 @@
 import axios from 'axios'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useSingleTimesheetDisplay, useHandleTimesheetDisplay, useuseGoogleUserData } from '../stores/useDataStore'
+import { useSingleTimesheetDisplay, useHandleTimesheetDisplay, useGoogleUserData, useHandleUserSettings } from '../stores/useDataStore'
 import { useDialog } from '../stores/useUserInterfaceStore'
 
 import AddProjectAlias from './AddProjectAlias.vue'
@@ -119,11 +119,9 @@ import type { Project, ProjectAlias } from '../types/types'
 const { timesheetData } = storeToRefs(useSingleTimesheetDisplay())
 const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
 const { id } = useGoogleUserData()
-
 const { showDialog } = useDialog()
-
+const { userAllowSaveCookies } = storeToRefs(useHandleUserSettings())
 const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTimesheetDisplay()
-
 
 const projects = ref<Project[]>([])
 
@@ -184,21 +182,20 @@ const getProjects = () => {
 getProjects()
 
 const loadStoredProjectAliases = () => {
-  const existingAliasesJson = localStorage.getItem('aliases')
+  const existingAliasesJson = localStorage.getItem(`aliases-${id}`)
   projectAliases.value = existingAliasesJson ? JSON.parse(existingAliasesJson) : []
 }
 
-loadStoredProjectAliases()
+if (userAllowSaveCookies.value) {
+  loadStoredProjectAliases()}
 
 const onAddProjectAliasSubmit = (newAlias: ProjectAlias) => {
   projectAliases.value.push(newAlias)
-  // IF USER SETTINGS ALLOWS
-  localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
+  if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 
 const deleteProjectAliasFromList = (aliasId: number) => {
   projectAliases.value = projectAliases.value.filter(alias => alias.projectid !== aliasId)
-  // IF USER SETTINGS ALLOWS
-  localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
+  if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 </script>

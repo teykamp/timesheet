@@ -5,6 +5,21 @@ import axios from 'axios'
 
 import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile, Timesheet, ManagerTimesheet } from '../types/types'
 
+export const useHandleUserSettings = defineStore('handleUserSettings', () => {
+  // have tooltip if this is false prompting to save aliases
+  const userAllowSaveCookies = ref(false)
+
+  const handleManageSettingsData = () => {
+    localStorage.setItem(`settings-${useGoogleUserData.$id}`, JSON.stringify(userAllowSaveCookies.value))
+  }
+
+  return {
+    handleManageSettingsData, 
+
+    userAllowSaveCookies,
+  }
+})
+
 // this needs a rename
 export const useHandleManagerTimesheets = defineStore('handleManagerTimesheets', () => {
 
@@ -166,7 +181,7 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
   }
 })
 
-export const useGoogleUserData = defineStore('googleUserData',{
+export const useGoogleUserData = defineStore('googleUserData', {
   state: () => ({
     id: '',
     email: '',
