@@ -101,11 +101,10 @@ export const useDialog = defineStore('dialog', {
         this.persistent = persistent
         this.component = markRaw(component)
         this.componentProps = componentProps ?? {}
-        if (body !== undefined) {
-          this.body.title = body.title ?? ''
-          this.body.description = body.description ?? ''
-          this.body.buttons = body.buttons ?? []
-        }
+        this.body = this.body || {}
+        this.body.title = body?.title ?? ''
+        this.body.description = body?.description ?? ''
+        this.body.buttons = body?.buttons ?? []
         this.show = true
       }, isDialogShowing ? 400 : 0)
     },
