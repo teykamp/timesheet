@@ -83,7 +83,7 @@ export const useDialog = defineStore('dialog', {
     body: {
       title: '',
       description: '',
-      buttons: [],
+      buttons: [] as Button[],
 	  },
     persistent: false,
   }),
