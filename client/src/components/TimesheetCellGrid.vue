@@ -131,7 +131,7 @@ const hasProperty = (value: any, propertyName: string): boolean => {
   return value && typeof value === 'object' && propertyName in value
 }
 
-const selectedProjects = computed(() => {
+const selectedProjects = computed<(number | null)[]>(() => {
   return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
 })
 
