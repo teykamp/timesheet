@@ -33,11 +33,11 @@
             >
               <v-list-item
                 v-bind="props"
-                :disabled="selectedProjects.includes(projectOrAlias.projectid)"
+                :disabled="selectedProjects.includes((projectOrAlias as ProjectAlias).projectid)"
               >
               </v-list-item>
                <v-btn
-                @click.stop="deleteProjectAliasFromList(projectOrAlias.projectid)"
+                @click.stop="deleteProjectAliasFromList((projectOrAlias as ProjectAlias).projectid)"
                 style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
                 variant="tonal"
                 size="x-small"
@@ -48,7 +48,7 @@
             <v-list-item
               v-else-if="(typeof projectOrAlias === 'object' && 'projectid' in projectOrAlias)"
               v-bind="props"
-              :disabled="selectedProjects.includes(projectOrAlias.projectid)"
+              :disabled="selectedProjects.includes((projectOrAlias as ProjectAlias).projectid)"
             ></v-list-item>
             <v-list-item
               v-else
