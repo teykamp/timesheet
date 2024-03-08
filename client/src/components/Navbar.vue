@@ -180,6 +180,7 @@
                 <v-img
                   :src="googleProfileData.picture"
                   alt=""
+                  lazy-src="https://avatars.githubusercontent.com/u/46391052?s=80&v=4"
                 ></v-img>
               </v-avatar>
             </v-btn>
