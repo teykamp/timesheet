@@ -53,3 +53,18 @@ export type TimesheetNote = {
   commentbody: string,
   requireresubmit: boolean
 }
+
+
+export type Row = {
+  projectid: number | null
+}
+
+export type Entry = {
+  entry: {
+    projectid: number | null,
+    hoursWorked: number,
+    date: Date | null
+  }
+}
+
+export type TimeTable = (Row | Entry)[][]

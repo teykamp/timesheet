@@ -3,7 +3,16 @@ import { useRoute, useRouter } from 'vue-router'
 import { ref } from 'vue'
 import axios from 'axios'
 
-import type { TimesheetDisplayStatus, TimesheetStateTypes, GoogleProfile, Timesheet, ManagerTimesheet } from '../types/types'
+import type { 
+  TimesheetDisplayStatus,
+   TimesheetStateTypes,
+   GoogleProfile,
+   Timesheet,
+   ManagerTimesheet,
+   Row,
+   Entry, 
+   TimeTable,
+} from '../types/types'
 
 export const useHandleUserSettings = defineStore('handleUserSettings', () => {
   // have tooltip if this is false prompting to save aliases
@@ -121,14 +130,15 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
   const rows = 3
   const cols = 6
 
-  const generateTimeTable = () => Array.from({ length: rows }, () => {
-                                    const row = []
-                                    row.push({ projectid: null })
-                                    for (let i = 0; i < cols - 1; i++) {
-                                      row.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
-                                    }
-                                    return row
-                                  })
+  const generateTimeTable = (): TimeTable => 
+    Array.from({ length: rows }, () => {
+      const row: (Row | Entry)[] = []
+        row.push({ projectid: null })
+        for (let i = 1; i < cols; i++) {
+          row.push({ entry: { projectid: null, hoursWorked: 0, date: null } })
+        }
+        return row
+      })
 
                                   
   const timesheetData = ref(generateTimeTable())

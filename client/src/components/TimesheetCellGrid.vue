@@ -17,7 +17,7 @@
       >
         <v-autocomplete
           v-if="colIndex === 0"
-          v-model="cell.projectid"
+          v-model="(cell as Row).projectid"
           :items="['Add New Alias', ...projectAliases, ...projects]"
           label="Project Name"
           density="compact"
@@ -58,10 +58,9 @@
             >Add New Alias</v-list-item>
           </template>
         </v-autocomplete>
-        <!-- error handled thorugh v-if -->
         <v-text-field
           v-else
-          v-model="cell.entry.hoursWorked"
+          v-model="(cell as Entry).entry.hoursWorked"
           :rules="[validateAllRules]"
           :readonly="timesheetDisplayStatus === 'view'"
           label="Hours"
@@ -114,7 +113,7 @@ import { useDialog } from '../stores/useUserInterfaceStore'
 
 import AddProjectAlias from './AddProjectAlias.vue'
 
-import type { Project, ProjectAlias } from '../types/types'
+import type { Project, ProjectAlias, Row, Entry } from '../types/types'
 
 const { timesheetData } = storeToRefs(useSingleTimesheetDisplay())
 const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
@@ -132,7 +131,10 @@ const hasProperty = (value: any, propertyName: string): boolean => {
 }
 
 const selectedProjects = computed<(number | null)[]>(() => {
-  return timesheetData.value.map(row => row[0].projectid === null ? null : row[0].projectid)
+  return timesheetData.value.map(row => {
+    if ('projectid' in row[0]) return (row[0] as Row).projectid
+    return null
+  })
 })
 
 const totalsStyles = {
@@ -145,8 +147,8 @@ const computeRowTotals = computed(() => {
   const rowTotals: number[] = []
   timesheetData.value.forEach(row => {
     let totalHours = 0
-    row.forEach(cell => {
-      if (cell.entry && typeof Number(cell.entry.hoursWorked) === 'number')
+    row.forEach((cell) => {
+      if ('entry' in cell && cell.entry)
         totalHours += Number(cell.entry.hoursWorked)
     })
     rowTotals.push(totalHours)
@@ -159,7 +161,7 @@ const computeColumnTotals = computed(() => {
 
   timesheetData.value.forEach(row => {
     row.forEach((cell, index) => {
-      if (index > 0 && cell.entry && typeof Number(cell.entry.hoursWorked) === 'number') {
+      if (index > 0 && 'entry' in cell && cell.entry) {
         if (!colTotals[index - 1]) colTotals[index - 1] = 0
         colTotals[index - 1] += Number(cell.entry.hoursWorked)
       }
