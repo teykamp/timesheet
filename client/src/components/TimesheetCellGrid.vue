@@ -29,6 +29,8 @@
           <template #item="{ props, item: { raw: projectOrAlias }}">
             <div 
               v-if="hasProperty(projectOrAlias, 'isAlias')"
+              @mouseenter="currentHoverAlias = (projectOrAlias as ProjectAlias).projectid"
+              @mouseleave="currentHoverAlias = null"
               style="position: relative;"
             >
               <v-list-item
@@ -36,14 +38,24 @@
                 :disabled="selectedProjects.includes((projectOrAlias as ProjectAlias).projectid)"
               >
               </v-list-item>
-               <v-btn
-                @click.stop="deleteProjectAliasFromList((projectOrAlias as ProjectAlias).projectid)"
+              <div
+                v-show="currentHoverAlias === (projectOrAlias as ProjectAlias).projectid"
                 style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
-                variant="tonal"
-                size="x-small"
-                color="red"
-                icon="mdi-delete"
-              ></v-btn>
+              >
+                <v-btn
+                  variant="tonal"
+                  size="x-small"
+                  icon="mdi-pencil"
+                  class="mr-2"
+                ></v-btn>
+                <v-btn
+                  @click.stop="deleteProjectAliasFromList((projectOrAlias as ProjectAlias).projectid)"
+                  variant="tonal"
+                  size="x-small"
+                  color="red"
+                  icon="mdi-delete"
+                ></v-btn>
+              </div>
             </div>
             <v-list-item
               v-else-if="(typeof projectOrAlias === 'object' && 'projectid' in projectOrAlias)"
@@ -125,6 +137,8 @@ const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTime
 const projects = ref<Project[]>([])
 
 const projectAliases = ref<ProjectAlias[]>([])
+
+const currentHoverAlias = ref<number | null>(null)
 
 const hasProperty = (value: any, propertyName: string): boolean => {
   return value && typeof value === 'object' && propertyName in value
