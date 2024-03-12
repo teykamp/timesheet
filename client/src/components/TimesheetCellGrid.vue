@@ -63,7 +63,6 @@
               v-bind="props"
               :disabled="selectedProjects.includes((projectOrAlias as Project).projectid)"
             ></v-list-item>
-            <!-- check if above needs to be project or project alias typing (what is this a list of??) -->
             <v-list-item
               v-else
               @click="showDialog(true, AddProjectAlias, { projects, onSubmitClick: onAddProjectAliasSubmit })"
