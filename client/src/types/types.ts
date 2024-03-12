@@ -27,7 +27,9 @@ export type Project = {
 }
 
 
-export type ProjectAlias = Project & { isAlias: true } // todo: fix -> look at timesheetcellgrid.vue
+export type ProjectAlias = Project & { 
+  aliasId: number,
+} // todo: fix -> look at timesheetcellgrid.vue
 
 export type TimesheetEntry = {
   id: number,

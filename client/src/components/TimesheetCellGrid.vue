@@ -28,8 +28,8 @@
         >
           <template #item="{ props, item: { raw: projectOrAlias }}">
             <div 
-              v-if="hasProperty(projectOrAlias, 'isAlias')"
-              @mouseenter="currentHoverAlias = (projectOrAlias as ProjectAlias).projectid"
+              v-if="hasProperty(projectOrAlias, 'aliasId')"
+              @mouseenter="currentHoverAlias = (projectOrAlias as ProjectAlias).aliasId"
               @mouseleave="currentHoverAlias = null"
               style="position: relative;"
             >
@@ -39,7 +39,7 @@
               >
               </v-list-item>
               <div
-                v-show="currentHoverAlias === (projectOrAlias as ProjectAlias).projectid"
+                v-show="currentHoverAlias === (projectOrAlias as ProjectAlias).aliasId"
                 style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
               >
                 <v-btn
