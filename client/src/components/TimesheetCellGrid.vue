@@ -43,6 +43,7 @@
                 style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
               >
                 <v-btn
+                  @click="showDialog(true, AddProjectAlias, { projects, onSubmitClick: onAliasUpdate, initialAliasValue: projectOrAlias })"
                   variant="tonal"
                   size="x-small"
                   icon="mdi-pencil"
@@ -60,11 +61,12 @@
             <v-list-item
               v-else-if="(typeof projectOrAlias === 'object' && 'projectid' in projectOrAlias)"
               v-bind="props"
-              :disabled="selectedProjects.includes((projectOrAlias as ProjectAlias).projectid)"
+              :disabled="selectedProjects.includes((projectOrAlias as Project).projectid)"
             ></v-list-item>
+            <!-- check if above needs to be project or project alias typing (what is this a list of??) -->
             <v-list-item
               v-else
-              @click="showDialog(true, AddProjectAlias, { projects, onAddProjectAliasSubmit })"
+              @click="showDialog(true, AddProjectAlias, { projects, onSubmitClick: onAddProjectAliasSubmit })"
               variant="tonal"
               append-icon="mdi-plus"
             >Add New Alias</v-list-item>
@@ -207,6 +209,12 @@ if (userAllowSaveCookies.value) {
 
 const onAddProjectAliasSubmit = (newAlias: ProjectAlias) => {
   projectAliases.value.push(newAlias)
+  if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
+}
+
+const onAliasUpdate = (aliasToUpdate: ProjectAlias) => {
+  const index = projectAliases.value.findIndex(alias => alias.projectid === aliasToUpdate.projectid)
+  projectAliases.value[index] = aliasToUpdate
   if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 
