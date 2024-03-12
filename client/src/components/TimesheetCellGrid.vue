@@ -28,8 +28,8 @@
         >
           <template #item="{ props, item: { raw: projectOrAlias }}">
             <div 
-              v-if="hasProperty(projectOrAlias, 'isAlias')"
-              @mouseenter="currentHoverAlias = (projectOrAlias as ProjectAlias).projectid"
+              v-if="hasProperty(projectOrAlias, 'aliasId')"
+              @mouseenter="currentHoverAlias = (projectOrAlias as ProjectAlias).aliasId"
               @mouseleave="currentHoverAlias = null"
               style="position: relative;"
             >
@@ -39,17 +39,18 @@
               >
               </v-list-item>
               <div
-                v-show="currentHoverAlias === (projectOrAlias as ProjectAlias).projectid"
+                v-show="currentHoverAlias === (projectOrAlias as ProjectAlias).aliasId"
                 style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
               >
                 <v-btn
+                  @click="showDialog(true, AddProjectAlias, { projects, onSubmitClick: onAliasUpdate, initialAliasValue: projectOrAlias })"
                   variant="tonal"
                   size="x-small"
                   icon="mdi-pencil"
                   class="mr-2"
                 ></v-btn>
                 <v-btn
-                  @click.stop="deleteProjectAliasFromList((projectOrAlias as ProjectAlias).projectid)"
+                  @click.stop="deleteProjectAliasFromList((projectOrAlias as ProjectAlias).aliasId)"
                   variant="tonal"
                   size="x-small"
                   color="red"
@@ -60,11 +61,11 @@
             <v-list-item
               v-else-if="(typeof projectOrAlias === 'object' && 'projectid' in projectOrAlias)"
               v-bind="props"
-              :disabled="selectedProjects.includes((projectOrAlias as ProjectAlias).projectid)"
+              :disabled="selectedProjects.includes((projectOrAlias as Project).projectid)"
             ></v-list-item>
             <v-list-item
               v-else
-              @click="showDialog(true, AddProjectAlias, { projects, onAddProjectAliasSubmit })"
+              @click="showDialog(true, AddProjectAlias, { projects, onSubmitClick: onAddProjectAliasSubmit })"
               variant="tonal"
               append-icon="mdi-plus"
             >Add New Alias</v-list-item>
@@ -210,8 +211,14 @@ const onAddProjectAliasSubmit = (newAlias: ProjectAlias) => {
   if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 
+const onAliasUpdate = (aliasToUpdate: ProjectAlias) => {
+  const index = projectAliases.value.findIndex(alias => alias.projectid === aliasToUpdate.projectid)
+  projectAliases.value[index] = aliasToUpdate
+  if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
+}
+
 const deleteProjectAliasFromList = (aliasId: number) => {
-  projectAliases.value = projectAliases.value.filter(alias => alias.projectid !== aliasId)
+  projectAliases.value = projectAliases.value.filter(alias => alias.aliasId !== aliasId)
   if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 </script>

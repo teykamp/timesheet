@@ -15,13 +15,13 @@
       <div class="d-flex justify-center gap-5">
         <v-btn
           @click="() => {
-            props.componentProps.onAddProjectAliasSubmit(alias)
+            props.componentProps.onSubmitClick(alias)
             closeDialog()
           }"
           :disabled="!alias.projectname"
-          append-icon="mdi-plus"
-        >Add</v-btn>
-        <v-btn
+          :append-icon="props.componentProps.initialAliasValue ? 'mdi-arrow-right': 'mdi-plus'"
+        >{{ props.componentProps.initialAliasValue ? 'Update' : 'Add' }}</v-btn>
+        <v-btn  
           @click="closeDialog()"
           color="red"
         >Close</v-btn>
@@ -39,13 +39,16 @@ const { closeDialog } = useDialog()
 const props = defineProps<{
   componentProps: { 
     projects: Project[],
-    onAddProjectAliasSubmit: (newAlias: ProjectAlias) => void,
+    onSubmitClick: (newAlias: ProjectAlias) => void,
+    initialAliasValue?: ProjectAlias,
   }
 }>()
 
-const alias = ref<ProjectAlias>({
+const getDate = () => Date.now()
+
+const alias = ref<ProjectAlias>(props.componentProps.initialAliasValue ?? {
   projectname: '',
-  projectid: props.componentProps.projects[0].projectid,
-  isAlias: true,
+  projectid: props.componentProps.projects[0].projectid ?? 0, // what if no projects?
+  aliasId: getDate(),
 })
 </script>
