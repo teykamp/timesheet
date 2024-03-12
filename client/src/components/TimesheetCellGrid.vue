@@ -50,7 +50,7 @@
                   class="mr-2"
                 ></v-btn>
                 <v-btn
-                  @click.stop="deleteProjectAliasFromList((projectOrAlias as ProjectAlias).projectid)"
+                  @click.stop="deleteProjectAliasFromList((projectOrAlias as ProjectAlias).aliasId)"
                   variant="tonal"
                   size="x-small"
                   color="red"
@@ -219,7 +219,7 @@ const onAliasUpdate = (aliasToUpdate: ProjectAlias) => {
 }
 
 const deleteProjectAliasFromList = (aliasId: number) => {
-  projectAliases.value = projectAliases.value.filter(alias => alias.projectid !== aliasId)
+  projectAliases.value = projectAliases.value.filter(alias => alias.aliasId !== aliasId)
   if (userAllowSaveCookies.value) localStorage.setItem(`aliases-${id}`, JSON.stringify(projectAliases.value))
 }
 </script>
