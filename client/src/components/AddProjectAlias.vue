@@ -18,7 +18,7 @@
             props.componentProps.onSubmitClick(alias)
             closeDialog()
           }"
-          :disabled="!alias.projectname"
+          :disabled="!alias.projectname || initialValue?.projectname === alias.projectname && initialValue?.projectid === alias.projectid"
           :append-icon="props.componentProps.initialAliasValue ? 'mdi-arrow-right': 'mdi-plus'"
         >{{ props.componentProps.initialAliasValue ? 'Update' : 'Add' }}</v-btn>
         <v-btn  
@@ -26,6 +26,7 @@
           color="red"
         >Close</v-btn>
       </div>
+      {{ initialValue }} {{ alias }}
     </div>
 </template>
 
@@ -43,6 +44,8 @@ const props = defineProps<{
     initialAliasValue?: ProjectAlias,
   }
 }>()
+
+const initialValue = {...props.componentProps.initialAliasValue}
 
 const getDate = () => Date.now()
 
