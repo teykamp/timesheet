@@ -26,7 +26,6 @@
           color="red"
         >Close</v-btn>
       </div>
-      {{ initialValue }} {{ alias }}
     </div>
 </template>
 

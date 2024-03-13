@@ -36,8 +36,7 @@
               <v-list-item
                 v-bind="props"
                 :disabled="selectedProjects.includes((projectOrAlias as ProjectAlias).projectid)"
-              >
-              </v-list-item>
+              ></v-list-item>
               <div
                 v-show="currentHoverAlias === (projectOrAlias as ProjectAlias).aliasId"
                 style="position: absolute; right: 15px; bottom: calc(50% - 16px);"
