@@ -15,7 +15,11 @@
           <v-col
             v-for="(label, index) in colLabels"
             :key="index"
-            :style="computeColumnStyles(index)"
+            :style="{
+              ...computeColumnStyles(index), 
+              position: 'relative',
+
+            }"
             :class="`d-flex ${index === 0 ? '' : 'justify-center'}`"
           >
             <div 
@@ -24,9 +28,16 @@
               >{{ label.lg }}</div>
             <div
               v-else
-              class="text-truncate text-center"
+              class="text-truncate text-center ml-4"
             >{{ label.sm || label.lg }}</div>
             <!-- <div v-else>{{ label.xs || label.sm || label.lg }}</div> -->
+            <div 
+              v-if="index === colLabels.length - 1"
+              :style="{
+                position: 'absolute',
+                right: lgAndUp ? '-35px' : '-45px',
+              }"
+            >Total</div>
         </v-col>
       </v-card>
       <TimesheetCellGrid />
