@@ -89,7 +89,7 @@
                       text: 'Close',
                       onClick: closeDialog,
                     }]
-                })"
+                }, { 'max-width': '400px' })"
                 class="my-2"
                 prepend-icon="mdi-cog"
                 :style="{
@@ -205,7 +205,7 @@
                             text: 'Close',
                             onClick: closeDialog,
                           }]
-                      })"
+                      }, { 'max-width': '400px' })"
                       flat
                       icon="mdi-cog"
                     ></v-btn>

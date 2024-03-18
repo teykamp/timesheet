@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
+import type { StyleValue } from 'vue'
 
 interface LoadingState {
   isTimesheetListLoading: boolean;
@@ -86,6 +87,7 @@ export const useDialog = defineStore('dialog', {
       buttons: [] as Button[],
 	  },
     persistent: false,
+    dialogStyles: {},
   }),
 
   actions: {
@@ -93,7 +95,7 @@ export const useDialog = defineStore('dialog', {
       this.show = false
     },
 
-    showDialog(persistent: boolean, component: any, componentProps?: object, body?: DialogBody ) {
+    showDialog(persistent: boolean, component: any, componentProps?: object, body?: DialogBody, dialogStyles?: StyleValue ) {
       const isDialogShowing = this.show
       if (this.show) this.closeDialog()
 
@@ -105,6 +107,7 @@ export const useDialog = defineStore('dialog', {
         this.body.title = body?.title ?? ''
         this.body.description = body?.description ?? ''
         this.body.buttons = body?.buttons ?? []
+        this.dialogStyles = dialogStyles || {}
         this.show = true
       }, isDialogShowing ? 400 : 0)
     },

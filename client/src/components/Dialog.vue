@@ -1,6 +1,8 @@
 <template>
   <!-- needs to become full width and bottom on mobile -->
-  <v-sheet class="pa-6">
+  <v-sheet 
+    class="pa-6"
+  >
     <h1>
       {{ body.title }}
     </h1>
