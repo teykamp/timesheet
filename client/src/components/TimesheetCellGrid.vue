@@ -80,7 +80,7 @@
           density="compact" 
         />
         <div 
-          v-if="rowIndex === timesheetData.length - 1" 
+          v-if="rowIndex === timesheetData.length - 1"
         >
           <p v-if="colIndex === 0"
           >Total</p>
@@ -95,7 +95,6 @@
         </div>
       </v-col>
       <p
-        v-if="true"
         class="mt-5 text-center"
         :style="{
           ...totalsStyles,
