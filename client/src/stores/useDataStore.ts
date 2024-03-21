@@ -142,6 +142,11 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
 
                                   
   const timesheetData = ref(generateTimeTable())
+  const emptyTimesheet = timesheetData.value
+
+  const isTimesheetEmpty = () => {
+    return JSON.stringify(emptyTimesheet) === JSON.stringify(timesheetData.value)
+  }
 
   const resetTimesheetData = () => timesheetData.value = generateTimeTable()
                                   
@@ -188,6 +193,7 @@ export const useSingleTimesheetDisplay = defineStore('singleTimesheetDisplay', (
     computeColumnStyles,
     validateAllRules,
     resetTimesheetData,
+    isTimesheetEmpty,
   }
 })
 

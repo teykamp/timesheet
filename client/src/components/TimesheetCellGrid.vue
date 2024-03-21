@@ -121,6 +121,7 @@ import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSingleTimesheetDisplay, useHandleTimesheetDisplay, useGoogleUserData, useHandleUserSettings } from '../stores/useDataStore'
 import { useDialog } from '../stores/useUserInterfaceStore'
+import { useDataStatus } from '../composables/useCheckBeforeRouteLeave'
 
 import AddProjectAlias from './AddProjectAlias.vue'
 
@@ -131,7 +132,11 @@ const { timesheetDisplayStatus } = storeToRefs(useHandleTimesheetDisplay())
 const { id } = useGoogleUserData()
 const { showDialog } = useDialog()
 const { userAllowSaveCookies } = storeToRefs(useHandleUserSettings())
-const { handleDeleteRow, computeColumnStyles, validateAllRules } = useSingleTimesheetDisplay()
+const { handleDeleteRow, computeColumnStyles, validateAllRules, isTimesheetEmpty } = useSingleTimesheetDisplay()
+
+useDataStatus(() => {
+  return isTimesheetEmpty()
+})
 
 const projects = ref<Project[]>([])
 
