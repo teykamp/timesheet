@@ -49,6 +49,7 @@ import type { Timesheet } from '../types/types'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { timesheetHeaderData } from '../functions/headerData'
 
+import { useStateStatus } from '../composables/useCheckBeforeRouteLeave'
 
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
@@ -58,12 +59,11 @@ import ViewTimesheetNote from '../components/ViewTimesheetNote.vue'
 const useLoadingScreenStore = useLoadingScreen()
 const { isTimesheetListLoading } = storeToRefs(useLoadingScreenStore)
 const { resetTimesheetDisplay, setTimesheetDisplayStatus, setCurrentTimesheet, updateTimesheetViewState } = useHandleTimesheetDisplay()
-const useTimesheetStateStore = useHandleTimesheetDisplay()
-const { timesheetViewState } = storeToRefs(useTimesheetStateStore)
+const { timesheetViewState } = storeToRefs(useHandleTimesheetDisplay())
 const { id, isUserLoggedIn } = useGoogleUserData()
 const { setLoadingState } = useLoadingScreen()
 const { showDialog } = useDialog()
-const { resetTimesheetData } = useSingleTimesheetDisplay()
+const { resetTimesheetData, isTimesheetEmpty } = useSingleTimesheetDisplay()
 
 const handleAddNewTimesheet = () => {
   resetTimesheetDisplay()
@@ -142,4 +142,6 @@ const getUserTimesheets = () => {
       console.error('Error fetching data:', error.message)
     })
 }
+
+const trackRef = useStateStatus(timesheetViewState, () => isTimesheetEmpty())
 </script>

@@ -134,9 +134,7 @@ const { showDialog } = useDialog()
 const { userAllowSaveCookies } = storeToRefs(useHandleUserSettings())
 const { handleDeleteRow, computeColumnStyles, validateAllRules, isTimesheetEmpty } = useSingleTimesheetDisplay()
 
-useDataStatus(() => {
-  return isTimesheetEmpty()
-})
+useDataStatus(() => isTimesheetEmpty())
 
 const projects = ref<Project[]>([])
 
