@@ -81,21 +81,27 @@
         />
         <div 
           v-if="rowIndex === timesheetData.length - 1"
+          class="relative"
         >
           <p v-if="colIndex === 0"
           >Total</p>
           <p 
-            class="text-center"
+            class="text-center d-flex justify-center"
             :style="{
               ...totalsStyles,
               }"
           >
             {{ computeColumnTotals[colIndex-1] }}
+            <p
+              v-if="colIndex === row.length - 1"
+              class="absolute"
+              :style="{
+                left: computeTotalPositioningStyle,
+              }"
+            >
+              {{ totalHours }}
+            </p>
           </p>
-          <v-col v-if="colIndex === row.length - 1">
-          
-            {{ totalHours }}
-          </v-col>
         </div>
       </v-col>
       <p
@@ -127,6 +133,7 @@ import { storeToRefs } from 'pinia'
 import { useSingleTimesheetDisplay, useHandleTimesheetDisplay, useGoogleUserData, useHandleUserSettings } from '../stores/useDataStore'
 import { useDialog } from '../stores/useUserInterfaceStore'
 import { useDataStatus } from '../composables/useCheckBeforeRouteLeave'
+import { useDisplay } from 'vuetify'
 
 import AddProjectAlias from './AddProjectAlias.vue'
 
@@ -138,6 +145,7 @@ const { id } = useGoogleUserData()
 const { showDialog } = useDialog()
 const { userAllowSaveCookies } = storeToRefs(useHandleUserSettings())
 const { handleDeleteRow, computeColumnStyles, validateAllRules, isTimesheetEmpty } = useSingleTimesheetDisplay()
+const { mdAndUp, smAndUp } = useDisplay()
 
 useDataStatus(() => isTimesheetEmpty())
 
@@ -150,6 +158,12 @@ const currentHoverAlias = ref<number | null>(null)
 const hasProperty = (value: any, propertyName: string): boolean => {
   return value && typeof value === 'object' && propertyName in value
 }
+
+const computeTotalPositioningStyle = computed(() => {
+  if (mdAndUp) return `${140 - totalHours.value.toString().length}px`
+  if (smAndUp) return '10%'
+  return `${60 - totalHours.value.toString().length}px`
+})
 
 const selectedProjects = computed<(number | null)[]>(() => {
   return timesheetData.value.map(row => {
@@ -191,6 +205,7 @@ const computeColumnTotals = computed(() => {
   return colTotals
 })
 
+// maybe have max?
 const totalHours = computed(() => computeColumnTotals.value.reduce((acc, curr) => acc += curr))
 
 const getProjects = () => {
