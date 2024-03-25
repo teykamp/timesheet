@@ -160,9 +160,9 @@ const hasProperty = (value: any, propertyName: string): boolean => {
 }
 
 const computeTotalPositioningStyle = computed(() => {
-  if (mdAndUp) return `${140 - totalHours.value.toString().length}px`
-  if (smAndUp) return '10%'
-  return `${60 - totalHours.value.toString().length}px`
+  if (mdAndUp.value) return `${148 - 2*totalHours.value.toString().length}px`
+  if (smAndUp.value) return '120%'
+  return `${82 - 2*totalHours.value.toString().length}px`
 })
 
 const selectedProjects = computed<(number | null)[]>(() => {
