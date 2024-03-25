@@ -92,6 +92,10 @@
           >
             {{ computeColumnTotals[colIndex-1] }}
           </p>
+          <v-col v-if="colIndex === row.length - 1">
+          
+            {{ totalHours }}
+          </v-col>
         </div>
       </v-col>
       <p
@@ -113,6 +117,7 @@
       ></v-btn>
     </v-sheet>
   </v-sheet>
+
 </template>
 
 <script setup lang="ts">
@@ -185,6 +190,8 @@ const computeColumnTotals = computed(() => {
   })
   return colTotals
 })
+
+const totalHours = computed(() => computeColumnTotals.value.reduce((acc, curr) => acc += curr))
 
 const getProjects = () => {
   axios.get(`/api/projects`)
