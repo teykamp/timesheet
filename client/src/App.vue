@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <NavBar />
+    <Navbar />
     <RouterView />
     <v-snackbar 
       v-model="snackbar.show" 
@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import Dialog from './components/Dialog.vue'
-import NavBar from './components/Navbar.vue'
+import Navbar from './components/Navbar.vue'
 import { storeToRefs } from 'pinia'
 
 import { useSnackbar, useDialog } from './stores/useUserInterfaceStore'
