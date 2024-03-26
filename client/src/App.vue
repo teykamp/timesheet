@@ -9,11 +9,12 @@
       style="font-family: Roboto Slab;"
     >{{ snackbar.text }}</v-snackbar>
     <v-dialog
-      v-model="dialog.show"
+      v-model="show"
       :style="{
         'max-width': '1000px',
-        ...dialog.dialogStyles
+        ...dialogStyles
       }"
+      :persistent="persistent"
     >
       <Dialog />
     </v-dialog>
@@ -23,9 +24,10 @@
 <script setup lang="ts">
 import Dialog from './components/Dialog.vue'
 import NavBar from './components/Navbar.vue'
+import { storeToRefs } from 'pinia'
 
 import { useSnackbar, useDialog } from './stores/useUserInterfaceStore'
 
 const snackbar = useSnackbar()
-const dialog = useDialog()
+const { show, persistent, dialogStyles } = storeToRefs(useDialog())
 </script>
