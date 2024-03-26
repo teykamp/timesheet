@@ -84,7 +84,7 @@
              
               <v-list-item 
                 v-if="xs"
-                @click="showDialog(true, UserSettings, undefined, {
+                @click="showDialog(false, UserSettings, undefined, {
                   buttons: [{
                       text: 'Close',
                       onClick: closeDialog,
@@ -199,8 +199,9 @@
                 :title="googleProfileData.name"
               >
                 <template v-slot:append>
+                  <!-- should be one function -->
                     <v-btn
-                      @click="showDialog(true, UserSettings, undefined, {
+                      @click="showDialog(false, UserSettings, undefined, {
                         buttons: [{
                             text: 'Close',
                             onClick: closeDialog,

@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import { markRaw } from 'vue'
-import type { StyleValue } from 'vue'
-
+import { markRaw, ref } from 'vue'
+import { useRouter } from 'vue-router'
 interface LoadingState {
   isTimesheetListLoading: boolean;
   isTimesheetContentLoading: boolean;
@@ -76,40 +75,59 @@ type DialogBody = {
   buttons?: Button[]
 }
 
-export const useDialog = defineStore('dialog', {
-  state: () => ({
-    show: false,
-    component: '',
-    componentProps: {},
-    body: {
-      title: '',
-      description: '',
-      buttons: [] as Button[],
-	  },
-    persistent: false,
-    dialogStyles: {},
-  }),
+export const useDialog = defineStore('dialog', () => {
+  const router = useRouter()
 
-  actions: {
-    closeDialog() {
-      this.show = false
-    },
+  const show = ref(false)
+  const component = ref('')
+  const componentProps = ref({})
+  const body = ref<DialogBody>({
+    title: '',
+    description: '',
+    buttons: [] as Button[],
+  })
+  const persistent = ref(false)
+  const dialogStyles = ref({})
 
-    showDialog(persistent: boolean, component: any, componentProps?: object, body?: DialogBody, dialogStyles?: StyleValue ) {
-      const isDialogShowing = this.show
-      if (this.show) this.closeDialog()
+  const closeDialog = () => {
+    show.value = false
+  }
 
-      setTimeout(() => {
-        this.persistent = persistent
-        this.component = markRaw(component)
-        this.componentProps = componentProps ?? {}
-        this.body = this.body || {}
-        this.body.title = body?.title ?? ''
-        this.body.description = body?.description ?? ''
-        this.body.buttons = body?.buttons ?? []
-        this.dialogStyles = dialogStyles || {}
-        this.show = true
-      }, isDialogShowing ? 400 : 0)
-    },
+  const showDialog = (
+    persistentDialog: boolean, 
+    dialogComponent: any, 
+    dialogComponentProps?: object, 
+    dialogBody?: DialogBody, 
+    dialogBodyStyles?: object, 
+    route?: string | { path: string }
+  ) => {
+
+    const isDialogShowing = show.value
+    if (show.value) closeDialog()
+
+    if (route) typeof route === 'string' ? router.push(route) : router.push(route.path)
+    setTimeout(() => {
+      persistent.value = persistentDialog
+      component.value = markRaw(dialogComponent)
+      componentProps.value = dialogComponentProps ?? {}
+      body.value = dialogBody ?? {}
+      body.value.title = dialogBody?.title ?? ''
+      body.value.description = dialogBody?.description ?? ''
+      body.value.buttons = dialogBody?.buttons ?? []
+      dialogStyles.value = dialogBodyStyles || {}
+      show.value = true
+    }, isDialogShowing ? 400 : 0)
+  }
+
+  return {
+    show,
+    dialogStyles,
+    body,
+    component,
+    componentProps,
+    persistent, 
+
+    closeDialog,
+    showDialog,
   }
 })

@@ -64,7 +64,7 @@
             ></v-list-item>
             <v-list-item
               v-else
-              @click="showDialog(true, AddProjectAlias, { projects, onSubmitClick: onAddProjectAliasSubmit })"
+              @click="showDialog(false, AddProjectAlias, { projects, onSubmitClick: onAddProjectAliasSubmit })"
               variant="tonal"
               append-icon="mdi-plus"
             >Add New Alias</v-list-item>
@@ -123,7 +123,6 @@
       ></v-btn>
     </v-sheet>
   </v-sheet>
-
 </template>
 
 <script setup lang="ts">
@@ -134,6 +133,7 @@ import { useSingleTimesheetDisplay, useHandleTimesheetDisplay, useGoogleUserData
 import { useDialog } from '../stores/useUserInterfaceStore'
 import { useDataStatus } from '../composables/useCheckBeforeRouteLeave'
 import { useDisplay } from 'vuetify'
+import { useRouter } from 'vue-router'
 
 import AddProjectAlias from './AddProjectAlias.vue'
 
