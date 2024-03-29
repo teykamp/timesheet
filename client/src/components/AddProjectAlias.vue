@@ -17,6 +17,9 @@
           @click="() => {
             props.componentProps.onSubmitClick(alias)
             closeDialog()
+            if (!userAllowSaveCookies) showSnackbar('You do not have cookies enabled so your alias will not be saved between sessions.', 'warning', { text: 'Enable', onClick: () => {
+              showDialog(false, UserSettings)
+            }, showButton: true })
           }"
           :disabled="!alias.projectname || initialValue?.projectname === alias.projectname && initialValue?.projectid === alias.projectid"
           :append-icon="props.componentProps.initialAliasValue ? 'mdi-arrow-right': 'mdi-plus'"
@@ -31,10 +34,15 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import { useDialog } from '../stores/useUserInterfaceStore'
+import { storeToRefs } from 'pinia'
+import { useDialog, useSnackbar } from '../stores/useUserInterfaceStore'
+import { useHandleUserSettings } from '../stores/useDataStore'
 import type { Project, ProjectAlias } from '../types/types'
+import UserSettings from './UserSettings.vue'
 
-const { closeDialog } = useDialog()
+const { closeDialog, showDialog } = useDialog()
+const { showSnackbar } = useSnackbar()
+const { userAllowSaveCookies } = storeToRefs(useHandleUserSettings())
 
 const props = defineProps<{
   componentProps: { 

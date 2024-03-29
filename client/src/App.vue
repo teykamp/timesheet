@@ -7,7 +7,14 @@
       :timeout="3000" 
       :color="snackbar.color"
       style="font-family: Roboto Slab;"
-    >{{ snackbar.text }}</v-snackbar>
+    >
+    {{ snackbar.text }}
+    <v-btn 
+      v-if="snackbar.snackbarButton.showButton"
+      @click="snackbar.snackbarButton.onClick"
+      variant="text"
+    >{{ snackbar.snackbarButton.text }}</v-btn>
+    </v-snackbar>
     <v-dialog
       v-model="show"
       :style="{

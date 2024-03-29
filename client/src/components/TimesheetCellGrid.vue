@@ -133,7 +133,6 @@ import { useSingleTimesheetDisplay, useHandleTimesheetDisplay, useGoogleUserData
 import { useDialog } from '../stores/useUserInterfaceStore'
 import { useDataStatus } from '../composables/useCheckBeforeRouteLeave'
 import { useDisplay } from 'vuetify'
-import { useRouter } from 'vue-router'
 
 import AddProjectAlias from './AddProjectAlias.vue'
 
