@@ -50,14 +50,24 @@ export const useSnackbar = defineStore('snackbar', {
   state: () => ({
     show: false,
     text: '',
-    color: ''
+    color: '',
+    snackbarButton: {
+      text: '',
+      onClick: () => {},
+      showButton: false,
+    },
   }),
   
   actions: {
-    showSnackbar(text: string, color: string = '') {
+    showSnackbar(text: string, color: string = '', button?: { text: string, onClick: () => void, showButton: boolean}) {
       this.show = true
       this.text = text
       this.color = color
+      this.snackbarButton = button || {
+        text: '',
+        onClick: () => {},
+        showButton: false,
+      }
     },
   }
 })
