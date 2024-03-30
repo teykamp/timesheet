@@ -3,17 +3,17 @@
     <Navbar />
     <RouterView />
     <v-snackbar 
-      v-model="snackbar.show" 
+      v-model="isSnackbarVisible" 
       :timeout="3000" 
-      :color="snackbar.color"
+      :color="snackbarColor"
       style="font-family: Roboto Slab;"
     >
-    {{ snackbar.text }}
+    {{ snackbarText }}
     <v-btn 
-      v-if="snackbar.snackbarButton.showButton"
-      @click="snackbar.snackbarButton.onClick"
+      v-if="snackbarButton"
+      @click="snackbarButton.onClick"
       variant="text"
-    >{{ snackbar.snackbarButton.text }}</v-btn>
+    >{{ snackbarButton.text }}</v-btn>
     </v-snackbar>
     <v-dialog
       v-model="show"
@@ -35,6 +35,6 @@ import { storeToRefs } from 'pinia'
 
 import { useSnackbar, useDialog } from './stores/useUserInterfaceStore'
 
-const snackbar = useSnackbar()
+const { isSnackbarVisible, snackbarButton, snackbarColor, snackbarText } = storeToRefs(useSnackbar())
 const { show, persistent, dialogStyles } = storeToRefs(useDialog())
 </script>

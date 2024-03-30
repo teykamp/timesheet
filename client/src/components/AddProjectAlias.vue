@@ -18,8 +18,8 @@
             props.componentProps.onSubmitClick(alias)
             closeDialog()
             if (!userAllowSaveCookies) showSnackbar('You do not have cookies enabled so your alias will not be saved between sessions.', 'warning', { text: 'Enable', onClick: () => {
-              showDialog(false, UserSettings)
-            }, showButton: true })
+              showDialog(false, UserSettings, undefined, undefined, { 'max-width': '400px' })
+            }})
           }"
           :disabled="!alias.projectname || initialValue?.projectname === alias.projectname && initialValue?.projectid === alias.projectid"
           :append-icon="props.componentProps.initialAliasValue ? 'mdi-arrow-right': 'mdi-plus'"

@@ -6,6 +6,13 @@ interface LoadingState {
   isTimesheetContentLoading: boolean;
 }
 
+export type Button = {
+  // need to update to accept icons also
+  text: string;
+  onClick: () => void;
+  color?: string;
+}
+
 export const useLoadingScreen = defineStore('loading', {
   state: () => ({
     isTimesheetListLoading: true,
@@ -46,38 +53,33 @@ export const useColorPalette = defineStore('colors',{
 	}		
 })
 
-export const useSnackbar = defineStore('snackbar', {
-  state: () => ({
-    show: false,
-    text: '',
-    color: '',
-    snackbarButton: {
+export const useSnackbar = defineStore('snackbar', () => {
+  const isSnackbarVisible = ref(false)
+  const snackbarText = ref('')
+  const snackbarColor = ref('')
+  const snackbarButton = ref<undefined | Button>(undefined)
+
+  const showSnackbar = (text: string, color?: string, button?: Button) => {
+    isSnackbarVisible.value = true
+    snackbarText.value = text
+    snackbarColor.value = color ?? ''
+    snackbarButton.value = button || {
       text: '',
       onClick: () => {},
-      showButton: false,
-    },
-  }),
-  
-  actions: {
-    showSnackbar(text: string, color: string = '', button?: { text: string, onClick: () => void, showButton: boolean}) {
-      this.show = true
-      this.text = text
-      this.color = color
-      this.snackbarButton = button || {
-        text: '',
-        onClick: () => {},
-        showButton: false,
-      }
-    },
+      color: undefined,
+    }
+  }
+
+  return {
+    isSnackbarVisible,
+    snackbarText,
+    snackbarColor,
+    snackbarButton,
+
+    showSnackbar,
   }
 })
 
-export type Button = {
-  // need to update to accept icons also
-  text: string;
-  onClick: () => void;
-  color?: string;
-}
 
 type DialogBody = {
   title?: string
