@@ -97,7 +97,7 @@ export const useDialog = defineStore('dialog', () => {
   const router = useRouter()
 
   const show = ref(false)
-  const component = ref('')
+  const component = ref(undefined)
   const componentProps = ref({})
   const body = ref<DialogBody>({
     title: '',
@@ -113,7 +113,7 @@ export const useDialog = defineStore('dialog', () => {
 
   const showDialog = (
     persistentDialog: boolean, 
-    dialogComponent: any, 
+    dialogComponent?: any, 
     dialogComponentProps?: object, 
     dialogBody?: DialogBody, 
     dialogBodyStyles?: object, 
@@ -126,7 +126,7 @@ export const useDialog = defineStore('dialog', () => {
     if (route) typeof route === 'string' ? router.push(route) : router.push(route.path)
     setTimeout(() => {
       persistent.value = persistentDialog
-      component.value = markRaw(dialogComponent)
+      component.value = dialogComponent ? markRaw(dialogComponent) : undefined
       componentProps.value = dialogComponentProps ?? {}
       body.value = dialogBody ?? {}
       body.value.title = dialogBody?.title ?? ''

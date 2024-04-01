@@ -9,7 +9,10 @@
     <p class="my-3">
       {{ body.description }}
     </p>
-    <component :is="component" :componentProps="componentProps"></component>
+    <component
+      :is="component" 
+      :componentProps="componentProps"
+    ></component>
     <v-btn 
       v-for="button in body.buttons" 
       :key="button.text" 
@@ -22,8 +25,6 @@
       :text="button.text ?? ''"
     >
     </v-btn>
-
-    {{ body.buttons }}
   </v-sheet>
 </template>
 
