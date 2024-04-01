@@ -8,9 +8,15 @@ interface LoadingState {
 
 export type Button = {
   // need to update to accept icons also
-  text: string;
+  text?: string;
   onClick: () => void;
   color?: string;
+  variant?: "flat" | "text" | "elevated" | "tonal" | "outlined" | "plain" 
+  icon?: {
+    icon: string,
+    location?: 'prepend' | 'append'
+  };
+
 }
 
 export const useLoadingScreen = defineStore('loading', {

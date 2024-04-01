@@ -12,8 +12,12 @@
     <v-btn 
       v-if="snackbarButton"
       @click="snackbarButton.onClick"
-      variant="text"
-    >{{ snackbarButton.text }}</v-btn>
+      :prepend-icon="snackbarButton.icon?.location === 'prepend' ? snackbarButton.icon?.icon : undefined"
+      :append-icon="snackbarButton.icon?.location === 'append' ? snackbarButton.icon?.icon : undefined"
+      :icon="snackbarButton.icon?.location === undefined ? snackbarButton.icon?.icon : undefined"
+      :variant="snackbarButton.variant ?? (snackbarButton.text ? 'text' : 'tonal')"
+      :text="snackbarButton.text ?? ''"
+    ></v-btn>
     </v-snackbar>
     <v-dialog
       v-model="show"
