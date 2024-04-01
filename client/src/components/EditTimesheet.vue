@@ -94,6 +94,8 @@ import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 
+import type { Row, Entry } from '../types/types'
+
 import { useHandleTimesheetDisplay, useSingleTimesheetDisplay, useHandleManagerTimesheets } from '../stores/useDataStore'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { useLoadingScreen, useSnackbar, useColorPalette, useDialog } from '../stores/useUserInterfaceStore'
@@ -124,7 +126,7 @@ const computeApprovalButtonStyles = computed(() => currentEditTimesheet && curre
 
 const canSaveOrSubmitTimesheet = computed(() => timesheetData.value.length > 0
                                             && allRulesPassed.value
-                                            && timesheetData.value.every(row => row[0].projectid !== null)
+                                            && timesheetData.value.every(row => (row[0] as Row).projectid !== null)
                                             && timesheetDisplayStatus.value !== 'view'
                                           )
 
@@ -159,8 +161,8 @@ const buildTimesheetData = (status: Status) => {
         return {
           ...cell,
           entry: {
-            ...cell.entry,
-            projectid: row[0].projectid,
+            ...(cell as Entry).entry,
+            projectid: (row[0] as Row).projectid,
             date: currentDate,
           },
         }
