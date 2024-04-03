@@ -36,7 +36,6 @@
       </template>
     </IsUserLoggedInWrapper>
   </div>
-  {{ watchTimesheetViewState }}
 </template>
 
 <script setup lang="ts">
