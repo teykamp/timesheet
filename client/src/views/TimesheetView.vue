@@ -36,6 +36,7 @@
       </template>
     </IsUserLoggedInWrapper>
   </div>
+  {{ watchTimesheetViewState }}
 </template>
 
 <script setup lang="ts">
@@ -143,5 +144,5 @@ const getUserTimesheets = () => {
     })
 }
 
-const trackRef = useStateStatus(timesheetViewState, () => isTimesheetEmpty())
+const watchTimesheetViewState = useStateStatus(timesheetViewState, () => isTimesheetEmpty())
 </script>
