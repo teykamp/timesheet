@@ -69,11 +69,7 @@ export const useSnackbar = defineStore('snackbar', () => {
     isSnackbarVisible.value = true
     snackbarText.value = text
     snackbarColor.value = color ?? ''
-    snackbarButton.value = button || {
-      text: '',
-      onClick: () => {},
-      color: undefined,
-    }
+    snackbarButton.value = button
   }
 
   return {

@@ -278,7 +278,7 @@ export const useGoogleUserData = defineStore('googleUserData', {
         const authUrl = response.data.url
         window.location.href = authUrl
       } catch (error) {
-        console.error('Error fetching authentication URL', error.response.data)
+        console.error('Error fetching authentication URL', error)
       }
     },
 
@@ -303,10 +303,10 @@ export const useGoogleUserData = defineStore('googleUserData', {
               ...profileResponse.data.profileData
             })
           } catch (error) {
-            console.error('Error fetching user profile data', error.response.data)
+            console.error('Error fetching user profile data', error)
           }
         } catch (error) {
-          console.error('Error exchanging authorization code for access token', error.response.data)
+          console.error('Error exchanging authorization code for access token', error)
         }
       }
     }
