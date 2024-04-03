@@ -24,6 +24,7 @@ export const useDataStatus = (validateRequireUserAction: () => boolean) => {
 }
 
 export const useStateStatus = (refToWatch: Ref, validateRequireUserAction: () => boolean) => {
+  // DEPRICATED
   return watch(refToWatch, (newState, oldState) => {
     console.log(refToWatch.value, oldState)
 

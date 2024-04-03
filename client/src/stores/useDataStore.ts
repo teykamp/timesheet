@@ -100,8 +100,8 @@ export const useHandleTimesheetDisplay = defineStore('handleTimesheetDisplay', (
     updateTimesheetViewState('singleTimesheet')
   }
 
-  function updateTimesheetViewState(newState: TimesheetStateTypes) {
-    timesheetViewState.value = newState
+  function updateTimesheetViewState(newState: TimesheetStateTypes, beforeUpdateTimesheetViewState: () => boolean = () => true) {
+    if (beforeUpdateTimesheetViewState()) timesheetViewState.value = newState
   }
 
   return {

@@ -25,7 +25,7 @@
         </div>
         <v-btn
           v-if="timesheetViewState === 'singleTimesheet'"
-          @click="updateTimesheetViewState('allTimesheets')"
+          @click="updateTimesheetViewState('allTimesheets', leaveEditTimesheetState)"
           icon="mdi-chevron-left"
           flat
           class="position-absolute ml-4 mt-2"
@@ -48,8 +48,6 @@ import { useLoadingScreen, useDialog } from '../stores/useUserInterfaceStore'
 import type { Timesheet } from '../types/types'
 import { useGoogleUserData } from '../stores/useDataStore'
 import { timesheetHeaderData } from '../functions/headerData'
-
-import { useStateStatus } from '../composables/useCheckBeforeRouteLeave'
 
 import EditTimesheet from '../components/EditTimesheet.vue'
 import TimesheetListDisplay from '../components/TimesheetListDisplay.vue'
@@ -143,5 +141,8 @@ const getUserTimesheets = () => {
     })
 }
 
-const watchTimesheetViewState = useStateStatus(timesheetViewState, () => isTimesheetEmpty())
+const leaveEditTimesheetState = () => {
+  if (isTimesheetEmpty()) return true
+  return window.confirm('Do you really want to leave? You have unsaved changes!')
+}
 </script>
